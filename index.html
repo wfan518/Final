@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>National Heat Vulnerability Explorer</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;500;600&family=Lora:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     <link rel="stylesheet" href="https://unpkg.com/leaflet-gesture-handling/dist/leaflet-gesture-handling.min.css" type="text/css">
     <link rel="stylesheet" href="global.css">
@@ -16,6 +16,7 @@
         background:linear-gradient(180deg,var(--surface) 0%,rgba(37,147,143,.08) 52%,var(--surface) 100%);
         background-size:140% 140%;
         animation:explorerWash 16s ease-in-out infinite;
+        font-weight:500;
     }
     @keyframes explorerWash{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
 
@@ -36,7 +37,7 @@
     .hero-left > *:nth-child(5){animation-delay:.38s}
     .hero-left{flex:1;max-width:580px}
     .hero-tag{font-family:var(--mono);font-size:0.62rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--accent-strong);margin-bottom:18px;display:block}
-    .hero-left h1{font-family:var(--serif);font-size:clamp(2.5rem,4.3vw,3.75rem);font-weight:600;line-height:1.06;margin-bottom:24px;letter-spacing:-.02em}
+    .hero-left h1{font-family:var(--serif);font-size:clamp(2.5rem,4.3vw,3.75rem);font-weight:700;line-height:1.06;margin-bottom:24px}
     .hero-left h1 em{font-style:italic;color:var(--heat)}
     .hero-left p{font-size:1.05rem;color:var(--mid);line-height:1.72;margin-bottom:36px;max-width:500px}
     .hero-stats{
@@ -73,7 +74,7 @@
         pointer-events:none;
     }
     .sec-tag{font-family:var(--mono);font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:rgba(253,255,247,.72);margin-bottom:12px;display:block}
-    .sec-h{font-family:var(--serif);font-size:clamp(1.8rem,3vw,2.6rem);line-height:1.15;margin-bottom:14px}
+    .sec-h{font-family:var(--serif);font-size:clamp(1.8rem,3vw,2.6rem);font-weight:700;line-height:1.15;margin-bottom:14px}
     .sec-sub{font-size:1rem;color:rgba(253,255,247,.72);max-width:580px;line-height:1.65;margin-bottom:52px}
     .pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
     .pillar{
@@ -266,6 +267,15 @@
     }
     .back-btn:hover{border-color:var(--ink);color:var(--ink);transform:translateX(-2px)}
     .results-layout{display:grid;grid-template-columns:1fr 370px;gap:24px;align-items:start}
+    .result-mobile-tabs{display:none}
+    .summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+    .summary-card{
+        border:1px solid var(--border);border-radius:var(--radius);background:var(--paper);
+        padding:15px 16px;box-shadow:var(--shadow-sm);min-width:0;
+    }
+    .summary-label{display:block;font-family:var(--mono);font-size:.56rem;letter-spacing:.08em;text-transform:uppercase;color:var(--light);margin-bottom:7px}
+    .summary-value{display:block;font-family:var(--serif);font-size:1.35rem;line-height:1.1;color:var(--ink)}
+    .summary-note{display:block;font-size:.74rem;color:var(--mid);margin-top:5px;line-height:1.35}
 
     /* Map */
     .map-explorer-shell{
@@ -286,6 +296,15 @@
     .leaflet-control-zoom a{width:32px!important;height:32px!important;line-height:32px!important;background:var(--paper)!important;color:#334155!important}
     .leaflet-control-attribution{font-size:10px!important;background:rgba(255,255,255,.88)!important;border-radius:6px!important;padding:3px 8px!important}
     .leaflet-control-scale-line{border-color:rgba(58,46,57,.2)!important;background:rgba(253,255,247,.92)!important;font-family:var(--mono)!important;font-size:10px!important}
+    .map-legend{
+        position:absolute;right:14px;bottom:14px;z-index:450;
+        width:min(220px,calc(100% - 28px));padding:12px 13px;border:1px solid rgba(58,46,57,.16);
+        border-radius:8px;background:rgba(253,255,247,.94);box-shadow:0 8px 28px rgba(58,46,57,.16);
+        backdrop-filter:blur(8px);
+    }
+    .legend-title{font-family:var(--mono);font-size:.58rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mid);margin-bottom:8px}
+    .legend-ramp{height:8px;border-radius:999px;background:linear-gradient(90deg,#fdfff7,#c8eeea,#1aab9f,#c94a35,#3a2e39);border:1px solid rgba(58,46,57,.12)}
+    .legend-scale{display:flex;justify-content:space-between;margin-top:6px;font-family:var(--mono);font-size:.54rem;color:var(--light)}
 
     /* Theme tabs */
     .theme-tabs{display:flex;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:14px;background:var(--paper);box-shadow:var(--shadow-sm)}
@@ -313,6 +332,7 @@
         animation:fadeLift .28s cubic-bezier(.2,.8,.2,1) both;
     }
     .rank-row:hover{transform:translateX(3px);border-color:var(--accent);background:var(--accent-pale)}
+    .rank-row.selected{border-color:var(--accent);background:var(--accent-pale);box-shadow:0 0 0 2px rgba(37,147,143,.12)}
     .r-pos{font-family:var(--mono);font-size:.62rem;color:var(--light);width:18px;flex-shrink:0;text-align:center}
     .r-name{font-size:.86rem;flex:1;color:var(--ink)}
     .r-bar{width:80px;height:5px;background:rgba(0,0,0,.08);border-radius:2px;overflow:hidden;flex-shrink:0}
@@ -352,11 +372,11 @@
     /* Modal Overlay Styles */
     .modal-overlay { position: fixed; inset: 0; background: rgba(58,46,57,0.85); z-index: 10000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; backdrop-filter: blur(4px); padding: 20px; }
     .modal-overlay.open { opacity: 1; pointer-events: auto; }
-    .modal-content { background: var(--paper); width: 100%; max-width: 560px; max-height: calc(100vh - 40px); overflow-y: auto; border-radius: 20px; padding: 32px; position: relative; transform: translateY(20px); transition: transform 0.3s ease; box-shadow: 0 32px 64px rgba(0,0,0,0.4); }
+    .modal-content { background: var(--paper); width: 100%; max-width: 640px; max-height: calc(100vh - 40px); overflow-y: auto; border-radius: 20px; padding: 0; position: relative; transform: translateY(20px); transition: transform 0.3s ease; box-shadow: 0 32px 64px rgba(0,0,0,0.4); }
     .modal-content::-webkit-scrollbar { width: 8px; }
     .modal-content::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 4px; }
     .modal-overlay.open .modal-content { transform: translateY(0); }
-    .modal-close { position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.04); border: none; width: 32px; height: 32px; border-radius: 16px; font-size: 20px; line-height: 1; cursor: pointer; color: var(--ink); transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+    .modal-close { position: absolute; top: 18px; right: 18px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,.16); width: 32px; height: 32px; border-radius: 16px; font-size: 20px; line-height: 1; cursor: pointer; color: var(--paper); transition: 0.2s; display: flex; align-items: center; justify-content: center; z-index:2; }
     .modal-close:hover { background: rgba(0,0,0,0.1); }
     .more-info-btn { width: 100%; margin-top: 12px; padding: 10px; background: var(--accent-pale); border: 1px solid rgba(37,147,143,.4); color: var(--accent-strong); border-radius: 6px; cursor: pointer; font-family: var(--mono); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; transition: 0.2s; font-weight: 500; }
     .more-info-btn:hover { background: var(--accent); color: var(--paper); border-color: var(--accent); }
@@ -375,12 +395,19 @@
         border-color: var(--heat); 
     }
 
-    .hood-popup { padding: 24px; font-family: var(--sans); }
-    .hp-title { font-family: var(--serif); font-size: 2rem; color: var(--ink); margin: 0 0 6px; line-height: 1.1; padding-right: 16px; }
-    .hp-comp { font-family: var(--mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent-strong); margin-bottom: 24px; font-weight: 600; }
+    .hood-popup { font-family: var(--sans); }
+    .hp-hero{background:linear-gradient(155deg,#3a2e39 0%,#2f2630 55%,#211a20 100%);color:var(--paper);padding:30px 32px 28px;display:grid;grid-template-columns:1fr auto;gap:18px;align-items:end}
+    .hp-kicker{font-family:var(--mono);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(253,255,247,.58);margin-bottom:7px}
+    .hp-title { font-family: var(--serif); font-size: 2rem; color: var(--paper); margin: 0; line-height: 1.08; padding-right: 24px; }
+    .hp-score-box{text-align:right;border-left:1px solid rgba(253,255,247,.16);padding-left:22px;min-width:126px}
+    .hp-score{font-family:var(--serif);font-size:3rem;line-height:.9;color:var(--accent)}
+    .hp-score span{font-family:var(--mono);font-size:.72rem;color:rgba(253,255,247,.55)}
+    .hp-comp { font-family: var(--mono); font-size: 0.64rem; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(253,255,247,.62); margin-top: 8px; font-weight: 600; }
+    .hp-body{padding:24px 32px 30px}
+    .hp-compare{display:inline-flex;align-items:center;gap:8px;margin-bottom:18px;padding:7px 10px;border-radius:999px;background:var(--accent-pale);color:var(--accent-strong);font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;text-transform:uppercase}
     .hp-section { margin-bottom: 20px; }
     .hp-sec-title { font-family: var(--mono); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--light); margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
-    .hp-worst-grid { display: grid; gap: 10px; margin-bottom: 16px; }
+    .hp-worst-grid { display: grid; grid-template-columns:repeat(2,1fr); gap: 10px; margin-bottom: 16px; }
     .hp-worst-card { background: var(--warm); border-left: 4px solid; padding: 12px 14px; border-radius: 6px; box-shadow: var(--shadow-sm); }
     .hp-worst-name { font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; }
     .hp-worst-score { font-family: var(--mono); font-size: 1.25rem; font-weight: 600; line-height: 1; }
@@ -389,9 +416,14 @@
     .hp-bar-track { flex: 1; height: 6px; background: rgba(0,0,0,0.06); border-radius: 3px; overflow: hidden; }
     .hp-bar-fill { height: 100%; border-radius: 3px; transition: width .4s; }
     .hp-bar-val { font-family: var(--mono); font-size: 0.75rem; width: 28px; text-align: right; color: var(--ink); font-weight: 600; }
-    .hp-int-item { margin-bottom: 10px; background: rgba(255,255,255,0.7); border: 1px solid var(--border); padding: 12px; border-radius: 8px; }
-    .hp-int-name { font-size: 0.85rem; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+    .hp-actions{display:grid;gap:10px}
+    .hp-int-item { background: rgba(255,255,255,0.7); border: 1px solid var(--border); padding: 13px 14px; border-radius: 8px; }
+    .hp-int-theme{font-family:var(--mono);font-size:.54rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-strong);margin-bottom:5px}
+    .hp-int-name { font-size: 0.9rem; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
     .hp-int-desc { font-size: 0.8rem; color: var(--mid); line-height: 1.5; }
+    .hp-int-next{display:inline-block;margin-top:8px;font-family:var(--mono);font-size:.54rem;letter-spacing:.07em;text-transform:uppercase;color:var(--light)}
+    .hp-why { background: var(--warm); border: 1px solid var(--border); padding: 13px 14px; border-radius: 8px; color: var(--mid); font-size: .88rem; line-height: 1.55; }
+    @media(max-width:600px){.hp-hero{grid-template-columns:1fr;padding:26px 24px}.hp-score-box{text-align:left;border-left:0;border-top:1px solid rgba(253,255,247,.16);padding:16px 0 0}.hp-body{padding:22px 24px 26px}.hp-worst-grid{grid-template-columns:1fr}}
 
     /* Responsive */
     @media(max-width:960px){
@@ -405,6 +437,14 @@
         .pillars,.prov-grid{grid-template-columns:1fr}
         #hero{padding:80px 20px 48px}.nav-inner,section,#explorer,#problem{padding-left:20px;padding-right:20px}
             #explorer{border-radius:24px; padding:64px 20px 80px; margin:-24px 12px 64px}
+        .summary-grid{grid-template-columns:1fr}
+        .result-mobile-tabs{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;margin:0 0 16px}
+        .result-mobile-tabs button{font-family:var(--mono);font-size:.58rem;letter-spacing:.08em;text-transform:uppercase;padding:10px 8px;border:1px solid var(--border);border-radius:8px;background:var(--paper);color:var(--light)}
+        .result-mobile-tabs button.active{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+        .result-pane{display:none}
+        .result-pane.mobile-active{display:block}
+        .summary-pane.mobile-active{display:grid}
+        .map-legend{position:static;margin:10px 0 0;width:100%}
         .muni-controls{flex-direction:column;align-items:stretch}
         .muni-search{max-width:none}
         .rank-row { cursor: pointer; }
@@ -440,8 +480,8 @@
                 <span class="stat-l">Neighborhoods</span>
             </div>
             <div>
-                <span class="stat-n">5</span>
-                <span class="stat-l">Vulnerability themes</span>
+                <span class="stat-n">4+1</span>
+                <span class="stat-l">Drivers + risk score</span>
             </div>
             <div>
                 <span class="stat-n">2025–75</span>
@@ -463,26 +503,26 @@
         <span class="sec-tag">The tool</span>
         <h2 class="sec-h" style="color:var(--ink); font-size:clamp(2.2rem, 4vw, 3.2rem); margin-bottom: 20px;">Explore climate vulnerability<br>in your region</h2>
         <p style="font-size:1rem;color:var(--mid);max-width:560px;line-height:1.65;margin-bottom:0">
-            Select a province, then a municipality to see neighborhood-level vulnerability across five themes - and receive targeted intervention recommendations.
+            Search for a municipality or browse by province to see neighborhood-level vulnerability across four drivers plus a composite risk score - and receive targeted intervention recommendations.
         </p>
 
         <!-- Wizard Tabs -->
         <div class="wizard-tabs">
-            <button class="wiz-tab active" id="wizProv" onclick="goToStep(1)">
+            <button class="wiz-tab active" id="wizProv" data-step="1">
                 <div class="wiz-num">1</div>
                 <div class="wiz-text">
                     <div class="wiz-label">Province</div>
                     <div class="wiz-val" id="lblProv">Select province...</div>
                 </div>
             </button>
-            <button class="wiz-tab" id="wizMuni" onclick="goToStep(2)" disabled>
+            <button class="wiz-tab" id="wizMuni" data-step="2" disabled>
                 <div class="wiz-num">2</div>
                 <div class="wiz-text">
                     <div class="wiz-label">Municipality</div>
                     <div class="wiz-val" id="lblMuni">Pending...</div>
                 </div>
             </button>
-            <button class="wiz-tab" id="wizRes" onclick="goToStep(3)" disabled>
+            <button class="wiz-tab" id="wizRes" data-step="3" disabled>
                 <div class="wiz-num">3</div>
                 <div class="wiz-text">
                     <div class="wiz-label">Results</div>
@@ -495,12 +535,12 @@
         <div class="wiz-panel active" id="panelProv">
             <div class="panel-header-row">
                 <h3 style="font-family:var(--serif);font-size:1.6rem; margin:0; color:var(--ink);">Select your province</h3>
-                <select id="provSort" style="display: none; margin: 0;">
-                    <option value="composite">Rank Provinces by: Composite Risk</option>
-                    <option value="theme_heat">Rank by: Heat Exposure</option>
-                    <option value="theme_populations">Rank by: Vulnerable Populations</option>
-                    <option value="theme_socioeconomic">Rank by: Socioeconomic Deprivation</option>
-                    <option value="theme_built_environment_access">Rank by: Built Environment & Access</option>
+                    <select id="provSort" style="margin: 0;">
+                        <option value="composite">Rank Provinces by: Composite Risk</option>
+                        <option value="theme_heat">Rank by: Heat Exposure</option>
+                        <option value="theme_populations">Rank by: Vulnerable Populations</option>
+                        <option value="theme_socioeconomic">Rank by: Socioeconomic Deprivation</option>
+                        <option value="theme_built_environment_access">Rank by: Built Environment & Access</option>
                 </select>
             </div>
             <!-- Data status -->
@@ -545,32 +585,54 @@
                 <div id="scenarioSelector" style="display: flex; align-items: center; gap: 8px; margin: 10px 0;">
                     <span style="font-family: var(--mono); font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--light);">Projected Scenario:</span>
                     <div style="display: flex; background: var(--warm); border-radius: 99px; padding: 4px; border: 1px solid var(--border);">
-                        <button class="scen-pill active" data-scen="risk_2024_baseline">2024</button>
+                        <button class="scen-pill active" data-scen="risk_2025_baseline">2025</button>
                         <button class="scen-pill" data-scen="risk_2050_baseline">2050</button>
-                        <button class="scen-pill" data-scen="risk_2100_baseline">2100</button>
+                        <button class="scen-pill" data-scen="risk_2075_baseline">2075</button>
                         <button class="scen-pill policy" data-scen="risk_2050_greening">2050 with intervention</button>
                     </div>
                 </div>
                 <button class="back-btn" id="backBtn">← Back to municipalities</button>
             </div>
 
+            <div class="summary-grid result-pane summary-pane mobile-active" id="resultSummary"></div>
+
+            <div class="result-mobile-tabs" id="resultMobileTabs">
+                <button type="button" class="active" data-result-view="summary">Summary</button>
+                <button type="button" data-result-view="map">Map</button>
+                <button type="button" data-result-view="neighborhoods">Neighborhoods</button>
+                <button type="button" data-result-view="interventions">Interventions</button>
+            </div>
+
             <div class="results-layout">
                 <!-- Left: map + rankings -->
                 <div>
+                    <div class="map-pane result-pane" data-result-pane="map">
                     <div class="map-explorer-shell">
                         <div id="r-map"></div>
+                        <div class="map-legend" id="mapLegend">
+                            <div class="legend-title">Composite risk score</div>
+                            <div class="legend-ramp"></div>
+                            <div class="legend-scale"><span>0 low</span><span>50</span><span>100 high</span></div>
+                        </div>
                     </div>
                     <div class="theme-tabs" id="themeTabs"></div>
+                    </div>
+                    <div class="rank-pane result-pane" data-result-pane="neighborhoods">
                     <input type="search" id="rankSearch" class="muni-search" style="max-width:100%;margin-bottom:4px" placeholder="Filter neighborhoods in this municipality…" aria-label="Filter neighborhoods">
                     <div class="rank-scroll">
                         <div class="rank-list" id="rankList"></div>
                     </div>
+                    </div>
                 </div>
                 <!-- Right: overview + interventions -->
                 <div>
+                    <div class="overview-pane result-pane" data-result-pane="summary">
                     <div class="overview-card" id="overviewCard"></div>
+                    </div>
+                    <div class="interventions-pane result-pane" data-result-pane="interventions">
                     <div class="int-title">Recommended interventions</div>
                     <div id="intList"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -608,9 +670,9 @@
 </section>
 
 <!-- NEIGHBORHOOD MODAL -->
-<div id="hoodModal" class="modal-overlay" onclick="closeModal()">
-    <div class="modal-content" onclick="event.stopPropagation()">
-        <button class="modal-close" onclick="closeModal()">×</button>
+<div id="hoodModal" class="modal-overlay">
+    <div class="modal-content">
+        <button class="modal-close" type="button" aria-label="Close detailed report">×</button>
         <div id="modalBody"></div>
     </div>
 </div>
@@ -651,6 +713,7 @@ const THEMES = [
     {key:'theme_socioeconomic', short:'Socio.',     label:'Socioeconomic',           color:'#c27728'},
     {key:'theme_built_environment_access', short:'Built+', label:'Built Environment & Access', color:'#3a7baa'},
 ];
+const DRIVER_THEMES = THEMES.filter(t => t.key !== 'composite');
 
 const RAMPS = {
     theme_heat:         ['#fdfff7','#fbd9cc','#e58060','#c94a35','#3a2e39'],
@@ -704,7 +767,7 @@ let activeProv = null;
 let activeMuni = null;
 let activeMuniFeats = null;
 let activeTheme = THEMES[0]; // Defaults to Composite Risk
-let activeScenario = 'risk_2024_baseline';
+let activeScenario = 'risk_2025_baseline';
 let currentProvSortTheme = 'composite'; 
 let currentMuniSortTheme = 'composite'; 
 let rMap = null, rLayer = null;
@@ -723,7 +786,6 @@ function featsForGemeente(name) {
     const n = normGm(name);
     return geoData.features.filter(f => normGm(f.properties.gemeentenaam) === n);
 }
-
 // ═══════════════════════════════════════════════════════════
 // BOOT
 // ═══════════════════════════════════════════════════════════
@@ -731,6 +793,21 @@ buildHeatGrid();
 renderProvinceGrid(); // Renders empty grid before data loads
 buildThemeTabs();
 document.getElementById('backBtn').addEventListener('click', backToMuniList);
+document.querySelectorAll('.wiz-tab[data-step]').forEach(btn => {
+    btn.addEventListener('click', () => goToStep(Number(btn.dataset.step)));
+});
+document.getElementById('hoodModal')?.addEventListener('click', e => {
+    if (e.target.id === 'hoodModal') closeModal();
+});
+document.querySelector('.modal-close')?.addEventListener('click', closeModal);
+document.addEventListener('click', e => {
+    const moreInfo = e.target.closest('.more-info-btn[data-id]');
+    if (moreInfo) openModal(moreInfo.dataset.id);
+});
+document.getElementById('resultMobileTabs')?.addEventListener('click', e => {
+    const btn = e.target.closest('button[data-result-view]');
+    if (btn) setMobileResultView(btn.dataset.resultView);
+});
 document.getElementById('provSort').addEventListener('change', e => {
     currentProvSortTheme = e.target.value;
     renderProvinceGrid();
@@ -756,6 +833,8 @@ document.querySelectorAll('.scen-pill').forEach(btn => {
             redrawLayer(activeMuniFeats);
             buildRankings(activeMuniFeats, activeTheme);
             buildOverview(activeMuniFeats, activeMuni);
+            buildResultSummary(activeMuniFeats, activeMuni);
+            updateMapLegend();
         }
     });
 });
@@ -783,21 +862,19 @@ async function loadGeoData() {
     try {
         const r = await fetch('map_scenarios.geojson');
         geoData = await r.json();
-        
         // Calculate true province averages across all matching neighborhoods
         PROVINCES.forEach(p => {
             const feats = geoData.features.filter(f =>
                 p.gemeenten.some(g => normGm(f.properties.gemeentenaam) === normGm(g))
             );
             const avg = arr => { const v=arr.filter(x=>x!=null&&!isNaN(x)); return v.length?v.reduce((a,b)=>a+b,0)/v.length:0; };
-            p.avgRisk = avg(feats.map(f => f.properties.risk_2024_baseline));
+            p.avgRisk = avg(feats.map(f => f.properties.risk_2025_baseline));
             p.themes = Object.fromEntries(THEMES.map(t => [t.key, avg(feats.map(f => scoreValue(f.properties, t.key)))]));
         });
 
         const statusEl = document.getElementById('dataStatus');
         statusEl.innerHTML = `${geoData.features.length.toLocaleString()} neighborhoods loaded — select a province to begin`;
             
-        document.getElementById('provSort').style.display = 'block';
         renderProvinceGrid();
 
     } catch(e) {
@@ -943,7 +1020,7 @@ function rankGemeenten(gemeenten, sortTheme) {
 }
 
 function worstThemes(gm, n) {
-    return THEMES.map(t => ({...t, score: gm.themes[t.key]||0}))
+    return DRIVER_THEMES.map(t => ({...t, score: gm.themes[t.key]||0}))
         .sort((a,b) => b.score-a.score).slice(0,n);
 }
 
@@ -966,12 +1043,15 @@ function selectMuni(name) {
 
     document.getElementById('rMuniName').textContent = name;
     document.getElementById('rMuniMeta').textContent =
-        `${feats.length} neighborhoods · ${activeProv?.name||''} · 2024 baseline`;
+        `${feats.length} neighborhoods · ${activeProv?.name||'Netherlands'} · 2025 baseline`;
 
         goToStep(3);
+        setMobileResultView('summary');
 
     setTimeout(() => {
         initMap(feats);
+        updateMapLegend();
+        buildResultSummary(feats, name);
         buildOverview(feats, name);
         buildRankings(feats, activeTheme);
         buildInterventions(feats);
@@ -1042,7 +1122,7 @@ function buildNeighborhoodPopup(feature, id) {
         <div style="font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);margin-bottom:2px;line-height:1.1">${n}</div>
         <div style="font-family:var(--mono);font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-strong);margin-bottom:14px">${scenLabel} Risk: ${comp}/100</div>
         ${statsHtml}
-        <button class="more-info-btn" data-id="${escapeHtml(id)}" onclick="openModal(this.getAttribute('data-id'))">Detailed Report →</button>
+        <button class="more-info-btn" type="button" data-id="${escapeHtml(id)}">Detailed Report →</button>
     </div>`;
 }
 
@@ -1054,14 +1134,25 @@ function openModal(id) {
     const comp = p[activeScenario] != null ? Math.round(p[activeScenario]) : '—';
     const scenLabel = activeScenario === 'risk_2050_greening' ? '2050 with intervention' : activeScenario.split('_')[1];
 
-    const worstThemes = THEMES.map(t => ({
+    const worstThemes = DRIVER_THEMES.map(t => ({
         ...t, score: scoreValue(p, t.key) || 0
     })).sort((a,b) => b.score - a.score).slice(0, 2);
+    const avg = arr => { const v=arr.filter(x=>x!=null&&!isNaN(x)); return v.length?v.reduce((a,b)=>a+b,0)/v.length:0; };
+    const muniAvg = activeMuniFeats ? Math.round(avg(activeMuniFeats.map(f=>f.properties[activeScenario]))) : null;
+    const diff = muniAvg != null && comp !== '—' ? Math.round(comp - muniAvg) : null;
+    const compareBadge = diff == null ? 'Municipality comparison unavailable' :
+        diff > 0 ? `${diff} points above municipality average` :
+        diff < 0 ? `${Math.abs(diff)} points below municipality average` :
+        'Matches municipality average';
+    const comparison = diff == null ? 'No municipality comparison is available for the active scenario.' :
+        diff >= 8 ? `${n} is well above the municipality average, so it should be treated as a priority location.` :
+        diff <= -8 ? `${n} is below the municipality average, but its strongest drivers still show where local prevention can help.` :
+        `${n} is close to the municipality average; focus on the strongest drivers rather than the composite score alone.`;
 
     const worstHtml = worstThemes.map(wt => `
         <div class="hp-worst-card" style="border-left-color: ${wt.color}">
             <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                <div class="hp-worst-name" style="color: ${wt.color}">${wt.label}</div>
+                <div class="hp-worst-name" style="color: ${wt.color}">${escapeHtml(wt.label)}</div>
                 <div class="hp-worst-score" style="color: ${wt.color}">${Math.round(wt.score)}<span style="font-size:0.6em;opacity:0.6">/100</span></div>
             </div>
         </div>
@@ -1089,32 +1180,51 @@ function openModal(id) {
             const item = cfg.items[0];
             intHtml += `
             <div class="hp-int-item">
-                <div class="hp-int-name">${item.name}</div>
-                <div class="hp-int-desc">${item.desc}</div>
+                <div class="hp-int-theme">${escapeHtml(cfg.label)}</div>
+                <div class="hp-int-name">${escapeHtml(item.name)}</div>
+                <div class="hp-int-desc">${escapeHtml(item.desc)}</div>
+                <span class="hp-int-next">Next step: scope this for the highest-risk streets</span>
             </div>`;
         }
     });
 
     document.getElementById('modalBody').innerHTML = `
-    <div class="hood-popup" style="padding:0">
-        <h3 class="hp-title">${n}</h3>
-        <div class="hp-comp">${scenLabel} Risk: ${comp}/100</div>
-        
+    <div class="hood-popup">
+        <div class="hp-hero">
+            <div>
+                <div class="hp-kicker">Neighborhood detailed report</div>
+                <h3 class="hp-title">${escapeHtml(n)}</h3>
+            </div>
+            <div class="hp-score-box">
+                <div class="hp-score">${comp}<span>/100</span></div>
+                <div class="hp-comp">${escapeHtml(scenLabel)} risk</div>
+            </div>
+        </div>
+
+        <div class="hp-body">
+        <div class="hp-compare">${escapeHtml(compareBadge)}</div>
+
         <div class="hp-section">
-            <div class="hp-sec-title">Critical Vulnerabilities</div>
+            <div class="hp-sec-title">Why it matters</div>
+            <div class="hp-why">${escapeHtml(comparison)}</div>
+        </div>
+
+        <div class="hp-section">
+            <div class="hp-sec-title">Main drivers</div>
             <div class="hp-worst-grid">
                 ${worstHtml}
             </div>
         </div>
 
         <div class="hp-section">
-            <div class="hp-sec-title">Priority Interventions</div>
-            ${intHtml}
+            <div class="hp-sec-title">Recommended actions</div>
+            <div class="hp-actions">${intHtml}</div>
         </div>
 
         <div class="hp-section" style="margin-bottom:0">
             <div class="hp-sec-title">All Theme Scores</div>
             ${allHtml}
+        </div>
         </div>
     </div>`;
 
@@ -1146,6 +1256,9 @@ function redrawLayer(feats) {
             layer.on('mouseout', function () {
                 this.setStyle(featStyle(f));
             });
+            layer.on('click', function () {
+                setSelectedNeighborhood(id);
+            });
         },
     }).addTo(rMap);
 }
@@ -1164,6 +1277,7 @@ function buildThemeTabs() {
             activeTheme = t;
             document.querySelectorAll('.theme-tab').forEach(x => x.classList.toggle('on', x.dataset.key===t.key));
             document.getElementById('scenarioSelector').style.display = (t.key === 'composite') ? 'flex' : 'none';
+            updateMapLegend();
             if (activeMuni && activeMuniFeats) {
                 redrawLayer(activeMuniFeats);
                 buildRankings(activeMuniFeats, t);
@@ -1192,15 +1306,17 @@ function buildRankings(feats, theme) {
         const s = Math.round(scoreValue(f.properties, targetKey));
         const row = document.createElement('div');
         row.className = 'rank-row';
+        row.dataset.id = f.properties.buurtcode || f.properties.buurtnaam;
         row.style.animationDelay = `${Math.min(i * 0.015, 0.18)}s`;
         row.style.cursor = 'pointer';
-        row.innerHTML = `<span class="r-pos">${i+1}</span><span class="r-name">${f.properties.buurtnaam||'—'}</span><div class="r-bar"><div class="r-fill" style="width:${s}%;background:${theme.color}"></div></div><span class="r-val">${s}</span>`;
+        row.innerHTML = `<span class="r-pos">${i+1}</span><span class="r-name">${escapeHtml(f.properties.buurtnaam||'—')}</span><div class="r-bar"><div class="r-fill" style="width:${s}%;background:${theme.color}"></div></div><span class="r-val">${s}</span>`;
         
         row.addEventListener('click', () => {
             const id = f.properties.buurtcode || f.properties.buurtnaam;
             const layer = layerMap[id];
             if (layer) {
                 rMap.fitBounds(layer.getBounds(), { padding: [30, 30], maxZoom: 13 });
+                setSelectedNeighborhood(id);
                 openModal(id);
             }
         });
@@ -1232,12 +1348,41 @@ function buildOverview(feats, name) {
         <div class="ov-rows">${rows}</div>`;
 }
 
+function buildResultSummary(feats, name) {
+    const avg = arr => { const v=arr.filter(x=>x!=null&&!isNaN(x)); return v.length?v.reduce((a,b)=>a+b,0)/v.length:0; };
+    const comp = Math.round(avg(feats.map(f=>f.properties[activeScenario])));
+    const topDriver = DRIVER_THEMES
+        .map(t => ({...t, score:avg(feats.map(f=>scoreValue(f.properties, t.key)))}))
+        .sort((a,b)=>b.score-a.score)[0];
+    const topNeighborhood = feats
+        .filter(f => f.properties[activeScenario] != null && !isNaN(f.properties[activeScenario]))
+        .sort((a,b)=>b.properties[activeScenario]-a.properties[activeScenario])[0];
+    const scenarioLabel = activeScenario === 'risk_2050_greening' ? '2050 intervention' : activeScenario.split('_')[1];
+
+    document.getElementById('resultSummary').innerHTML = `
+        <div class="summary-card">
+            <span class="summary-label">${escapeHtml(scenarioLabel)} risk</span>
+            <span class="summary-value">${isNaN(comp) ? '—' : comp}<span style="font-size:.62em;color:var(--light)">/100</span></span>
+            <span class="summary-note">Average composite score for ${escapeHtml(name)}.</span>
+        </div>
+        <div class="summary-card">
+            <span class="summary-label">Top driver</span>
+            <span class="summary-value">${escapeHtml(topDriver?.short || '—')}</span>
+            <span class="summary-note">${topDriver ? `${Math.round(topDriver.score)}/100 · ${escapeHtml(topDriver.label)}` : 'No driver data available.'}</span>
+        </div>
+        <div class="summary-card">
+            <span class="summary-label">Highest-risk neighborhood</span>
+            <span class="summary-value">${escapeHtml(topNeighborhood?.properties.buurtnaam || '—')}</span>
+            <span class="summary-note">${topNeighborhood ? `${Math.round(topNeighborhood.properties[activeScenario])}/100 in active scenario.` : 'No ranked neighborhoods available.'}</span>
+        </div>`;
+}
+
 // ═══════════════════════════════════════════════════════════
 // INTERVENTIONS (based on 3 worst themes)
 // ═══════════════════════════════════════════════════════════
 function buildInterventions(feats) {
     const avg = arr => { const v=arr.filter(x=>x!=null&&!isNaN(x)); return v.length?v.reduce((a,b)=>a+b,0)/v.length:0; };
-    const worst3 = THEMES
+    const worst3 = DRIVER_THEMES
         .map(t => ({key:t.key, score:avg(feats.map(f=>scoreValue(f.properties, t.key)))}))
         .sort((a,b)=>b.score-a.score).slice(0,3).map(x=>x.key);
 
@@ -1277,10 +1422,33 @@ function goToStep(n) {
     document.getElementById('panelProv').classList.toggle('active', n === 1);
     document.getElementById('panelMuni').classList.toggle('active', n === 2);
     document.getElementById('panelResults').classList.toggle('active', n === 3);
+}
 
-    if (n > 1) {
-        document.getElementById('explorer').scrollIntoView({behavior: 'smooth', block: 'start'});
-    }
+function setMobileResultView(view) {
+    document.querySelectorAll('#resultMobileTabs button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.resultView === view);
+    });
+    document.querySelectorAll('.result-pane').forEach(pane => {
+        const paneView = pane.dataset.resultPane || (pane.id === 'resultSummary' ? 'summary' : '');
+        pane.classList.toggle('mobile-active', paneView === view);
+    });
+}
+
+function setSelectedNeighborhood(id) {
+    document.querySelectorAll('.rank-row').forEach(row => {
+        const selected = row.dataset.id === id;
+        row.classList.toggle('selected', selected);
+    });
+}
+
+function updateMapLegend() {
+    const legend = document.getElementById('mapLegend');
+    if (!legend) return;
+    const key = activeTheme.key === 'composite' ? 'composite' : activeTheme.key;
+    const ramp = RAMPS[key] || RAMPS.composite;
+    const label = activeTheme.key === 'composite' ? `Composite risk · ${activeScenario === 'risk_2050_greening' ? '2050 intervention' : activeScenario.split('_')[1]}` : activeTheme.label;
+    legend.querySelector('.legend-title').textContent = label;
+    legend.querySelector('.legend-ramp').style.background = `linear-gradient(90deg, ${ramp.join(',')})`;
 }
 
 function rampColor(score, key) {
