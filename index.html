@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fuck you</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;500;600&family=Lora:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-gesture-handling/dist/leaflet-gesture-handling.min.css" type="text/css">
+    <link rel="stylesheet" href="global.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-gesture-handling/dist/leaflet-gesture-handling.min.js"></script>
+    <style>
+    body{
+        background:linear-gradient(180deg,var(--surface) 0%,rgba(37,147,143,.08) 52%,var(--surface) 100%);
+        background-size:140% 140%;
+        animation:explorerWash 16s ease-in-out infinite;
+    }
+    @keyframes explorerWash{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+
+    /* ── HERO ── */
+    #hero{
+        min-height:100vh;padding:112px 32px 140px;
+        display:flex;align-items:center;
+        max-width:var(--w);margin:0 auto;gap:64px;
+        background-image:
+            radial-gradient(ellipse 90% 70% at 85% 15%, rgba(37,147,143,.10) 0%, transparent 50%),
+            radial-gradient(ellipse 60% 50% at 10% 80%, rgba(145,39,46,.07) 0%, transparent 45%);
+    }
+    .hero-left > *{animation:fadeLift .65s cubic-bezier(.2,.8,.2,1) both}
+    .hero-left > *:nth-child(1){animation-delay:.06s}
+    .hero-left > *:nth-child(2){animation-delay:.14s}
+    .hero-left > *:nth-child(3){animation-delay:.22s}
+    .hero-left > *:nth-child(4){animation-delay:.30s}
+    .hero-left > *:nth-child(5){animation-delay:.38s}
+    .hero-left{flex:1;max-width:580px}
+    .hero-tag{font-family:var(--mono);font-size:0.62rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--accent-strong);margin-bottom:18px;display:block}
+    .hero-left h1{font-family:var(--serif);font-size:clamp(2.5rem,4.3vw,3.75rem);font-weight:600;line-height:1.06;margin-bottom:24px;letter-spacing:-.02em}
+    .hero-left h1 em{font-style:italic;color:var(--heat)}
+    .hero-left p{font-size:1.05rem;color:var(--mid);line-height:1.72;margin-bottom:36px;max-width:500px}
+    .hero-stats{
+        display:flex;gap:32px;padding:24px 0;
+        border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+        margin-bottom:40px;
+    }
+    .stat-n{display:block;font-family:var(--serif);font-size:2.2rem;line-height:1}
+    .stat-l{display:block;font-family:var(--mono);font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--light);margin-top:4px}
+    .hero-cta{
+        display:inline-block;font-family:var(--mono);font-size:0.68rem;
+        letter-spacing:0.11em;text-transform:uppercase;
+        background:linear-gradient(135deg,var(--accent) 0%,var(--accent-strong) 100%);color:var(--paper);
+        text-decoration:none;padding:14px 32px;border-radius:999px;transition:.2s;
+        box-shadow:0 8px 28px rgba(37,147,143,.28);
+    }
+    .hero-cta{position:relative;overflow:hidden}
+    .hero-cta:hover{filter:brightness(1.06);transform:translateY(-2px)}
+    .hero-right{flex:0 0 360px;animation:fadeLift .75s cubic-bezier(.2,.8,.2,1) .22s both}
+    .heat-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:3px}
+    .heat-cell{aspect-ratio:1;border-radius:4px;animation:hpulse var(--d,3s) ease-in-out infinite var(--dl,0s)}
+    @keyframes hpulse{0%,100%{opacity:var(--mo,.4)}50%{opacity:1}}
+    .heat-caption{margin-top:10px;font-family:var(--mono);font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--light);text-align:center}
+
+    /* ── PROBLEM ── */
+    #problem{
+        background:linear-gradient(165deg,#3a2e39 0%,#2f2630 55%,#211a20 100%);
+        color:#fdfff7;padding:96px 32px;
+        position:relative;overflow:hidden;
+    }
+    #problem::before{
+        content:'';position:absolute;inset:0;
+        background:radial-gradient(ellipse 80% 60% at 70% 20%,rgba(37,147,143,.10) 0%,transparent 55%);
+        pointer-events:none;
+    }
+    .sec-tag{font-family:var(--mono);font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:rgba(253,255,247,.72);margin-bottom:12px;display:block}
+    .sec-h{font-family:var(--serif);font-size:clamp(1.8rem,3vw,2.6rem);line-height:1.15;margin-bottom:14px}
+    .sec-sub{font-size:1rem;color:rgba(253,255,247,.72);max-width:580px;line-height:1.65;margin-bottom:52px}
+    .pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+    .pillar{
+        padding:36px 28px;border:1px solid rgba(253,255,247,.14);
+        background:rgba(255,255,255,.03);border-radius:var(--radius);
+        backdrop-filter:blur(6px);
+        transition:transform .22s ease,border-color .22s ease,background .22s ease;
+    }
+    .pillar:hover{transform:translateY(-4px);border-color:rgba(37,147,143,.34);background:rgba(253,255,247,.06)}
+    .p-num{font-family:var(--serif);font-size:3rem;color:var(--accent);line-height:1;margin-bottom:14px;opacity:.65}
+    .pillar h3{font-family:var(--serif);font-size:1.35rem;color:var(--paper);margin-bottom:12px;line-height:1.2}
+    .pillar p{font-size:.9rem;color:rgba(253,255,247,.68);line-height:1.65}
+    .p-stat{
+        margin-top:20px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08);
+        font-family:var(--mono);font-size:.65rem;letter-spacing:.06em;text-transform:uppercase;
+        color:#25938f;
+    }
+
+    /* ── EXPLORER ── */
+    #explorer{
+        padding:88px 40px 96px;
+        background:var(--paper);
+        position:relative;
+        z-index:10;
+        border-radius:40px;
+        margin:-64px 32px 96px;
+        box-shadow:0 24px 64px rgba(58,46,57,.12), 0 -8px 32px rgba(58,46,57,.04);
+        max-width: 1300px;
+    }
+    @media(min-width: 1364px){
+        #explorer { margin-left: auto; margin-right: auto; }
+    }
+    #explorer .sec-inner > *{animation:fadeLift .52s cubic-bezier(.2,.8,.2,1) both}
+    #explorer .sec-inner > *:nth-child(1){animation-delay:.04s}
+    #explorer .sec-inner > *:nth-child(2){animation-delay:.08s}
+    #explorer .sec-inner > *:nth-child(3){animation-delay:.12s}
+    #explorer .sec-inner > *:nth-child(4){animation-delay:.16s}
+    #explorer .sec-tag { color: var(--accent-strong); font-weight: 600; }
+
+    /* Controls (dropdowns) */
+    select{
+        font-family:var(--mono);font-size:.68rem;letter-spacing:.04em;
+        padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius);
+        background:var(--paper);color:var(--ink);cursor:pointer;min-width:240px;
+        box-shadow:var(--shadow-sm);
+    }
+    select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-pale)}
+
+    /* Wizard Tabs */
+    .wizard-tabs {
+        display: flex; gap: 16px; margin-top: 36px; margin-bottom: 24px; flex-wrap: wrap;
+    }
+    .wiz-tab {
+        flex: 1; min-width: 220px;
+        display: flex; align-items: center; gap: 18px;
+        padding: 16px 24px; background: var(--paper); border: 2px solid var(--border);
+        border-radius: 20px; cursor: pointer; text-align: left;
+        transition: all 0.4s cubic-bezier(.2,.8,.2,1);
+        box-shadow: 0 4px 16px rgba(0,0,0,.04);
+    }
+    .wiz-tab:disabled { opacity: 0.45; cursor: not-allowed; background: transparent; box-shadow: none; border-color: rgba(0,0,0,.05); }
+    .wiz-tab:not(:disabled):hover { border-color: rgba(37,147,143,.4); transform: translateY(-4px); box-shadow: 0 12px 32px rgba(37,147,143,.15); }
+    .wiz-tab.active {
+        border-color: var(--accent); background: linear-gradient(145deg, #3a2e39, #2f2630); color: #fdfff7;
+        box-shadow: 0 12px 32px rgba(58,46,57,.25);
+    }
+    .wiz-num {
+        width: 36px; height: 36px; border-radius: 50%; background: var(--warm);
+        display: flex; align-items: center; justify-content: center;
+        font-family: var(--mono); font-weight: 600; font-size: 1rem; color: var(--mid);
+        transition: 0.4s;
+    }
+    .wiz-tab.active .wiz-num { background: var(--accent); color: var(--paper); box-shadow: 0 0 12px rgba(37,147,143,.4); }
+    .wiz-text { display: flex; flex-direction: column; gap: 4px; }
+    .wiz-label { font-family: var(--mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--light); }
+    .wiz-tab.active .wiz-label { color: rgba(253,255,247,.6); }
+    .wiz-val { font-size: 1.15rem; font-weight: 600; font-family: var(--serif); color: var(--ink); line-height: 1.1; }
+    .wiz-tab.active .wiz-val { color: #fdfff7; }
+
+    /* province grid */
+    .prov-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:24px}
+    .prov-btn{
+        padding:16px 44px 16px 16px;background:var(--paper);border:1px solid var(--border);
+        border-radius:var(--radius);cursor:pointer;text-align:left;transition:transform .18s ease,border-color .18s ease,background .18s ease,box-shadow .18s ease;
+        position:relative;overflow:hidden;box-shadow:var(--shadow-sm);
+        animation:fadeLift .42s cubic-bezier(.2,.8,.2,1) both;
+    }
+    .prov-btn:nth-child(4n+1){animation-delay:.03s}
+    .prov-btn:nth-child(4n+2){animation-delay:.08s}
+    .prov-btn:nth-child(4n+3){animation-delay:.13s}
+    .prov-btn:nth-child(4n+4){animation-delay:.18s}
+    .prov-btn::after{
+        content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+        background:var(--accent);transform:scaleY(0);transition:transform .2s;transform-origin:center;border-radius:2px 0 0 2px;
+    }
+    .prov-btn:hover{border-color:rgba(37,147,143,.45);background:var(--accent-pale);transform:translateY(-2px)}
+    .prov-btn:hover::after{transform:scaleY(1)}
+    .prov-btn.active{background:linear-gradient(145deg,#3a2e39,#2f2630);border-color:rgba(253,255,247,.18);animation:activeGlow 3.4s ease-in-out infinite}
+    .prov-btn.active::after{transform:scaleY(1)}
+    .pb-code{font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--light);display:block;margin-bottom:3px}
+    .pb-name{font-size:.95rem;font-weight:500;display:block;line-height:1.2}
+    .pb-city{font-size:.72rem;color:var(--light);display:block;margin-top:2px}
+    .prov-score{
+        position:absolute; top:18px; right:14px;
+        font-family:var(--mono); font-size:1rem; color:var(--accent-strong); font-weight:600;font-variant-numeric:tabular-nums;
+    }
+    .prov-btn.active .pb-code,.prov-btn.active .pb-city{color:rgba(248,250,252,.45)}
+    .prov-btn.active .pb-name{color:#fdfff7}
+    .prov-btn.active .prov-score{color:#25938f;}
+
+    /* data status */
+    .data-status{
+        display: flex; align-items: center;
+        font-family:var(--mono);font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;
+        color:var(--light);padding:18px 0;
+    }
+
+    /* ── CONTENT PANELS ── */
+    .wiz-panel {
+        display: none;
+        animation: slideIn .45s cubic-bezier(.2,.8,.2,1) forwards;
+    }
+    .wiz-panel.active { display: block; }
+    .panel-header-row {
+        display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 20px; padding-top: 12px; flex-wrap: wrap; gap: 12px;
+    }
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateY(30px) scale(0.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Municipality panel */
+    .muni-panel-head{
+        display:flex;align-items:center;justify-content:space-between;
+        margin-bottom:20px;flex-wrap:wrap;gap:12px;padding-top:28px;
+        border-top:1px solid var(--border);
+    }
+    .muni-panel-title{font-family:var(--serif);font-size:1.6rem}
+    .muni-panel-meta{font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--light);margin-top:2px}
+    .muni-controls{display:flex;gap:10px;align-items:center}
+
+    /* Municipality ranked cards — scroll when many gemeenten */
+    .muni-list-wrap{max-height:min(62vh,560px);overflow-y:auto;margin-bottom:8px;padding-right:6px;border-radius:var(--radius);border:1px solid var(--border);background:rgba(255,255,255,.5)}
+    .muni-list-wrap::-webkit-scrollbar{width:8px}
+    .muni-list-wrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+    .muni-search{
+        width:100%;max-width:320px;font-family:var(--sans);font-size:.85rem;padding:10px 14px;margin-bottom:12px;
+        border:1px solid var(--border);border-radius:var(--radius);background:var(--paper);
+    }
+    .muni-search:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 3px var(--accent-pale)}
+    .empty-state {
+        grid-column: 1 / -1;
+        padding: 40px 20px;
+        text-align: center;
+        border: 1px dashed var(--border);
+        border-radius: var(--radius);
+        background: var(--warm);
+    }
+    .empty-state h4 { font-family: var(--serif); font-size: 1.2rem; margin-bottom: 8px; }
+    .empty-state p { font-size: .9rem; color: var(--mid); max-width: 300px; margin: 0 auto; }
+    .muni-list{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;padding:10px}
+    .muni-card{
+        display:flex;align-items:center;gap:14px;
+        padding:13px 16px;border:1px solid var(--border);
+        border-radius:6px;cursor:pointer;transition:transform .18s ease,border-color .18s ease,background .18s ease,box-shadow .18s ease;background:var(--paper);
+        text-align:left;width:100%;box-shadow:var(--shadow-sm);
+        animation:fadeSlide .34s cubic-bezier(.2,.8,.2,1) both;
+    }
+    .muni-card:hover{border-color:var(--accent);background:var(--accent-pale);transform:translateY(-2px)}
+    .mc-rank{font-family:var(--mono);font-size:.65rem;color:var(--light);width:20px;flex-shrink:0;text-align:center}
+    .mc-name{font-size:.92rem;font-weight:500;flex:1;color:var(--ink)}
+    .mc-badges{display:flex;gap:3px;flex-shrink:0}
+    .mc-badge{
+        font-family:var(--mono);font-size:.55rem;letter-spacing:.05em;text-transform:uppercase;
+        padding:2px 5px;border-radius:1px;color:var(--paper);
+    }
+    .mc-score{font-family:var(--mono);font-size:.75rem;color:var(--accent-strong);flex-shrink:0;width:32px;text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+
+    /* Results panel */
+    .results-head{
+        display:flex;align-items:flex-start;justify-content:space-between;
+        padding-top:28px;border-top:1px solid var(--border);margin-bottom:22px;
+        flex-wrap:wrap;gap:12px;
+    }
+    .back-btn{
+        font-family:var(--mono);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;
+        padding:8px 14px;border:1px solid var(--border);border-radius:2px;
+        background:transparent;cursor:pointer;color:var(--mid);transition:.15s;flex-shrink:0;
+    }
+    .back-btn:hover{border-color:var(--ink);color:var(--ink);transform:translateX(-2px)}
+    .results-layout{display:grid;grid-template-columns:1fr 370px;gap:24px;align-items:start}
+
+    /* Map */
+    .map-explorer-shell{
+        border-radius:var(--radius);overflow:hidden;margin-bottom:18px;
+        border:1px solid var(--border);box-shadow:var(--shadow-md);
+        background:linear-gradient(180deg,rgba(37,147,143,.12) 0%,rgba(253,255,247,.9) 100%);
+        position:relative;
+        animation:mapBreath 5.5s ease-in-out infinite;
+    }
+    .map-explorer-shell::before{
+        content:'';pointer-events:none;position:absolute;inset:0;z-index:400;
+        border-radius:var(--radius);
+        box-shadow:inset 0 0 0 1px rgba(255,255,255,.5),inset 0 1px 40px rgba(58,46,57,.06);
+    }
+    #r-map{height:460px}
+    .leaflet-container{background:#dbeafe!important;border-radius:var(--radius)}
+    .leaflet-control-zoom{border:none!important;border-radius:8px!important;overflow:hidden;box-shadow:0 4px 16px rgba(58,46,57,.12)!important}
+    .leaflet-control-zoom a{width:32px!important;height:32px!important;line-height:32px!important;background:var(--paper)!important;color:#334155!important}
+    .leaflet-control-attribution{font-size:10px!important;background:rgba(255,255,255,.88)!important;border-radius:6px!important;padding:3px 8px!important}
+    .leaflet-control-scale-line{border-color:rgba(58,46,57,.2)!important;background:rgba(253,255,247,.92)!important;font-family:var(--mono)!important;font-size:10px!important}
+
+    /* Theme tabs */
+    .theme-tabs{display:flex;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:14px;background:var(--paper);box-shadow:var(--shadow-sm)}
+    .theme-tab{
+        position:relative;overflow:hidden;
+        flex:1;padding:9px 4px;background:transparent;border:none;border-right:1px solid var(--border);
+        cursor:pointer;font-family:var(--mono);font-size:.56rem;letter-spacing:.06em;text-transform:uppercase;
+        color:var(--light);transition:.15s;text-align:center;line-height:1.3;
+    }
+    .theme-tab:last-child{border-right:none}
+    .theme-tab:hover{background:var(--warm)}
+    .theme-tab.on{background:linear-gradient(135deg,#3a2e39,#2f2630);color:#fdfff7;animation:activeGlow 3.2s ease-in-out infinite}
+    .t-dot{display:block;width:6px;height:6px;border-radius:50%;background:currentColor;margin:0 auto 4px}
+
+    /* Neighborhood ranking — full list, scrollable */
+    .rank-scroll{max-height:min(50vh,420px);overflow-y:auto;padding-right:6px;margin-top:4px}
+    .rank-scroll::-webkit-scrollbar{width:8px}
+    .rank-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+    .rank-list{display:flex;flex-direction:column;gap:4px}
+    .rank-row{
+        display:flex;align-items:center;gap:10px;
+        padding:10px 13px;background:var(--paper);border:1px solid var(--border);border-radius:8px;
+        box-shadow:var(--shadow-sm);
+        transition:transform .16s ease,border-color .16s ease,background .16s ease;
+        animation:fadeLift .28s cubic-bezier(.2,.8,.2,1) both;
+    }
+    .rank-row:hover{transform:translateX(3px);border-color:var(--accent);background:var(--accent-pale)}
+    .r-pos{font-family:var(--mono);font-size:.62rem;color:var(--light);width:18px;flex-shrink:0;text-align:center}
+    .r-name{font-size:.86rem;flex:1;color:var(--ink)}
+    .r-bar{width:80px;height:5px;background:rgba(0,0,0,.08);border-radius:2px;overflow:hidden;flex-shrink:0}
+    .r-fill{height:100%;border-radius:2px;transition:width .4s}
+    .r-val{font-family:var(--mono);font-size:.7rem;color:var(--mid);width:26px;text-align:right}
+
+    /* Right panel */
+    .overview-card{background:linear-gradient(155deg,#3a2e39 0%,#2f2630 50%,#211a20 100%);color:#fdfff7;padding:22px;border-radius:var(--radius);margin-bottom:14px;box-shadow:var(--shadow-md);border:1px solid rgba(253,255,247,.14);animation:fadeLift .46s cubic-bezier(.2,.8,.2,1) both;transition:transform .2s ease,border-color .2s ease}
+    .overview-card:hover{transform:translateY(-2px);border-color:rgba(37,147,143,.35)}
+    .ov-name{font-family:var(--serif);font-size:1.4rem;margin-bottom:2px}
+    .ov-meta{font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.08em;color:rgba(253,255,247,.50);margin-bottom:16px;display:block}
+    .ov-rows{display:flex;flex-direction:column;gap:7px}
+    .ov-row{display:flex;align-items:center;gap:8px}
+    .ov-label{font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.04em;color:rgba(253,255,247,.58);width:70px;flex-shrink:0}
+    .ov-track{flex:1;height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden}
+    .ov-fill{height:100%;border-radius:2px}
+    .ov-val{font-family:var(--mono);font-size:.65rem;color:rgba(253,255,247,.78);width:24px;text-align:right;font-variant-numeric:tabular-nums}
+
+    /* Interventions */
+    .int-title{
+        font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;
+        color:var(--light);margin-bottom:10px;
+    }
+    .int-card{border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px;overflow:hidden;background:var(--paper);box-shadow:var(--shadow-sm);animation:fadeLift .34s cubic-bezier(.2,.8,.2,1) both;transition:transform .18s ease,border-color .18s ease}
+    .int-card:hover{transform:translateY(-2px);border-color:var(--accent)}
+    .int-bar{height:3px}
+    .int-body{padding:13px 15px}
+    .int-theme{font-family:var(--mono);font-size:.55rem;letter-spacing:.08em;text-transform:uppercase;color:var(--light);margin-bottom:5px;display:block}
+    .int-name{font-size:.88rem;font-weight:500;color:var(--ink);margin-bottom:5px;line-height:1.3}
+    .int-desc{font-size:.78rem;color:var(--mid);line-height:1.5}
+    .int-type{
+        display:inline-block;font-family:var(--mono);font-size:.52rem;letter-spacing:.06em;
+        text-transform:uppercase;padding:2px 6px;background:var(--warm);
+        color:var(--light);border-radius:1px;margin-top:7px;
+    }
+    
+    /* Modal Overlay Styles */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(58,46,57,0.85); z-index: 10000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; backdrop-filter: blur(4px); padding: 20px; }
+    .modal-overlay.open { opacity: 1; pointer-events: auto; }
+    .modal-content { background: var(--paper); width: 100%; max-width: 560px; max-height: calc(100vh - 40px); overflow-y: auto; border-radius: 20px; padding: 32px; position: relative; transform: translateY(20px); transition: transform 0.3s ease; box-shadow: 0 32px 64px rgba(0,0,0,0.4); }
+    .modal-content::-webkit-scrollbar { width: 8px; }
+    .modal-content::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 4px; }
+    .modal-overlay.open .modal-content { transform: translateY(0); }
+    .modal-close { position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.04); border: none; width: 32px; height: 32px; border-radius: 16px; font-size: 20px; line-height: 1; cursor: pointer; color: var(--ink); transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+    .modal-close:hover { background: rgba(0,0,0,0.1); }
+    .more-info-btn { width: 100%; margin-top: 12px; padding: 10px; background: var(--accent-pale); border: 1px solid rgba(37,147,143,.4); color: var(--accent-strong); border-radius: 6px; cursor: pointer; font-family: var(--mono); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; transition: 0.2s; font-weight: 500; }
+    .more-info-btn:hover { background: var(--accent); color: var(--paper); border-color: var(--accent); }
+    
+    /* Scenario Selection Pills */
+    .scen-pill {
+        border: none; background: transparent; padding: 6px 14px; border-radius: 99px;
+        font-family: var(--mono); font-size: 0.62rem; text-transform: uppercase;
+        cursor: pointer; color: var(--light); transition: all 0.2s;
+    }
+    .scen-pill:hover { color: var(--ink); }
+    .scen-pill.active { background: var(--ink); color: #fdfff7; box-shadow: var(--shadow-sm); }
+    .scen-pill.policy { border: 1px dashed rgba(37,147,143,.4); }
+    .scen-pill.policy.active { 
+        background: linear-gradient(135deg, var(--heat) 0%, var(--accent-strong) 100%); 
+        border-color: var(--heat); 
+    }
+
+    .hood-popup { padding: 24px; font-family: var(--sans); }
+    .hp-title { font-family: var(--serif); font-size: 2rem; color: var(--ink); margin: 0 0 6px; line-height: 1.1; padding-right: 16px; }
+    .hp-comp { font-family: var(--mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent-strong); margin-bottom: 24px; font-weight: 600; }
+    .hp-section { margin-bottom: 20px; }
+    .hp-sec-title { font-family: var(--mono); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--light); margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+    .hp-worst-grid { display: grid; gap: 10px; margin-bottom: 16px; }
+    .hp-worst-card { background: var(--warm); border-left: 4px solid; padding: 12px 14px; border-radius: 6px; box-shadow: var(--shadow-sm); }
+    .hp-worst-name { font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; }
+    .hp-worst-score { font-family: var(--mono); font-size: 1.25rem; font-weight: 600; line-height: 1; }
+    .hp-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .hp-bar-label { font-family: var(--mono); font-size: 0.65rem; text-transform: uppercase; width: 75px; flex-shrink: 0; color: var(--mid); }
+    .hp-bar-track { flex: 1; height: 6px; background: rgba(0,0,0,0.06); border-radius: 3px; overflow: hidden; }
+    .hp-bar-fill { height: 100%; border-radius: 3px; transition: width .4s; }
+    .hp-bar-val { font-family: var(--mono); font-size: 0.75rem; width: 28px; text-align: right; color: var(--ink); font-weight: 600; }
+    .hp-int-item { margin-bottom: 10px; background: rgba(255,255,255,0.7); border: 1px solid var(--border); padding: 12px; border-radius: 8px; }
+    .hp-int-name { font-size: 0.85rem; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+    .hp-int-desc { font-size: 0.8rem; color: var(--mid); line-height: 1.5; }
+
+    /* Responsive */
+    @media(max-width:960px){
+        #hero{flex-direction:column;gap:40px;min-height:auto;padding-top:88px}
+        .hero-right{flex:none;width:100%}
+        .pillars,.prov-grid{grid-template-columns:repeat(2,1fr)}
+        .results-layout{grid-template-columns:1fr}
+        .muni-list{grid-template-columns:1fr}
+    }
+    @media(max-width:600px){
+        .pillars,.prov-grid{grid-template-columns:1fr}
+        #hero{padding:80px 20px 48px}.nav-inner,section,#explorer,#problem{padding-left:20px;padding-right:20px}
+            #explorer{border-radius:24px; padding:64px 20px 80px; margin:-24px 12px 64px}
+        .muni-controls{flex-direction:column;align-items:stretch}
+        .muni-search{max-width:none}
+        .rank-row { cursor: pointer; }
+    }
+    .leaflet-interactive.explorer-feature{transition:fill-opacity .18s ease,stroke-width .18s ease;stroke-dasharray:0}
+    .leaflet-interactive.explorer-feature:hover{stroke-dasharray:6 6;animation:dashPulse 1.1s linear infinite}
+    </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+    <div class="nav-inner">
+        <span class="nav-logo">Heat &amp; Health NL</span>
+        <div class="nav-links">
+            <a href="dashboard.html" class="nav-lk">Dashboard</a>
+            <a href="explain.html" class="nav-lk">Methodology</a>
+            <a href="#explorer" class="nav-btn">Start Exploring →</a>
+        </div>
+    </div>
+</nav>
+
+<!-- ═══════════ HERO ═══════════ -->
+<div style="max-width:var(--w);margin:0 auto">
+<section id="hero">
+    <div class="hero-left">
+        <span class="hero-tag">Climate Health Research · Netherlands 2025</span>
+        <h1>Heat does not<br>discriminate —<br><em>but vulnerability does.</em></h1>
+        <p>As climate change intensifies heat waves across the Netherlands, health risk concentrates in neighborhoods shaped by poverty, aging, social isolation, and housing that traps heat. This tool maps where the crisis is deepest — and what municipalities can do about it.</p>
+        <div class="hero-stats">
+            <div>
+                <span class="stat-n">11,554</span>
+                <span class="stat-l">Neighborhoods</span>
+            </div>
+            <div>
+                <span class="stat-n">5</span>
+                <span class="stat-l">Vulnerability themes</span>
+            </div>
+            <div>
+                <span class="stat-n">2025–75</span>
+                <span class="stat-l">Scenarios</span>
+            </div>
+        </div>
+        <a href="#explorer" class="hero-cta">Explore your region</a>
+    </div>
+    <div class="hero-right">
+        <div class="heat-grid" id="heatGrid"></div>
+        <div class="heat-caption">Simulated heat vulnerability by neighborhood</div>
+    </div>
+</section>
+</div>
+
+<!-- ═══════════ EXPLORER ═══════════ -->
+<section id="explorer">
+    <div class="sec-inner">
+        <span class="sec-tag">The tool</span>
+        <h2 class="sec-h" style="color:var(--ink); font-size:clamp(2.2rem, 4vw, 3.2rem); margin-bottom: 20px;">Explore climate vulnerability<br>in your region</h2>
+        <p style="font-size:1rem;color:var(--mid);max-width:560px;line-height:1.65;margin-bottom:0">
+            Select a province, then a municipality to see neighborhood-level vulnerability across five themes — and receive targeted intervention recommendations.
+        </p>
+
+        <!-- Wizard Tabs -->
+        <div class="wizard-tabs">
+            <button class="wiz-tab active" id="wizProv" onclick="goToStep(1)">
+                <div class="wiz-num">1</div>
+                <div class="wiz-text">
+                    <div class="wiz-label">Province</div>
+                    <div class="wiz-val" id="lblProv">Select province...</div>
+                </div>
+            </button>
+            <button class="wiz-tab" id="wizMuni" onclick="goToStep(2)" disabled>
+                <div class="wiz-num">2</div>
+                <div class="wiz-text">
+                    <div class="wiz-label">Municipality</div>
+                    <div class="wiz-val" id="lblMuni">Pending...</div>
+                </div>
+            </button>
+            <button class="wiz-tab" id="wizRes" onclick="goToStep(3)" disabled>
+                <div class="wiz-num">3</div>
+                <div class="wiz-text">
+                    <div class="wiz-label">Results</div>
+                    <div class="wiz-val" id="lblRes">Pending...</div>
+                </div>
+            </button>
+        </div>
+
+        <!-- ── PANEL: PROVINCE ── -->
+        <div class="wiz-panel active" id="panelProv">
+            <div class="panel-header-row">
+                <h3 style="font-family:var(--serif);font-size:1.6rem; margin:0; color:var(--ink);">Select your province</h3>
+                <select id="provSort" style="display: none; margin: 0;">
+                    <option value="composite">Rank Provinces by: Composite Risk</option>
+                    <option value="theme_heat">Rank by: Heat Exposure</option>
+                    <option value="theme_populations">Rank by: Vulnerable Populations</option>
+                    <option value="theme_socioeconomic">Rank by: Socioeconomic Deprivation</option>
+                    <option value="theme_mental_health">Rank by: Mental Health</option>
+                    <option value="theme_built_environment_access">Rank by: Built Environment & Access</option>
+                </select>
+            </div>
+            <!-- Data status -->
+            <div class="data-status" id="dataStatus">
+                <div class="spinner"></div>
+                Loading neighborhood data…
+            </div>
+            <div class="prov-grid" id="provGrid"></div>
+        </div>
+
+        <!-- ── PANEL: Municipality list ── -->
+        <div class="wiz-panel" id="panelMuni">
+            <div class="muni-panel-head">
+                <div>
+                    <div class="muni-panel-title" id="muniPanelTitle"></div>
+                    <div class="muni-panel-meta" id="muniPanelMeta"></div>
+                </div>
+                <div class="muni-controls" style="flex-wrap:wrap">
+                    <input type="search" id="muniSearch" class="muni-search" placeholder="Filter municipalities…" aria-label="Filter municipalities">
+                    <select id="muniSort">
+                        <option value="composite">Sort by: Composite Risk</option>
+                        <option value="theme_heat">Sort by: Heat Exposure</option>
+                        <option value="theme_populations">Sort by: Vulnerable Populations</option>
+                        <option value="theme_socioeconomic">Sort by: Socioeconomic Deprivation</option>
+                        <option value="theme_mental_health">Sort by: Mental Health</option>
+                        <option value="theme_built_environment_access">Sort by: Built Environment & Access</option>
+                    </select>
+                </div>
+            </div>
+            <div class="muni-list-wrap">
+                <div class="muni-list" id="muniList"></div>
+            </div>
+        </div>
+
+        <!-- ── PANEL: Results ── -->
+        <div class="wiz-panel" id="panelResults">
+            <div class="results-head">
+                <div>
+                    <div style="font-family:var(--serif);font-size:1.7rem" id="rMuniName"></div>
+                    <div style="font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--light);margin-top:2px" id="rMuniMeta"></div>
+                </div>
+                <!-- Scenario Selector (Visible when 'Risk' tab is active) -->
+                <div id="scenarioSelector" style="display: flex; align-items: center; gap: 8px; margin: 10px 0;">
+                    <span style="font-family: var(--mono); font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--light);">Projected Scenario:</span>
+                    <div style="display: flex; background: var(--warm); border-radius: 99px; padding: 4px; border: 1px solid var(--border);">
+                        <button class="scen-pill active" data-scen="risk_2024_baseline">2024</button>
+                        <button class="scen-pill" data-scen="risk_2050_baseline">2050</button>
+                        <button class="scen-pill" data-scen="risk_2100_baseline">2100</button>
+                        <button class="scen-pill policy" data-scen="risk_2050_greening">2050 with intervention</button>
+                    </div>
+                </div>
+                <button class="back-btn" id="backBtn">← Back to municipalities</button>
+            </div>
+
+            <div class="results-layout">
+                <!-- Left: map + rankings -->
+                <div>
+                    <div class="map-explorer-shell">
+                        <div id="r-map"></div>
+                    </div>
+                    <div class="theme-tabs" id="themeTabs"></div>
+                    <input type="search" id="rankSearch" class="muni-search" style="max-width:100%;margin-bottom:4px" placeholder="Filter neighborhoods in this municipality…" aria-label="Filter neighborhoods">
+                    <div class="rank-scroll">
+                        <div class="rank-list" id="rankList"></div>
+                    </div>
+                </div>
+                <!-- Right: overview + interventions -->
+                <div>
+                    <div class="overview-card" id="overviewCard"></div>
+                    <div class="int-title">Recommended interventions</div>
+                    <div id="intList"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ═══════════ PROBLEM ═══════════ -->
+<section id="problem">
+    <div class="sec-inner" style="max-width: var(--w, 1200px); margin: 0 auto;">
+        <span class="sec-tag">The research context</span>
+        <h2 class="sec-h">Three pathways from<br>climate change to health harm</h2>
+        <p class="sec-sub">Heat waves are the deadliest weather event in the Netherlands. But the risk is not random — it follows deep structural patterns that policy can address.</p>
+        <div class="pillars">
+            <div class="pillar">
+                <div class="p-num">01</div>
+                <h3>Heat exposure is spatially unequal</h3>
+                <p>Dense urban neighborhoods with little vegetation and high shares of dark surfaces experience Physiological Equivalent Temperatures up to 8°C higher than surrounding areas. Green space, parks, and water reduce this — but are unequally distributed across the country.</p>
+                <div class="p-stat">↑ 8°C PET gap between most and least exposed neighborhoods in major cities</div>
+            </div>
+            <div class="pillar">
+                <div class="p-num">02</div>
+                <h3>The most vulnerable cannot adapt alone</h3>
+                <p>Elderly residents, young children, people with frail health, and those experiencing chronic stress or loneliness face compounding barriers to self-protection. Low incomes mean no access to cooling, while social isolation means no one to check in during heat alerts.</p>
+                <div class="p-stat">↑ 3× higher hospitalization rate for residents aged 75+ during heat waves</div>
+            </div>
+            <div class="pillar">
+                <div class="p-num">03</div>
+                <h3>Poor housing traps people inside with heat</h3>
+                <p>Neighborhoods dominated by pre-2010 housing — built before modern thermal insulation standards — become indoor heat traps during prolonged heat events. Rental-heavy neighborhoods offer residents little control over retrofitting or installing cooling.</p>
+                <div class="p-stat">↑ Pre-2010 buildings show highest rates of inability to find indoor cooling</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- NEIGHBORHOOD MODAL -->
+<div id="hoodModal" class="modal-overlay" onclick="closeModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <button class="modal-close" onclick="closeModal()">×</button>
+        <div id="modalBody"></div>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+    <div style="max-width:var(--w);margin:0 auto">
+        <p>Heat &amp; Health NL &nbsp;·&nbsp; Climate vulnerability research &nbsp;·&nbsp; Data: CBS, RIVM, GGD &nbsp;·&nbsp; <a href="dashboard.html">Open full dashboard →</a></p>
+        <p style="margin-top:12px;opacity:.85">Layout and typography inspired by award-winning <a href="https://winners.webbyawards.com/winners/websites-and-mobile-sites/features-design/best-data-visualization?years=0" target="_blank" rel="noopener noreferrer">data visualization galleries</a>.</p>
+    </div>
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// DATA DEFINITIONS
+// ═══════════════════════════════════════════════════════════
+
+const PROVINCES = [
+    {code:'GR',name:'Groningen',    city:'Groningen',  gemeenten:['Groningen','Westerkwartier','Het Hogeland','Eemsdelta','Midden-Groningen','Oldambt','Pekela','Stadskanaal','Veendam','Westerwolde']},
+    {code:'FR',name:'Friesland',    city:'Leeuwarden', gemeenten:['Leeuwarden','Súdwest-Fryslân','De Fryske Marren','Harlingen','Waadhoeke','Tytsjerksteradiel','Achtkarspelen','Noardeast-Fryslân','Opsterland','Smallingerland','Heerenveen','Ooststellingwerf','Weststellingwerf']},
+    {code:'DR',name:'Drenthe',      city:'Assen',      gemeenten:['Emmen','Hoogeveen','Assen','Coevorden','De Wolden','Meppel','Midden-Drenthe','Borger-Odoorn','Noordenveld','Westerveld','Tynaarlo','Aa en Hunze']},
+    {code:'OV',name:'Overijssel',   city:'Zwolle',     gemeenten:['Enschede','Almelo','Deventer','Zwolle','Hengelo','Oldenzaal','Rijssen-Holten','Hellendoorn','Wierden','Losser','Dinkelland','Steenwijkerland','Hardenberg','Kampen','Zwartewaterland','Dalfsen','Ommen','Staphorst','Tubbergen']},
+    {code:'GE',name:'Gelderland',   city:'Arnhem',     gemeenten:['Arnhem','Nijmegen','Apeldoorn','Ede','Doetinchem','Harderwijk','Zutphen','Wageningen','Tiel','Barneveld','Berg en Dal','Duiven','Westervoort','Renkum','Rheden','Overbetuwe','Oost Gelre','Aalten','Winterswijk','Montferland','Bronckhorst','Lochem','Berkelland','Brummen','Voorst','Zevenaar','Neder-Betuwe','Oude IJsselstreek','West Maas en Waal','Maasdriel','Zaltbommel','Culemborg','Buren','Lingewaard','Nijkerk','Wijchen','Heumen','Druten']},
+    {code:'UT',name:'Utrecht',      city:'Utrecht',    gemeenten:['Utrecht','Amersfoort','Veenendaal','Houten','Nieuwegein','IJsselstein','Woerden','Stichtse Vecht','De Bilt','Zeist','Utrechtse Heuvelrug','Lopik','Montfoort','Oudewater','Bunnik','Wijk bij Duurstede','Soest','Baarn','Eemnes','Bunschoten','Rhenen']},
+    {code:'NH',name:'Noord-Holland',city:'Amsterdam',  gemeenten:['Amsterdam','Haarlem','Alkmaar','Zaanstad','Haarlemmermeer','Hilversum','Den Helder','Hoorn','Velsen','Purmerend','Enkhuizen','Medemblik','Hollands Kroon','Texel','Bergen','Castricum','Dijk en Waard','Heiloo','Uitgeest','Bloemendaal','Heemstede','Zandvoort','Beverwijk','Uithoorn','Amstelveen','Aalsmeer','Diemen','Edam-Volendam','Waterland','Wormerland','Landsmeer','Oostzaan','Koggenland','Stede Broec']},
+    {code:'ZH',name:'Zuid-Holland', city:'Den Haag',   gemeenten:['Rotterdam','Den Haag','Leiden','Dordrecht','Zoetermeer','Delft','Westland','Alphen aan den Rijn','Lansingerland','Gouda','Pijnacker-Nootdorp','Nissewaard','Goeree-Overflakkee','Hoeksche Waard','Vlaardingen','Schiedam','Capelle aan den IJssel','Krimpen aan den IJssel','Ridderkerk','Barendrecht','Zwijndrecht','Papendrecht','Sliedrecht','Hardinxveld-Giessendam','Gorinchem','Molenlanden','Alblasserdam','Hendrik-Ido-Ambacht','Leidschendam-Voorburg','Rijswijk','Wassenaar','Katwijk','Teylingen','Kaag en Braassem','Nieuwkoop','Bodegraven-Reeuwijk','Krimpenerwaard','Maassluis','Midden-Delfland','Brielle']},
+    {code:'ZE',name:'Zeeland',      city:'Middelburg', gemeenten:['Middelburg','Goes','Terneuzen','Vlissingen','Hulst','Tholen','Borsele','Noord-Beveland','Kapelle','Reimerswaal','Schouwen-Duiveland','Sluis','Veere']},
+    {code:'NB',name:'Noord-Brabant',city:'Den Bosch',  gemeenten:['Eindhoven','Tilburg','Breda',"'s-Hertogenbosch",'Helmond','Roosendaal','Bergen op Zoom','Oss','Waalwijk','Meierijstad','Bernheze','Boekel','Boxtel','Cranendonck','Gemert-Bakel','Laarbeek','Sint-Michielsgestel','Asten','Bladel','Eersel','Geldrop-Mierlo','Heeze-Leende','Oirschot','Reusel-De Mierden','Son en Breugel','Valkenswaard','Veldhoven','Waalre','Altena','Drimmelen','Geertruidenberg','Loon op Zand','Oosterhout','Alphen-Chaam','Baarle-Nassau','Dongen','Goirle','Gilze en Rijen','Hilvarenbeek','Moerdijk','Steenbergen','Halderberge','Rucphen','Woensdrecht','Zundert','Deurne','Nuenen c.a.']},
+    {code:'LI',name:'Limburg',      city:'Maastricht', gemeenten:['Maastricht','Venlo','Sittard-Geleen','Heerlen','Roermond','Venray','Weert','Landgraaf','Brunssum','Kerkrade','Valkenburg aan de Geul','Bergen','Beesel','Echt-Susteren','Gennep','Horst aan de Maas','Leudal','Maasgouw','Peel en Maas','Roerdalen','Nederweert','Beekdaelen','Gulpen-Wittem','Beek','Eijsden-Margraten','Meerssen','Vaals','Simpelveld','Voerendaal','Stein']},
+    {code:'FL',name:'Flevoland',    city:'Lelystad',   gemeenten:['Almere','Lelystad','Dronten','Zeewolde','Urk','Noordoostpolder']},
+];
+
+const COMPOSITE_THEME = {key:'composite', short:'Risk', label:'Composite Risk Score', color:'#3a2e39'};
+const THEMES = [
+    COMPOSITE_THEME,
+    {key:'theme_heat',          short:'Heat',       label:'Heat Exposure',           color:'#c94a35'},
+    {key:'theme_populations',   short:'Popul.',     label:'Vulnerable Populations',  color:'#7e5a9b'},
+    {key:'theme_socioeconomic', short:'Socio.',     label:'Socioeconomic',           color:'#c27728'},
+    {key:'theme_mental_health', short:'Mental',     label:'Mental Health',           color:'#1aab9f'},
+    {key:'theme_built_environment_access', short:'Built+', label:'Built Environment & Access', color:'#3a7baa'},
+];
+
+const RAMPS = {
+    theme_heat:         ['#fdfff7','#fbd9cc','#e58060','#c94a35','#3a2e39'],
+    theme_populations:  ['#fdfff7','#e2c6f2','#b271d6','#76319b','#3a2e39'],
+    theme_socioeconomic:['#fdfff7','#faebd6','#e0a840','#c27728','#3a2e39'],
+    theme_mental_health:['#fdfff7','#c8eeea','#50c8be','#1aab9f','#3a2e39'],
+    theme_built_environment_access:['#fdfff7','#cce3f0','#68b0d8','#3a7baa','#3a2e39'],
+    composite:          ['#fdfff7','#c8eeea','#1aab9f','#c94a35','#3a2e39'],
+};
+
+function scoreValue(props, key) {
+    if (props[key] != null && !isNaN(props[key])) return props[key];
+    if (key === 'theme_built_environment_access') {
+        const parts = [props.theme_built_env, props.theme_access].filter(v => v != null && !isNaN(v));
+        return parts.length ? parts.reduce((a, b) => a + b, 0) / parts.length : null;
+    }
+    return null;
+}
+
+const INTERVENTIONS = {
+    theme_heat:{label:'Heat Exposure',color:'#91272e',items:[
+        {type:'Infrastructure',name:'Urban greening corridors',desc:'Plant street trees and vegetated corridors along the hottest streets. Each mature tree reduces surrounding Physiological Equivalent Temperature by 2–4°C and provides shade for pedestrians.'},
+        {type:'Infrastructure',name:'Blue-green infrastructure',desc:'Introduce water channels, retention ponds, and misting stations in high-density zones. Open water surfaces cool the air through evaporation during heat events.'},
+        {type:'Housing',name:'Reflective and green roofing',desc:'Subsidise installation of green roofs and light-coloured reflective roofing for residential buildings. Green roofs can reduce rooftop temperatures by up to 30°C on hot days.'},
+        {type:'Policy',name:'Heat island priority zoning',desc:'Use PET data to designate heat priority zones. Require shade structures, cool paving, and a minimum green space ratio in all new developments within those zones.'},
+    ]},
+    theme_populations:{label:'Vulnerable Populations',color:'#3a2e39',items:[
+        {type:'Services',name:'Proactive heat wave outreach',desc:'Train neighbourhood workers to conduct door-to-door welfare checks on elderly people living alone and families with young children during orange and red heat alerts from KNMI.'},
+        {type:'Services',name:'Community buddy program',desc:'Match isolated elderly residents with trained volunteer neighbours for regular contact. A simple check-in during heat waves can prevent heat-related illness and death.'},
+        {type:'Services',name:'Cool rest spaces in care facilities',desc:'Ensure all care homes, daycare centres, and community centres have at least one air-conditioned rest room available to residents and neighbourhood visitors during heat events.'},
+        {type:'Policy',name:'Heat emergency protocol for frail residents',desc:'Develop a tiered response protocol triggered by KNMI heat warnings, with automatic outreach to care providers and high-risk individuals identified via health records.'},
+    ]},
+    theme_socioeconomic:{label:'Socioeconomic Deprivation',color:'#91272e',items:[
+        {type:'Financial',name:'Free cooling equipment distribution',desc:'Distribute fans and portable cooling devices to households below social minimum. Prioritise families with elderly members, infants, or chronically ill individuals registered with GGD.'},
+        {type:'Housing',name:'Targeted home insulation subsidies',desc:'Offer income-based grants for low-cost heat adaptation: internal blinds, door and window sealing, and secondary glazing for pre-2000 housing stock in deprived neighbourhoods.'},
+        {type:'Services',name:'Multilingual heat communication',desc:'Translate all heat-health alerts and guidance into the top five community languages. Use WhatsApp, community radio, and trusted local organisations to reach residents with limited digital access.'},
+        {type:'Policy',name:'Landlord minimum heat standards',desc:'Introduce a local ordinance requiring landlords to ensure rental properties meet minimum indoor thermal comfort standards, with enforcement through existing housing inspection routes.'},
+    ]},
+    theme_mental_health:{label:'Mental Health & Social Isolation',color:'#25938f',items:[
+        {type:'Services',name:'Social prescribing: green spaces',desc:'Train GPs to issue prescriptions for regular visits to local parks and community gardens for patients experiencing stress, loneliness, or depression — particularly effective during hot periods.'},
+        {type:'Services',name:'Community health worker programme',desc:'Deploy community health workers with dual mental health and heat-health training into high-stress, high-loneliness neighbourhoods for year-round preventative outreach.'},
+        {type:'Infrastructure',name:'Shaded community garden network',desc:'Develop a network of accessible, shaded community gardens and social spaces. Green social infrastructure reduces stress biomarkers while providing outdoor cooling for residents.'},
+        {type:'Policy',name:'Integrated loneliness and heat risk mapping',desc:'Cross-reference loneliness prevalence data with heat exposure scores to identify the highest-priority neighbourhoods for compound mental-heat health interventions.'},
+    ]},
+    theme_built_environment_access:{label:'Built Environment & Access',color:'#3a2e39',items:[
+        {type:'Infrastructure',name:'Shaded public routes and stops',desc:'Install shade structures over key pedestrian routes, cycle paths, and bus stops in neighbourhoods dominated by pre-2010 housing. Prioritise routes used by elderly and mobility-limited residents.'},
+        {type:'Housing',name:'Building heat retrofit programme',desc:'Target pre-2010 housing blocks for a phased insulation and passive ventilation retrofit. Include loft insulation, draft-proofing, and low-cost window shading as the minimum standard.'},
+        {type:'Services',name:'Mobile GP and health units',desc:'Deploy mobile health units to underserved neighbourhoods during heat events to provide GP consultations and early heat-illness screening close to where people live.'},
+        {type:'Services',name:'Cool zone map and signage',desc:'Map and publicise all nearest accessible cooling spaces — libraries, community centres, large supermarkets. Install multilingual signage and maintain a live online map.'},
+    ]},
+};
+
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+let geoData = null;
+let activeProv = null;
+let activeMuni = null;
+let activeMuniFeats = null;
+let activeTheme = THEMES[0]; // Defaults to Composite Risk
+let activeScenario = 'risk_2024_baseline';
+let currentProvSortTheme = 'composite'; 
+let currentMuniSortTheme = 'composite'; 
+let rMap = null, rLayer = null;
+let layerMap = {};
+
+/** Normalize gemeente strings so GeoJSON matches hardcoded province lists (apostrophes, Unicode). */
+function normGm(s) {
+    return String(s ?? '').normalize('NFKC').trim().replace(/\u2019/g, "'");
+}
+function featsForGemeente(name) {
+    if (!geoData) return [];
+    const n = normGm(name);
+    return geoData.features.filter(f => normGm(f.properties.gemeentenaam) === n);
+}
+
+// ═══════════════════════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════════════════════
+buildHeatGrid();
+renderProvinceGrid(); // Renders empty grid before data loads
+buildThemeTabs();
+document.getElementById('backBtn').addEventListener('click', backToMuniList);
+document.getElementById('provSort').addEventListener('change', e => {
+    currentProvSortTheme = e.target.value;
+    renderProvinceGrid();
+});
+document.getElementById('muniSort').addEventListener('change', e => {
+    currentMuniSortTheme = e.target.value;
+    if (activeProv) renderMuniList();
+});
+const muniSearchEl = document.getElementById('muniSearch');
+if (muniSearchEl) muniSearchEl.addEventListener('input', () => { if (activeProv) renderMuniList(); });
+const rankSearchEl = document.getElementById('rankSearch');
+if (rankSearchEl) rankSearchEl.addEventListener('input', () => {
+    if (activeMuniFeats && activeTheme) buildRankings(activeMuniFeats, activeTheme);
+});
+
+// Scenario pill listeners
+document.querySelectorAll('.scen-pill').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.scen-pill').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        activeScenario = this.dataset.scen;
+        if (activeMuni && activeMuniFeats) {
+            redrawLayer(activeMuniFeats);
+            buildRankings(activeMuniFeats, activeTheme);
+            buildOverview(activeMuniFeats, activeMuni);
+        }
+    });
+});
+loadGeoData();
+
+// ═══════════════════════════════════════════════════════════
+// HEAT GRID ANIMATION
+// ═══════════════════════════════════════════════════════════
+function buildHeatGrid() {
+    const g = document.getElementById('heatGrid');
+    const cols = ['#fdfff7','#cde9e7','#25938f','#91272e','#3a2e39'];
+    for (let i = 0; i < 144; i++) {
+        const t = Math.random();
+        const c = document.createElement('div');
+        c.className = 'heat-cell';
+        c.style.cssText = `background:${cols[Math.floor(t*cols.length)]};--d:${2+Math.random()*4}s;--dl:-${Math.random()*5}s;--mo:${.2+t*.5}`;
+        g.appendChild(c);
+    }
+}
+
+// ═══════════════════════════════════════════════════════════
+// DATA LOAD & PROVINCE SCORING
+// ═══════════════════════════════════════════════════════════
+async function loadGeoData() {
+    try {
+        const r = await fetch('map_scenarios.geojson');
+        geoData = await r.json();
+        
+        // Calculate true province averages across all matching neighborhoods
+        PROVINCES.forEach(p => {
+            const feats = geoData.features.filter(f =>
+                p.gemeenten.some(g => normGm(f.properties.gemeentenaam) === normGm(g))
+            );
+            const avg = arr => { const v=arr.filter(x=>x!=null&&!isNaN(x)); return v.length?v.reduce((a,b)=>a+b,0)/v.length:0; };
+            p.avgRisk = avg(feats.map(f => f.properties.risk_2024_baseline));
+            p.themes = Object.fromEntries(THEMES.map(t => [t.key, avg(feats.map(f => scoreValue(f.properties, t.key)))]));
+        });
+
+        const statusEl = document.getElementById('dataStatus');
+        statusEl.innerHTML = `${geoData.features.length.toLocaleString()} neighborhoods loaded — select a province to begin`;
+            
+        document.getElementById('provSort').style.display = 'block';
+        renderProvinceGrid();
+
+    } catch(e) {
+        const statusEl = document.getElementById('dataStatus');
+        statusEl.innerHTML = 'Could not load map_scenarios.geojson — make sure it is in the same folder.';
+    }
+}
+
+// ═══════════════════════════════════════════════════════════
+// DYNAMIC PROVINCE GRID
+// ═══════════════════════════════════════════════════════════
+function renderProvinceGrid() {
+    const grid = document.getElementById('provGrid');
+    grid.innerHTML = '';
+    
+    let sortedProvs = [...PROVINCES];
+    
+    // Sort logic only runs after data is loaded
+    if (geoData) {
+        sortedProvs.sort((a,b) => {
+            const scoreA = currentProvSortTheme === 'composite' ? a.avgRisk : a.themes[currentProvSortTheme];
+            const scoreB = currentProvSortTheme === 'composite' ? b.avgRisk : b.themes[currentProvSortTheme];
+            return scoreB - scoreA; // Descending
+        });
+    }
+
+    sortedProvs.forEach((p, idx) => {
+        const b = document.createElement('button');
+        b.className = 'prov-btn';
+        b.dataset.code = p.code;
+        if (activeProv && activeProv.code === p.code) b.classList.add('active');
+        
+        let scoreHtml = '';
+        let rankText = p.code; 
+        
+        if (geoData && p.avgRisk !== undefined) {
+            const displayScore = currentProvSortTheme === 'composite' ? p.avgRisk : p.themes[currentProvSortTheme];
+            scoreHtml = `<span class="prov-score">${Math.round(displayScore)}</span>`;
+            rankText = `${idx + 1} · ${p.code}`; // Prepend rank
+        }
+
+        b.innerHTML = `<span class="pb-code">${rankText}</span><span class="pb-name">${p.name}</span><span class="pb-city">${p.city}</span>${scoreHtml}`;
+        b.addEventListener('click', () => selectProvince(p));
+        grid.appendChild(b);
+    });
+}
+
+// ═══════════════════════════════════════════════════════════
+// PROVINCE → MUNICIPALITY LIST
+// ═══════════════════════════════════════════════════════════
+function selectProvince(prov) {
+    if (!geoData) { alert('Data not yet loaded. Please wait a moment.'); return; }
+    activeProv = prov;
+    const ms = document.getElementById('muniSearch');
+    if (ms) ms.value = '';
+
+        document.getElementById('lblProv').textContent = prov.name;
+        document.getElementById('wizMuni').disabled = false;
+        document.getElementById('lblMuni').textContent = 'Select municipality...';
+        
+        activeMuni = null;
+        document.getElementById('wizRes').disabled = true;
+        document.getElementById('lblRes').textContent = 'Pending...';
+
+    renderProvinceGrid(); // Update active state visually
+    renderMuniList();
+        goToStep(2);
+}
+
+function renderMuniList() {
+    if (!activeProv) return;
+    
+    const rankings = rankGemeenten(activeProv.gemeenten, currentMuniSortTheme);
+    const q = (document.getElementById('muniSearch')?.value || '').trim().toLowerCase();
+    const filtered = q ? rankings.filter(gm => gm.name.toLowerCase().includes(q)) : rankings;
+
+    const totalWithData = rankings.length;
+    const totalListed = activeProv.gemeenten.length;
+
+    document.getElementById('muniPanelTitle').textContent = activeProv.name;
+    document.getElementById('muniPanelMeta').textContent =
+        `${totalWithData} of ${totalListed} municipalities have neighborhood data in this tool · showing ${filtered.length}${q ? ' (filtered)' : ''}`;
+
+    const list = document.getElementById('muniList');
+    list.innerHTML = '';
+    if (!rankings.length) {
+        list.innerHTML = `<p style="grid-column:span 2;font-family:var(--mono);font-size:.7rem;color:var(--light);padding:16px 0">No neighborhood data found for this province in the current dataset.</p>`;
+        return;
+    }
+    if (!filtered.length) {
+        list.innerHTML = `
+            <div class="empty-state">
+                <h4>No matches found</h4>
+                <p>No municipalities match “${escapeHtml(q)}”. Try a different search term or clear the filter.</p>
+            </div>`;
+        return;    
+    }
+
+    filtered.forEach((gm, i) => {
+        const worst = worstThemes(gm, 2);
+        const displayScore = currentMuniSortTheme === 'composite' ? gm.avgRisk : gm.themes[currentMuniSortTheme];
+        const rankIndex = rankings.indexOf(gm) + 1;
+
+        const card = document.createElement('button');
+        card.className = 'muni-card';
+        card.style.animationDelay = `${Math.min(i * 0.025, 0.28)}s`;
+        card.innerHTML = `
+            <span class="mc-rank">${rankIndex}</span>
+            <span class="mc-name">${escapeHtml(gm.name)}</span>
+            <div class="mc-badges">
+                ${worst.map(t => `<span class="mc-badge" style="background:${t.color}">${t.short}</span>`).join('')}
+            </div>
+            <span class="mc-score">${Math.round(displayScore)}</span>`;
+        card.addEventListener('click', () => selectMuni(gm.name));
+        list.appendChild(card);
+    });
+}
+
+function escapeHtml(s) {
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+}
+
+function rankGemeenten(gemeenten, sortTheme) {
+    return gemeenten.map(name => {
+        const feats = featsForGemeente(name);
+        if (!feats.length) return null;
+        const avg = arr => { const v=arr.filter(x=>x!=null&&!isNaN(x)); return v.length?v.reduce((a,b)=>a+b,0)/v.length:0; };
+        
+        const gmData = {
+            name,
+            count: feats.length,
+            avgRisk: avg(feats.map(f => f.properties.risk_2025_baseline)),
+            themes: Object.fromEntries(THEMES.map(t => [t.key, avg(feats.map(f => scoreValue(f.properties, t.key)))]))
+        };
+        return gmData;
+    }).filter(Boolean).sort((a,b) => {
+        const scoreA = sortTheme === 'composite' ? a.avgRisk : a.themes[sortTheme];
+        const scoreB = sortTheme === 'composite' ? b.avgRisk : b.themes[sortTheme];
+        return scoreB - scoreA; 
+    });
+}
+
+function worstThemes(gm, n) {
+    return THEMES.map(t => ({...t, score: gm.themes[t.key]||0}))
+        .sort((a,b) => b.score-a.score).slice(0,n);
+}
+
+// ═══════════════════════════════════════════════════════════
+// MUNICIPALITY → NEIGHBORHOOD RESULTS
+// ═══════════════════════════════════════════════════════════
+function selectMuni(name) {
+    if (!geoData) return;
+    activeMuni = name;
+    const feats = featsForGemeente(name);
+    if (!feats.length) { alert('No data for ' + name); return; }
+
+    activeMuniFeats = feats;
+    const rs = document.getElementById('rankSearch');
+    if (rs) rs.value = '';
+
+        document.getElementById('lblMuni').textContent = name;
+        document.getElementById('wizRes').disabled = false;
+        document.getElementById('lblRes').textContent = 'View findings';
+
+    document.getElementById('rMuniName').textContent = name;
+    document.getElementById('rMuniMeta').textContent =
+        `${feats.length} neighborhoods · ${activeProv?.name||''} · 2024 baseline`;
+
+        goToStep(3);
+
+    setTimeout(() => {
+        initMap(feats);
+        buildOverview(feats, name);
+        buildRankings(feats, activeTheme);
+        buildInterventions(feats);
+    }, 50);
+}
+
+function backToMuniList() {
+        goToStep(2);
+}
+
+// ═══════════════════════════════════════════════════════════
+// MAP
+// ═══════════════════════════════════════════════════════════
+function initMap(feats) {
+    const netherlandsBounds = L.latLngBounds(L.latLng(50.5, 3.0), L.latLng(53.7, 7.5));
+    if (rMap) { rMap.remove(); rMap = null; rLayer = null; }
+    rMap = L.map('r-map', { 
+        zoomControl: true, 
+        preferCanvas: true,
+        gestureHandling: true,
+        minZoom: 8
+    });
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> · <a href="https://carto.com/">CARTO</a>',
+        maxZoom: 19,
+    }).addTo(rMap);
+    L.control.scale({ imperial: false, metric: true, position: 'bottomleft' }).addTo(rMap);
+    redrawLayer(feats);
+    if (rLayer) rMap.fitBounds(rLayer.getBounds(), { padding: [22, 22] });
+}
+
+function featStyle(f) {
+    const isComp = activeTheme.key === 'composite';
+    const targetKey = isComp ? activeScenario : activeTheme.key;
+    const s = scoreValue(f.properties, targetKey);
+    const fill = rampColor(s, isComp ? 'composite' : activeTheme.key);
+    return {
+        fillColor: fill,
+        weight: 0.38,
+        opacity: 1,
+        color: 'rgba(58, 46, 57, 0.28)',
+        fillOpacity: s == null || isNaN(s) ? 0.38 : 0.78,
+        className: 'explorer-feature',
+    };
+}
+
+function buildNeighborhoodPopup(feature, id) {
+    const p = feature.properties;
+    const n = p.buurtnaam || 'Neighborhood';
+    const comp = p[activeScenario] != null ? Math.round(p[activeScenario]) : '—';
+    const scenLabel = activeScenario === 'risk_2050_greening' ? '2050 with intervention' : activeScenario.split('_')[1];
+
+    const statsHtml = THEMES.map(t => {
+        if (t.key === 'composite') return '';
+        const s = scoreValue(p, t.key);
+        const val = s != null ? Math.round(s) : '—';
+        const pct = s != null ? Math.round(s) : 0;
+        return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+            <span style="font-family:var(--mono);font-size:9px;text-transform:uppercase;color:var(--light);width:55px;flex-shrink:0">${t.short}</span>
+            <div style="flex:1;height:4px;background:rgba(0,0,0,.08);border-radius:2px;overflow:hidden">
+                <div style="height:100%;width:${pct}%;background:${t.color}"></div>
+            </div>
+            <span style="font-family:var(--mono);font-size:10px;width:22px;text-align:right;color:var(--mid)">${val}</span>
+        </div>`;
+    }).join('');
+
+    return `<div style="font-family:var(--sans);padding:4px">
+        <div style="font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);margin-bottom:2px;line-height:1.1">${n}</div>
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-strong);margin-bottom:14px">${scenLabel} Risk: ${comp}/100</div>
+        ${statsHtml}
+        <button class="more-info-btn" data-id="${escapeHtml(id)}" onclick="openModal(this.getAttribute('data-id'))">Detailed Report →</button>
+    </div>`;
+}
+
+function openModal(id) {
+    const layer = layerMap[id];
+    if (!layer || !layer.feature) return;
+    const p = layer.feature.properties;
+    const n = p.buurtnaam || 'Neighborhood';
+    const comp = p[activeScenario] != null ? Math.round(p[activeScenario]) : '—';
+    const scenLabel = activeScenario === 'risk_2050_greening' ? '2050 with intervention' : activeScenario.split('_')[1];
+
+    const worstThemes = THEMES.map(t => ({
+        ...t, score: scoreValue(p, t.key) || 0
+    })).sort((a,b) => b.score - a.score).slice(0, 2);
+
+    const worstHtml = worstThemes.map(wt => `
+        <div class="hp-worst-card" style="border-left-color: ${wt.color}">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <div class="hp-worst-name" style="color: ${wt.color}">${wt.label}</div>
+                <div class="hp-worst-score" style="color: ${wt.color}">${Math.round(wt.score)}<span style="font-size:0.6em;opacity:0.6">/100</span></div>
+            </div>
+        </div>
+    `).join('');
+
+    const allHtml = THEMES.map(t => {
+        if (t.key === 'composite') return '';
+        const s = scoreValue(p, t.key);
+        const val = s != null ? Math.round(s) : '—';
+        const pct = s != null ? Math.round(s) : 0;
+        return `
+        <div class="hp-bar-row">
+            <span class="hp-bar-label">${t.short}</span>
+            <div class="hp-bar-track">
+                <div class="hp-bar-fill" style="width:${pct}%;background:${t.color}"></div>
+            </div>
+            <span class="hp-bar-val">${val}</span>
+        </div>`;
+    }).join('');
+
+    let intHtml = '';
+    worstThemes.forEach(wt => {
+        const cfg = INTERVENTIONS[wt.key];
+        if(cfg && cfg.items.length) {
+            const item = cfg.items[0];
+            intHtml += `
+            <div class="hp-int-item">
+                <div class="hp-int-name">${item.name}</div>
+                <div class="hp-int-desc">${item.desc}</div>
+            </div>`;
+        }
+    });
+
+    document.getElementById('modalBody').innerHTML = `
+    <div class="hood-popup" style="padding:0">
+        <h3 class="hp-title">${n}</h3>
+        <div class="hp-comp">${scenLabel} Risk: ${comp}/100</div>
+        
+        <div class="hp-section">
+            <div class="hp-sec-title">Critical Vulnerabilities</div>
+            <div class="hp-worst-grid">
+                ${worstHtml}
+            </div>
+        </div>
+
+        <div class="hp-section">
+            <div class="hp-sec-title">Priority Interventions</div>
+            ${intHtml}
+        </div>
+
+        <div class="hp-section" style="margin-bottom:0">
+            <div class="hp-sec-title">All Theme Scores</div>
+            ${allHtml}
+        </div>
+    </div>`;
+
+    document.getElementById('hoodModal').classList.add('open');
+}
+
+function closeModal() {
+    document.getElementById('hoodModal').classList.remove('open');
+}
+
+function redrawLayer(feats) {
+    if (rLayer) rMap.removeLayer(rLayer);
+    layerMap = {};
+    rLayer = L.geoJson({ type: 'FeatureCollection', features: feats }, {
+        style: featStyle,
+        onEachFeature: (f, layer) => {
+            const id = f.properties.buurtcode || f.properties.buurtnaam;
+            layerMap[id] = layer;
+            layer.bindPopup(() => buildNeighborhoodPopup(f, id), { maxWidth: 260 });
+
+            layer.on('mouseover', function () {
+                const v = scoreValue(f.properties, activeTheme.key === 'composite' ? activeScenario : activeTheme.key);
+                this.setStyle({
+                    weight: 1.7,
+                    color: 'rgba(58, 46, 57, 0.55)',
+                    fillOpacity: v == null || isNaN(v) ? 0.48 : 0.92,
+                });
+            });
+            layer.on('mouseout', function () {
+                this.setStyle(featStyle(f));
+            });
+        },
+    }).addTo(rMap);
+}
+
+// ═══════════════════════════════════════════════════════════
+// THEME TABS
+// ═══════════════════════════════════════════════════════════
+function buildThemeTabs() {
+    const tabs = document.getElementById('themeTabs');
+    THEMES.forEach((t,i) => {
+        const b = document.createElement('button');
+        b.className = 'theme-tab' + (i===0?' on':'');
+        b.dataset.key = t.key;
+        b.innerHTML = `<span class="t-dot" style="background:${t.color}"></span>${t.short}`;
+        b.addEventListener('click', () => {
+            activeTheme = t;
+            document.querySelectorAll('.theme-tab').forEach(x => x.classList.toggle('on', x.dataset.key===t.key));
+            document.getElementById('scenarioSelector').style.display = (t.key === 'composite') ? 'flex' : 'none';
+            if (activeMuni && activeMuniFeats) {
+                redrawLayer(activeMuniFeats);
+                buildRankings(activeMuniFeats, t);
+            }
+        });
+        tabs.appendChild(b);
+    });
+}
+
+// ═══════════════════════════════════════════════════════════
+// RANKINGS
+// ═══════════════════════════════════════════════════════════
+function buildRankings(feats, theme) {
+    const q = (document.getElementById('rankSearch')?.value || '').trim().toLowerCase();
+    const targetKey = theme.key === 'composite' ? activeScenario : theme.key;
+    let pool = feats.filter(f => scoreValue(f.properties, targetKey) != null);
+    if (q) {
+        pool = pool.filter(f => (f.properties.buurtnaam || '').toLowerCase().includes(q));
+    }
+    const sorted = pool.sort((a,b) => scoreValue(b.properties, targetKey) - scoreValue(a.properties, targetKey));
+
+    const list = document.getElementById('rankList');
+    const nAll = feats.filter(f => scoreValue(f.properties, targetKey) != null).length;
+    list.innerHTML = `<div style="font-family:var(--mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--light);margin-bottom:8px">Neighborhoods ranked — ${theme.label} · ${sorted.length}${q ? ` of ${nAll}` : ''} shown</div>`;
+    sorted.forEach((f,i) => {
+        const s = Math.round(scoreValue(f.properties, targetKey));
+        const row = document.createElement('div');
+        row.className = 'rank-row';
+        row.style.animationDelay = `${Math.min(i * 0.015, 0.18)}s`;
+        row.style.cursor = 'pointer';
+        row.innerHTML = `<span class="r-pos">${i+1}</span><span class="r-name">${f.properties.buurtnaam||'—'}</span><div class="r-bar"><div class="r-fill" style="width:${s}%;background:${theme.color}"></div></div><span class="r-val">${s}</span>`;
+        
+        row.addEventListener('click', () => {
+            const id = f.properties.buurtcode || f.properties.buurtnaam;
+            const layer = layerMap[id];
+            if (layer) {
+                rMap.fitBounds(layer.getBounds(), { padding: [30, 30], maxZoom: 13 });
+                openModal(id);
+            }
+        });
+
+        list.appendChild(row);
+    });
+}
+
+// ═══════════════════════════════════════════════════════════
+// OVERVIEW CARD
+// ═══════════════════════════════════════════════════════════
+function buildOverview(feats, name) {
+    const avg = arr => { const v=arr.filter(x=>x!=null&&!isNaN(x)); return v.length?v.reduce((a,b)=>a+b,0)/v.length:0; };
+    const comp = Math.round(avg(feats.map(f=>f.properties[activeScenario])));
+    const scenarioYear = activeScenario === 'risk_2050_greening' ? '2050 with intervention' : activeScenario.split('_')[1];
+
+    const rows = THEMES.map(t => {
+        if (t.key === 'composite') return '';
+        const s = Math.round(avg(feats.map(f=>scoreValue(f.properties, t.key))));
+        return `<div class="ov-row">
+            <span class="ov-label">${t.short}</span>
+            <div class="ov-track"><div class="ov-fill" style="width:${s}%;background:${t.color}"></div></div>
+            <span class="ov-val">${s}</span>
+        </div>`;
+    }).join('');
+    document.getElementById('overviewCard').innerHTML = `
+        <div class="ov-name">${name}</div>
+        <span class="ov-meta">${feats.length} neighborhoods · ${scenarioYear} composite: ${comp}/100</span>
+        <div class="ov-rows">${rows}</div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// INTERVENTIONS (based on 3 worst themes)
+// ═══════════════════════════════════════════════════════════
+function buildInterventions(feats) {
+    const avg = arr => { const v=arr.filter(x=>x!=null&&!isNaN(x)); return v.length?v.reduce((a,b)=>a+b,0)/v.length:0; };
+    const worst3 = THEMES
+        .map(t => ({key:t.key, score:avg(feats.map(f=>scoreValue(f.properties, t.key)))}))
+        .sort((a,b)=>b.score-a.score).slice(0,3).map(x=>x.key);
+
+    const container = document.getElementById('intList');
+    container.innerHTML = '';
+    worst3.forEach(key => {
+        const cfg = INTERVENTIONS[key];
+        if (!cfg) return;
+        cfg.items.slice(0, 2).forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'int-card';
+            card.style.animationDelay = `${Math.min(container.children.length * 0.06, 0.3)}s`;
+            card.innerHTML = `
+                <div class="int-bar" style="background:${cfg.color}"></div>
+                <div class="int-body">
+                    <span class="int-theme">${cfg.label}</span>
+                    <div class="int-name">${item.name}</div>
+                    <div class="int-desc">${item.desc}</div>
+                    <span class="int-type">${item.type}</span>
+                </div>`;
+            container.appendChild(card);
+        });
+    });
+}
+
+// ═══════════════════════════════════════════════════════════
+// UI HELPERS
+// ═══════════════════════════════════════════════════════════
+function goToStep(n) {
+    if (n === 2 && !activeProv) return;
+    if (n === 3 && !activeMuni) return;
+
+    document.getElementById('wizProv').classList.toggle('active', n === 1);
+    document.getElementById('wizMuni').classList.toggle('active', n === 2);
+    document.getElementById('wizRes').classList.toggle('active', n === 3);
+
+    document.getElementById('panelProv').classList.toggle('active', n === 1);
+    document.getElementById('panelMuni').classList.toggle('active', n === 2);
+    document.getElementById('panelResults').classList.toggle('active', n === 3);
+
+    if (n > 1) {
+        document.getElementById('explorer').scrollIntoView({behavior: 'smooth', block: 'start'});
+    }
+}
+
+function rampColor(score, key) {
+    if (score == null || isNaN(score)) return 'rgba(58,46,57,.22)';
+    const ramp = RAMPS[key] || RAMPS.composite;
+    const idx = Math.min((score/100)*(ramp.length-1), ramp.length-1.001);
+    const lo = Math.floor(idx), hi = Math.ceil(idx);
+    if (lo===hi) return ramp[lo];
+    const p = h => [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
+    const [r1,g1,b1]=p(ramp[lo]),[r2,g2,b2]=p(ramp[hi]),t=idx-lo;
+    return '#'+[r1+(r2-r1)*t,g1+(g2-g1)*t,b1+(b2-b1)*t].map(v=>Math.round(v).toString(16).padStart(2,'0')).join('');
+}
+</script>
+</body>
+</html>
