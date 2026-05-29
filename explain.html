@@ -286,7 +286,6 @@
                     <span class="var">Heat</span>,
                     <span class="var">Populations</span>,
                     <span class="var">Socioeconomic</span>,
-                    <span class="var">Mental health</span>,
                     <span class="var">Built environment &amp; access</span>)
                 </div>
                 <div class="formula-terms">
@@ -306,11 +305,6 @@
                         <div class="formula-term-desc">Poverty, income, education, employment, density, household energy, loneliness, and housing satisfaction.</div>
                     </div>
                     <div class="formula-term minor">
-                        <div class="formula-term-label">Mental health</div>
-                        <div class="formula-term-coef">PCA score</div>
-                        <div class="formula-term-desc">Loneliness, anxiety or depression risk, recent stress, green-space satisfaction, and shade.</div>
-                    </div>
-                    <div class="formula-term minor">
                         <div class="formula-term-label">Built environment &amp; access</div>
                         <div class="formula-term-coef">PCA score</div>
                         <div class="formula-term-desc">Shade, address density, old homes, GP distance, cooling distance, traffic noise, housing satisfaction, and cooling access.</div>
@@ -325,9 +319,11 @@
         <div class="section-header">
             <span class="section-num">03</span>
             <h2>Understanding the 5 Themes</h2>
+            <h2>Understanding the 4 Themes</h2>
         </div>
 
         <p>Because "overall risk" isn't actionable enough for city planners, vulnerability is broken into five distinct themes. Each theme is built with <strong>PCA</strong>: variables are direction-adjusted, standardized, reduced to PC1, and scaled to 0–100.</p>
+        <p>Because "overall risk" isn't actionable enough for city planners, vulnerability is broken into four distinct themes. Each theme is built with <strong>PCA</strong>: variables are direction-adjusted, standardized, reduced to PC1, and scaled to 0–100.</p>
 
         <div class="math-box">
             <h4>What does a score of 82 actually mean?</h4>
@@ -382,15 +378,9 @@
                 <div class="scenario-desc"><strong>What it measures:</strong> Financial barriers. Low-income residents cannot afford AC, high electricity bills, or better insulation. Dependency on rental housing means residents legally cannot modify their structures to protect themselves.</div>
             </div>
 
-            <div class="scenario-card" style="border-top: 4px solid var(--c-mental)">
-                <div class="scenario-year" style="color: var(--c-mental);">Theme 04</div>
-                <div class="theme-icon" style="background: rgba(26,171,159,0.12); color: var(--c-mental);">🧠</div>
-                <div class="scenario-title">Mental Health</div>
-                <div class="scenario-desc"><strong>What it measures:</strong> High stress and severe loneliness. Extreme heat disrupts sleep and triggers psychiatric episodes, while isolation impairs cognitive coping—making residents less likely to actively hydrate or seek shade.</div>
-            </div>
-
             <div class="scenario-card" style="border-top: 4px solid var(--c-built)">
-                <div class="scenario-year" style="color: var(--c-built);">Theme 05</div>
+                <div class="scenario-year" style="color: var(--c-built);">Theme 04</div>
+                <div class="scenario-year" style="color: var(--c-built);">Theme 04</div>
                 <div class="theme-icon" style="background: rgba(58,123,170,0.12); color: var(--c-built);">🏗️</div>
                 <div class="scenario-title">Built Environment &amp; Access</div>
                 <div class="scenario-desc"><strong>What it measures:</strong> The combined physical and service-access context: shade, dense addresses, older homes, distance to GP practices and cooling spaces, gas or electric heating profiles, traffic noise, housing satisfaction, green-space satisfaction, and ability to find cooling indoors or outdoors.</div>

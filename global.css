@@ -15,7 +15,7 @@
     --mono:'Fira Code',monospace;
     --w:1180px;
     --c-heat:#c94a35; --c-pop:#7e5a9b; --c-socio:#c27728;
-    --c-mental:#1aab9f; --c-built:#3a7baa;
+    --c-built:#3a7baa;
 }
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}

@@ -31,7 +31,6 @@
             --c-heat: #c94a35;
             --c-pop: #7e5a9b;
             --c-socio: #c27728;
-            --c-mental: #1aab9f;
             --c-built: #3a7baa;
         }
 
@@ -482,12 +481,6 @@
                 <span class="th-vars">Income · Education · Social min · Rental</span>
             </button>
 
-            <button class="theme-btn" style="--theme-color:var(--c-mental)"
-                    data-layer="theme_mental_health" data-type="theme" data-theme="mental_health">
-                <span class="th-name">Mental Health</span>
-                <span class="th-vars">Stress · Loneliness · Anxiety</span>
-            </button>
-
             <button class="theme-btn" style="--theme-color:var(--c-built)"
                     data-layer="theme_built_environment_access" data-type="theme" data-theme="built_environment_access">
                 <span class="th-name">Built Environment & Access</span>
@@ -541,7 +534,6 @@ const THEME_DEFS = {
     heat:                     { label: 'Heat Exposure',                color: '#c94a35' },
     populations:              { label: 'Vulnerable Populations',       color: '#7e5a9b' },
     socioeconomic:            { label: 'Socioeconomic',                color: '#c27728' },
-    mental_health:            { label: 'Mental Health',                color: '#1aab9f' },
     built_environment_access: { label: 'Built Environment & Access',   color: '#3a7baa' },
 };
 
@@ -550,7 +542,6 @@ const POPUP_THEMES = [
     { key:'theme_heat',         label:'Heat',     theme:'heat' },
     { key:'theme_populations',  label:'Popul.',   theme:'populations' },
     { key:'theme_socioeconomic',label:'Socio.',   theme:'socioeconomic' },
-    { key:'theme_mental_health',label:'Mental',   theme:'mental_health' },
     { key:'theme_built_environment_access', label:'Built+', theme:'built_environment_access' },
 ];
 
@@ -560,7 +551,6 @@ const RAMPS = {
     heat:         ['#fdfff7','#fbd9cc','#e58060','#c94a35','#3a2e39'],
     populations:  ['#fdfff7','#e2c6f2','#b271d6','#76319b','#3a2e39'],
     socioeconomic:['#fdfff7','#faebd6','#e0a840','#c27728','#3a2e39'],
-    mental_health:['#fdfff7','#c8eeea','#50c8be','#1aab9f','#3a2e39'],
     built_environment_access:['#fdfff7','#cce3f0','#68b0d8','#3a7baa','#3a2e39'],
 };
 
@@ -774,6 +764,9 @@ function searchMunicipality() {
         if (status) status.textContent = 'No matching municipality found.';
         return;
     }
+
+    // Close existing popups to focus on the search result
+    map.closePopup();
 
     if (municipalityHighlightLayer) map.removeLayer(municipalityHighlightLayer);
     municipalityHighlightLayer = L.geoJson({ type: 'FeatureCollection', features: matches }, {
