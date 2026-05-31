@@ -679,10 +679,7 @@
                     </div>
                     <div class="interventions-pane result-pane" data-result-pane="interventions">
                         <div class="int-title">Intervention directions</div>
-                        <div class="int-note">
-                            These suggestions are generated from the municipality’s strongest vulnerability drivers. 
-                            They should be read as starting points for local policy discussion, not final prescriptions.
-                        </div>
+                        <div class="int-note" id="intNote"></div>
                         <div id="intList"></div>
                     </div>
                 </div>
@@ -1433,10 +1430,39 @@ function buildResultSummary(feats, name) {
 // ═══════════════════════════════════════════════════════════
 // INTERVENTIONS (based on 3 worst themes)
 // ═══════════════════════════════════════════════════════════
+function buildInterventionNote(topDrivers) {
+    const noteEl = document.getElementById('intNote');
+    if (!noteEl || !topDrivers.length) return;
+
+    const topTwo = topDrivers.slice(0, 2);
+    const topNames = topTwo.map(d => d.label.toLowerCase()).join(' and ');
+    const topKeys = topTwo.map(d => d.key);
+    const has = key => topKeys.includes(key);
+
+    let text = `For this municipality, the intervention list is shaped mainly by ${topNames}. The suggestions below translate these driver patterns into possible action areas for local discussion and feasibility checks.`;
+
+    if (has('theme_heat') && has('theme_built_environment_access')) {
+        text = 'Because high heat exposure overlaps with built-environment and access constraints, the intervention directions focus on cooling routes, shaded public space, housing adaptation, and accessible cool zones.';
+    } else if (has('theme_heat') && has('theme_populations')) {
+        text = 'Because high heat exposure overlaps with heat-sensitive population groups, the intervention directions focus on targeted outreach, heat-health communication, cooling access, and protection during heat alerts.';
+    } else if (has('theme_socioeconomic') && has('theme_built_environment_access')) {
+        text = 'Because socioeconomic deprivation overlaps with built-environment and access constraints, the intervention directions focus on affordable adaptation, rental housing conditions, cooling access, and support that does not depend on private resources.';
+    } else if (has('theme_populations') && has('theme_socioeconomic')) {
+        text = 'Because population sensitivity overlaps with socioeconomic deprivation, the intervention directions focus on residents who may be both physiologically vulnerable and less able to adapt without public support.';
+    } else if (has('theme_heat') && has('theme_socioeconomic')) {
+        text = 'Because heat exposure overlaps with socioeconomic deprivation, the intervention directions focus on low-cost cooling support, accessible communication, and neighbourhoods where residents may have fewer private adaptation options.';
+    } else if (has('theme_populations') && has('theme_built_environment_access')) {
+        text = 'Because vulnerable population groups overlap with built-environment and access constraints, the intervention directions focus on reachable cooling spaces, care-linked outreach, and safer routes between homes and services.';
+    }
+
+    noteEl.textContent = text;
+}
+
+
 function buildInterventions(feats) {
     const avg = arr => {
         const v = arr.filter(x => x != null && !isNaN(x));
-        return v.length ? v.reduce((a,b) => a + b, 0) / v.length : 0;
+        return v.length ? v.reduce((a, b) => a + b, 0) / v.length : 0;
     };
 
     const topDrivers = DRIVER_THEMES
@@ -1444,8 +1470,12 @@ function buildInterventions(feats) {
             ...t,
             score: avg(feats.map(f => scoreValue(f.properties, t.key)))
         }))
-        .sort((a,b) => b.score - a.score)
+        .sort((a, b) => b.score - a.score)
         .slice(0, 3);
+
+    buildInterventionNote(topDrivers);
+
+    const topDriverNames = topDrivers.map(d => d.label).join(', ');
 
     const items = [];
 
@@ -1469,7 +1499,7 @@ function buildInterventions(feats) {
             <div class="int-logic">
                 <div class="int-logic-title">No intervention directions available</div>
                 <p>
-                    The current driver combination does not match the intervention library. 
+                    The current driver combination does not match the intervention library.
                     Please use the map and local knowledge to interpret the results.
                 </p>
             </div>
@@ -1485,19 +1515,24 @@ function buildInterventions(feats) {
         .filter(i => ['Infrastructure', 'Housing'].includes(i.type))
         .slice(0, 3);
 
+    const fallbackImmediate = items
+        .filter(i => !structural.includes(i))
+        .slice(0, 3);
+
     const fallbackStructural = items
         .filter(i => !immediate.includes(i))
         .slice(0, 3);
 
+    const immediateItems = immediate.length ? immediate : fallbackImmediate;
     const structuralItems = structural.length ? structural : fallbackStructural;
 
     document.getElementById('intList').innerHTML = `
         <div class="int-logic">
             <div class="int-logic-title">From drivers to action</div>
             <p>
-                The tool first identifies the dominant vulnerability drivers in this municipality, 
-                then links them to intervention directions that can be checked against local knowledge, 
-                existing services, and implementation capacity.
+                In this municipality, the strongest driver signals are ${topDriverNames}.
+                The intervention directions below connect these patterns to immediate responses,
+                structural adaptation measures, and local checks before action.
             </p>
             <div class="int-driver-tags">
                 ${topDrivers.map(d => `
@@ -1513,8 +1548,8 @@ function buildInterventions(feats) {
             <p class="int-group-desc">
                 Actions that can support heatwave preparedness, communication, outreach, or temporary cooling access.
             </p>
-            ${immediate.length 
-                ? immediate.map(renderInterventionItem).join('')
+            ${immediateItems.length
+                ? immediateItems.map(renderInterventionItem).join('')
                 : `<p class="int-group-desc">No immediate-response items are available for the current driver combination.</p>`
             }
         </div>
@@ -1524,7 +1559,7 @@ function buildInterventions(feats) {
             <p class="int-group-desc">
                 Measures that address housing, public space, infrastructure, and long-term neighbourhood resilience.
             </p>
-            ${structuralItems.length 
+            ${structuralItems.length
                 ? structuralItems.map(renderInterventionItem).join('')
                 : `<p class="int-group-desc">No structural-adaptation items are available for the current driver combination.</p>`
             }
@@ -1537,6 +1572,34 @@ function buildInterventions(feats) {
             </ul>
         </div>
     `;
+}
+
+function buildInterventionNote(topDrivers) {
+    const noteEl = document.getElementById('intNote');
+    if (!noteEl || !topDrivers.length) return;
+
+    const topTwo = topDrivers.slice(0, 2);
+    const topNames = topTwo.map(d => d.label.toLowerCase()).join(' and ');
+    const topKeys = topTwo.map(d => d.key);
+    const has = key => topKeys.includes(key);
+
+    let text = `For this municipality, the intervention list is shaped mainly by ${topNames}. The suggestions below translate these driver patterns into possible action areas for local discussion and feasibility checks.`;
+
+    if (has('theme_heat') && has('theme_built_environment_access')) {
+        text = 'Because high heat exposure overlaps with built-environment and access constraints, the intervention directions focus on cooling routes, shaded public space, housing adaptation, and accessible cool zones.';
+    } else if (has('theme_heat') && has('theme_populations')) {
+        text = 'Because high heat exposure overlaps with heat-sensitive population groups, the intervention directions focus on targeted outreach, heat-health communication, cooling access, and protection during heat alerts.';
+    } else if (has('theme_socioeconomic') && has('theme_built_environment_access')) {
+        text = 'Because socioeconomic deprivation overlaps with built-environment and access constraints, the intervention directions focus on affordable adaptation, rental housing conditions, cooling access, and support that does not depend on private resources.';
+    } else if (has('theme_populations') && has('theme_socioeconomic')) {
+        text = 'Because population sensitivity overlaps with socioeconomic deprivation, the intervention directions focus on residents who may be both physiologically vulnerable and less able to adapt without public support.';
+    } else if (has('theme_heat') && has('theme_socioeconomic')) {
+        text = 'Because heat exposure overlaps with socioeconomic deprivation, the intervention directions focus on low-cost cooling support, accessible communication, and neighbourhoods where residents may have fewer private adaptation options.';
+    } else if (has('theme_populations') && has('theme_built_environment_access')) {
+        text = 'Because vulnerable population groups overlap with built-environment and access constraints, the intervention directions focus on reachable cooling spaces, care-linked outreach, and safer routes between homes and services.';
+    }
+
+    noteEl.textContent = text;
 }
 
 function buildLocalChecks(topDrivers) {
