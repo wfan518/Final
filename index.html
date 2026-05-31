@@ -367,6 +367,55 @@
         text-transform:uppercase;padding:2px 6px;background:var(--warm);
         color:var(--light);border-radius:1px;margin-top:7px;
     }
+    .int-note {
+        font-size: .82rem;line-height: 1.5;
+        color: var(--mid);margin: -4px 0 16px;
+    }
+    .int-logic {
+        border: 1px solid var(--border);border-radius:
+        var(--radius);padding: 14px 15px;background: var(--warm);margin-bottom: 16px;
+    }
+    .int-logic-title {
+        font-family: var(--serif);font-size: 1rem;
+        font-weight: 700;color: var(--ink);
+        margin-bottom: 6px;
+    }
+    .int-logic p {
+        font-size: .82rem;color: var(--mid);
+        line-height: 1.5;margin: 0;
+    }
+    .int-driver-tags {
+        display: flex;flex-wrap: wrap;
+        gap: 6px;margin-top: 10px;
+    }
+    .int-driver-tag {
+        display: inline-flex;align-items: center;
+        padding: 4px 8px;border-radius: 999px;
+        color: var(--paper);font-family: var(--mono);
+        font-size: .55rem;letter-spacing: .06em;
+        text-transform: uppercase;
+    }
+    .int-group {
+        margin-bottom: 18px;
+    }
+    .int-group-title {
+        font-family: var(--serif);font-size: 1.02rem;
+        font-weight: 700;color: var(--ink);margin: 0 0 8px;
+    }
+    .int-group-desc {
+        font-size: .78rem;color: var(--mid);
+        line-height: 1.45;margin: -4px 0 10px;
+    }
+    .local-checks {
+        border-top: 1px solid var(--border);padding-top: 14px;margin-top: 16px;
+    }
+    .local-checks ul {
+        margin: 0;padding-left: 18px;
+    }
+    .local-checks li {
+        font-size: .82rem;color: var(--mid);
+        line-height: 1.5;margin-bottom: 6px;
+    }
     
     /* Modal Overlay Styles */
     .modal-overlay { position: fixed; inset: 0; background: rgba(58,46,57,0.85); z-index: 10000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; backdrop-filter: blur(4px); padding: 20px; }
@@ -629,8 +678,12 @@
                     <div class="overview-card" id="overviewCard"></div>
                     </div>
                     <div class="interventions-pane result-pane" data-result-pane="interventions">
-                    <div class="int-title">Recommended interventions</div>
-                    <div id="intList"></div>
+                        <div class="int-title">Intervention directions</div>
+                        <div class="int-note">
+                            These suggestions are generated from the municipality’s strongest vulnerability drivers. 
+                            They should be read as starting points for local policy discussion, not final prescriptions.
+                        </div>
+                        <div id="intList"></div>
                     </div>
                 </div>
             </div>
@@ -1381,31 +1434,147 @@ function buildResultSummary(feats, name) {
 // INTERVENTIONS (based on 3 worst themes)
 // ═══════════════════════════════════════════════════════════
 function buildInterventions(feats) {
-    const avg = arr => { const v=arr.filter(x=>x!=null&&!isNaN(x)); return v.length?v.reduce((a,b)=>a+b,0)/v.length:0; };
-    const worst3 = DRIVER_THEMES
-        .map(t => ({key:t.key, score:avg(feats.map(f=>scoreValue(f.properties, t.key)))}))
-        .sort((a,b)=>b.score-a.score).slice(0,3).map(x=>x.key);
+    const avg = arr => {
+        const v = arr.filter(x => x != null && !isNaN(x));
+        return v.length ? v.reduce((a,b) => a + b, 0) / v.length : 0;
+    };
 
-    const container = document.getElementById('intList');
-    container.innerHTML = '';
-    worst3.forEach(key => {
-        const cfg = INTERVENTIONS[key];
+    const topDrivers = DRIVER_THEMES
+        .map(t => ({
+            ...t,
+            score: avg(feats.map(f => scoreValue(f.properties, t.key)))
+        }))
+        .sort((a,b) => b.score - a.score)
+        .slice(0, 3);
+
+    const items = [];
+
+    topDrivers.forEach(driver => {
+        const cfg = INTERVENTIONS[driver.key];
         if (!cfg) return;
-        cfg.items.slice(0, 2).forEach(item => {
-            const card = document.createElement('div');
-            card.className = 'int-card';
-            card.style.animationDelay = `${Math.min(container.children.length * 0.06, 0.3)}s`;
-            card.innerHTML = `
-                <div class="int-bar" style="background:${cfg.color}"></div>
-                <div class="int-body">
-                    <span class="int-theme">${cfg.label}</span>
-                    <div class="int-name">${item.name}</div>
-                    <div class="int-desc">${item.desc}</div>
-                    <span class="int-type">${item.type}</span>
-                </div>`;
-            container.appendChild(card);
+
+        cfg.items.forEach(item => {
+            items.push({
+                ...item,
+                theme: cfg.label,
+                color: cfg.color,
+                driverKey: driver.key,
+                driverScore: driver.score
+            });
         });
     });
+
+    if (!items.length) {
+        document.getElementById('intList').innerHTML = `
+            <div class="int-logic">
+                <div class="int-logic-title">No intervention directions available</div>
+                <p>
+                    The current driver combination does not match the intervention library. 
+                    Please use the map and local knowledge to interpret the results.
+                </p>
+            </div>
+        `;
+        return;
+    }
+
+    const immediate = items
+        .filter(i => ['Services', 'Policy', 'Financial'].includes(i.type))
+        .slice(0, 3);
+
+    const structural = items
+        .filter(i => ['Infrastructure', 'Housing'].includes(i.type))
+        .slice(0, 3);
+
+    const fallbackStructural = items
+        .filter(i => !immediate.includes(i))
+        .slice(0, 3);
+
+    const structuralItems = structural.length ? structural : fallbackStructural;
+
+    document.getElementById('intList').innerHTML = `
+        <div class="int-logic">
+            <div class="int-logic-title">From drivers to action</div>
+            <p>
+                The tool first identifies the dominant vulnerability drivers in this municipality, 
+                then links them to intervention directions that can be checked against local knowledge, 
+                existing services, and implementation capacity.
+            </p>
+            <div class="int-driver-tags">
+                ${topDrivers.map(d => `
+                    <span class="int-driver-tag" style="background:${d.color}">
+                        ${d.short} · ${Math.round(d.score)}
+                    </span>
+                `).join('')}
+            </div>
+        </div>
+
+        <div class="int-group">
+            <div class="int-group-title">Immediate response</div>
+            <p class="int-group-desc">
+                Actions that can support heatwave preparedness, communication, outreach, or temporary cooling access.
+            </p>
+            ${immediate.length 
+                ? immediate.map(renderInterventionItem).join('')
+                : `<p class="int-group-desc">No immediate-response items are available for the current driver combination.</p>`
+            }
+        </div>
+
+        <div class="int-group">
+            <div class="int-group-title">Structural adaptation</div>
+            <p class="int-group-desc">
+                Measures that address housing, public space, infrastructure, and long-term neighbourhood resilience.
+            </p>
+            ${structuralItems.length 
+                ? structuralItems.map(renderInterventionItem).join('')
+                : `<p class="int-group-desc">No structural-adaptation items are available for the current driver combination.</p>`
+            }
+        </div>
+
+        <div class="local-checks">
+            <div class="int-group-title">Check locally before action</div>
+            <ul>
+                ${buildLocalChecks(topDrivers).map(check => `<li>${check}</li>`).join('')}
+            </ul>
+        </div>
+    `;
+}
+
+function buildLocalChecks(topDrivers) {
+    const keys = topDrivers.map(d => d.key);
+    const checks = [];
+
+    if (keys.includes('theme_heat')) {
+        checks.push('Where are the hottest neighbourhoods during the active scenario, and do they overlap with daily pedestrian or transit routes?');
+    }
+
+    if (keys.includes('theme_populations')) {
+        checks.push('Which care providers, neighbourhood workers, or community organisations can reach elderly residents, children, or people with frail health?');
+    }
+
+    if (keys.includes('theme_socioeconomic')) {
+        checks.push('Are residents likely to face financial, language, rental, or digital-access barriers when trying to adapt?');
+    }
+
+    if (keys.includes('theme_built_environment_access')) {
+        checks.push('Are cooling spaces, shaded public routes, green areas, and health services actually reachable on foot or by public transport?');
+    }
+
+    checks.push('Which existing municipal programmes could carry these interventions without creating a new standalone policy process?');
+
+    return checks.slice(0, 4);
+}
+
+function renderInterventionItem(item) {
+    return `
+        <div class="int-card">
+            <div class="int-bar" style="background:${item.color}"></div>
+            <div class="int-body">
+                <span class="int-theme">${item.theme} · ${item.type}</span>
+                <div class="int-name">${item.name}</div>
+                <div class="int-desc">${item.desc}</div>
+            </div>
+        </div>
+    `;
 }
 
 // ═══════════════════════════════════════════════════════════
