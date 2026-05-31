@@ -416,7 +416,71 @@
         font-size: .82rem;color: var(--mid);
         line-height: 1.5;margin-bottom: 6px;
     }
-    
+    .int-pager {
+        display: grid;grid-template-columns: 1fr 1fr;
+        gap: 6px;margin: 14px 0 14px;
+        padding: 4px;border: 1px solid var(--border);
+        border-radius: 999px;background: var(--warm);
+    }
+    .int-page-btn {
+        border: 0;border-radius: 999px;
+        padding: 8px 10px;background: transparent;
+        color: var(--mid);font-family: var(--sans);
+        font-size: .78rem;font-weight: 700;
+        cursor: pointer;transition: .2s ease;
+    }
+    .int-page-btn.active {
+        background: var(--ink);color: var(--paper);
+        box-shadow: var(--shadow-sm);
+    }
+    .int-page {
+        display: none;animation: intPageIn .26s ease both;
+    }
+    .int-page.active {display: block;}
+
+    @keyframes intPageIn {
+        from {
+            opacity: 0;
+            transform: translateY(8px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    .int-page-header {margin-bottom: 10px;}
+    .int-page-kicker {
+        display: block;font-family: var(--mono);
+        font-size: .56rem;letter-spacing: .08em;
+        text-transform: uppercase;color: var(--light);
+        margin-bottom: 4px;
+    }
+    .int-group-title {
+        font-family: var(--serif);font-size: 1.04rem;
+        font-weight: 700;color: var(--ink);
+        margin: 0 0 5px;
+    }
+    .int-group-desc {
+        font-size: .78rem;color: var(--mid);
+        line-height: 1.45;margin: 0 0 12px;
+    }
+    .local-checks details {
+        border-top: 1px solid var(--border);margin-top: 14px;
+        padding-top: 12px;
+    }
+    .local-checks summary {
+        cursor: pointer;font-family: var(--sans);
+        font-size: .82rem;font-weight: 700;
+        color: var(--ink);
+    }
+    .local-checks ul {
+        margin: 10px 0 0;padding-left: 18px;
+    }
+    .local-checks li {
+        font-size: .8rem;color: var(--mid);
+        line-height: 1.5;margin-bottom: 6px;
+    }
+        
     /* Modal Overlay Styles */
     .modal-overlay { position: fixed; inset: 0; background: rgba(58,46,57,0.85); z-index: 10000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; backdrop-filter: blur(4px); padding: 20px; }
     .modal-overlay.open { opacity: 1; pointer-events: auto; }
@@ -1531,8 +1595,9 @@ function buildInterventions(feats) {
             <div class="int-logic-title">From drivers to action</div>
             <p>
                 In this municipality, the strongest driver signals are ${topDriverNames}.
-                The intervention directions below connect these patterns to immediate responses,
-                structural adaptation measures, and local checks before action.
+                The intervention flow starts from actions that fit existing municipal and GGD routines,
+                then opens toward longer-term adaptation choices. This helps translate vulnerability data
+                into policy questions that local actors can recognise, discuss, and adjust.
             </p>
             <div class="int-driver-tags">
                 ${topDrivers.map(d => `
@@ -1543,22 +1608,39 @@ function buildInterventions(feats) {
             </div>
         </div>
 
-        <div class="int-group">
-            <div class="int-group-title">Immediate response</div>
-            <p class="int-group-desc">
-                Actions that can support heatwave preparedness, communication, outreach, or temporary cooling access.
-            </p>
+        <div class="int-pager" role="tablist" aria-label="Intervention timing">
+            <button class="int-page-btn active" type="button" data-int-page="immediate">
+                Immediate response
+            </button>
+            <button class="int-page-btn" type="button" data-int-page="structural">
+                Structural adaptation
+            </button>
+        </div>
+
+        <div class="int-page active" data-int-panel="immediate">
+            <div class="int-page-header">
+                <span class="int-page-kicker">Near-term action</span>
+                <div class="int-group-title">Immediate response</div>
+                <p class="int-group-desc">
+                    Actions that can support heatwave preparedness, communication, outreach, or temporary cooling access.
+                </p>
+            </div>
+
             ${immediateItems.length
                 ? immediateItems.map(renderInterventionItem).join('')
                 : `<p class="int-group-desc">No immediate-response items are available for the current driver combination.</p>`
             }
         </div>
 
-        <div class="int-group">
-            <div class="int-group-title">Structural adaptation</div>
-            <p class="int-group-desc">
-                Measures that address housing, public space, infrastructure, and long-term neighbourhood resilience.
-            </p>
+        <div class="int-page" data-int-panel="structural">
+            <div class="int-page-header">
+                <span class="int-page-kicker">Longer-term adaptation</span>
+                <div class="int-group-title">Structural adaptation</div>
+                <p class="int-group-desc">
+                    Measures that address housing, public space, infrastructure, and long-term neighbourhood resilience.
+                </p>
+            </div>
+
             ${structuralItems.length
                 ? structuralItems.map(renderInterventionItem).join('')
                 : `<p class="int-group-desc">No structural-adaptation items are available for the current driver combination.</p>`
@@ -1566,12 +1648,16 @@ function buildInterventions(feats) {
         </div>
 
         <div class="local-checks">
-            <div class="int-group-title">Check locally before action</div>
-            <ul>
-                ${buildLocalChecks(topDrivers).map(check => `<li>${check}</li>`).join('')}
-            </ul>
+            <details>
+                <summary>Check locally before action</summary>
+                <ul>
+                    ${buildLocalChecks(topDrivers).map(check => `<li>${check}</li>`).join('')}
+                </ul>
+            </details>
         </div>
     `;
+
+    setupInterventionPager();
 }
 
 function buildInterventionNote(topDrivers) {
@@ -1638,6 +1724,25 @@ function renderInterventionItem(item) {
             </div>
         </div>
     `;
+}
+
+function setupInterventionPager() {
+    const buttons = document.querySelectorAll('.int-page-btn');
+    const panels = document.querySelectorAll('.int-page');
+
+    buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const target = btn.dataset.intPage;
+
+            buttons.forEach(b => {
+                b.classList.toggle('active', b === btn);
+            });
+
+            panels.forEach(panel => {
+                panel.classList.toggle('active', panel.dataset.intPanel === target);
+            });
+        });
+    });
 }
 
 // ═══════════════════════════════════════════════════════════
