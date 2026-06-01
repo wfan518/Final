@@ -258,6 +258,23 @@
             color: rgba(253, 255, 247, 0.55); margin-top: 12px;
             letter-spacing: 0.06em; text-transform: uppercase;
         }
+        .model-explain {
+            margin-top: 12px;padding-top: 12px;
+            border-top: 1px solid rgba(253, 255, 247, 0.12);
+            font-size: 0.78rem;line-height: 1.55;
+            color: var(--sidebar-muted);
+        }
+        .model-explain strong {
+            color: var(--sidebar-heading);
+            font-weight: 600;
+        }
+        .model-bullets {
+            margin: 8px 0 0;
+            padding-left: 16px;
+        }
+        .model-bullets li {
+            margin-bottom: 5px;
+        }
 
         /* ── MAP STAGE ── */
         .map-stage-wrap {
@@ -445,8 +462,8 @@
     <div class="control-group">
         <span class="section-label">Composite Risk Score</span>
         <button class="scenario-btn active" data-layer="risk_2025_baseline" data-type="composite">2025 — Current Baseline</button>
-        <button class="scenario-btn" data-layer="risk_2050_baseline" data-type="composite">2050 — +1.5°C Warming</button>
-        <button class="scenario-btn" data-layer="risk_2075_baseline" data-type="composite">2075 — +3.0°C Warming</button>
+        <button class="scenario-btn" data-layer="risk_2050_baseline" data-type="composite">2050 — Medium-Term Outlook</button>
+        <button class="scenario-btn" data-layer="risk_2075_baseline" data-type="composite">2075 — Long-Term Outlook</button>
     </div>
 
     <!-- THEMATIC VARIABLE LAYERS -->
@@ -483,17 +500,9 @@
 
     <!-- MODEL CARD -->
     <div class="model-card">
-        <h3>Composite 4+1 Theme Model</h3>
-        <div class="formula">
-            Vulnerability ≈ f(<br>
-            &nbsp;&nbsp;<span style="color:#c94a35">PET temp</span>,
-            <span style="color:#7e5a9b">Elderly%</span>,<br>
-            &nbsp;&nbsp;<span style="color:#c27728">Low-income%</span>,
-            <span style="color:#7e5a9b">Children%</span>,<br>
-            &nbsp;&nbsp;<span style="color:#3a7baa">Pre-2010 bldgs</span>,<br>
-            &nbsp;&nbsp;<span style="color:#1aab9f">Stress index</span><br>
-            )
-        </div>
+        <h3 id="modelTitle">Composite vulnerability model</h3>
+        <div class="formula" id="modelFormula"></div>
+        <div class="model-explain" id="modelExplain"></div>
         <div id="debug-info">Loading data…</div>
     </div>
 </div>
@@ -526,6 +535,86 @@ const THEME_DEFS = {
     populations:              { label: 'Vulnerable Populations',       color: '#7e5a9b' },
     socioeconomic:            { label: 'Socioeconomic',                color: '#c27728' },
     built_environment_access: { label: 'Built Environment & Access',   color: '#3a7baa' },
+};
+
+const MODEL_EXPLANATIONS = {
+    composite: {
+        title: 'Composite vulnerability model',
+        formula: `
+            Vulnerability ≈ f(<br>
+            &nbsp;&nbsp;<span style="color:#c94a35">Heat exposure</span>,<br>
+            &nbsp;&nbsp;<span style="color:#7e5a9b">Vulnerable populations</span>,<br>
+            &nbsp;&nbsp;<span style="color:#c27728">Socioeconomic deprivation</span>,<br>
+            &nbsp;&nbsp;<span style="color:#3a7baa">Built environment &amp; access</span><br>
+            )
+        `,
+        explain: `
+            <strong>Composite Risk Score</strong> combines the four vulnerability drivers into one relative neighbourhood score. 
+            It should be used to compare spatial patterns and identify areas for closer local interpretation, not as an exact health forecast.
+        `
+    },
+
+    heat: {
+        title: 'Heat exposure',
+        formula: `
+            Heat Exposure ≈ f(<br>
+            &nbsp;&nbsp;<span style="color:#c94a35">PET temperature</span>,<br>
+            &nbsp;&nbsp;<span style="color:#c94a35">RIVM heat class</span>,<br>
+            &nbsp;&nbsp;<span style="color:#c94a35">urban heat intensity</span><br>
+            )
+        `,
+        explain: `
+            <strong>Heat Exposure</strong> describes where outdoor heat stress is likely to be higher. 
+            It helps identify neighbourhoods where physical exposure to heat may require shading, cooling routes, or green-blue infrastructure.
+        `
+    },
+
+    populations: {
+        title: 'Vulnerable populations',
+        formula: `
+            Vulnerable Populations ≈ f(<br>
+            &nbsp;&nbsp;<span style="color:#7e5a9b">elderly residents</span>,<br>
+            &nbsp;&nbsp;<span style="color:#7e5a9b">young children</span>,<br>
+            &nbsp;&nbsp;<span style="color:#7e5a9b">frailty indicators</span><br>
+            )
+        `,
+        explain: `
+            <strong>Vulnerable Populations</strong> captures groups that may be physiologically more sensitive to heat. 
+            It supports targeted outreach, care coordination, and heat-health communication during heat events.
+        `
+    },
+
+    socioeconomic: {
+        title: 'Socioeconomic deprivation',
+        formula: `
+            Socioeconomic Deprivation ≈ f(<br>
+            &nbsp;&nbsp;<span style="color:#c27728">low income</span>,<br>
+            &nbsp;&nbsp;<span style="color:#c27728">education level</span>,<br>
+            &nbsp;&nbsp;<span style="color:#c27728">social minimum</span>,<br>
+            &nbsp;&nbsp;<span style="color:#c27728">rental housing</span><br>
+            )
+        `,
+        explain: `
+            <strong>Socioeconomic Deprivation</strong> points to limited adaptive capacity. 
+            High scores may indicate that residents face financial, legal, language, or housing barriers when trying to protect themselves from heat.
+        `
+    },
+
+    built_environment_access: {
+        title: 'Built environment & access',
+        formula: `
+            Built Environment &amp; Access ≈ f(<br>
+            &nbsp;&nbsp;<span style="color:#3a7baa">older housing</span>,<br>
+            &nbsp;&nbsp;<span style="color:#3a7baa">shade and green access</span>,<br>
+            &nbsp;&nbsp;<span style="color:#3a7baa">cooling spaces</span>,<br>
+            &nbsp;&nbsp;<span style="color:#3a7baa">health-service access</span><br>
+            )
+        `,
+        explain: `
+            <strong>Built Environment & Access</strong> describes whether the physical and service environment helps or limits adaptation. 
+            It links housing, public space, green access, cooling locations, and service proximity to heat-health vulnerability.
+        `
+    }
 };
 
 // All popup themes in display order
@@ -573,6 +662,8 @@ function interpolateHex(a, b, t) {
 var currentLayer = 'risk_2025_baseline';
 var currentType  = 'composite';
 var currentTheme = 'composite';
+
+updateModelCard();
 
 // ─── MAP ──────────────────────────────────────────────────────────────────────
 const netherlandsBounds = L.latLngBounds(L.latLng(50.5, 3.0), L.latLng(53.7, 7.5));
@@ -700,6 +791,19 @@ function updateLegend() {
     legendControl._div.innerHTML = html;
 }
 
+function updateModelCard() {
+    const key = currentType === 'theme' ? currentTheme : 'composite';
+    const cfg = MODEL_EXPLANATIONS[key] || MODEL_EXPLANATIONS.composite;
+
+    const titleEl = document.getElementById('modelTitle');
+    const formulaEl = document.getElementById('modelFormula');
+    const explainEl = document.getElementById('modelExplain');
+
+    if (titleEl) titleEl.textContent = cfg.title;
+    if (formulaEl) formulaEl.innerHTML = cfg.formula;
+    if (explainEl) explainEl.innerHTML = cfg.explain;
+}
+
 // ─── BUTTON EVENTS ────────────────────────────────────────────────────────────
 document.querySelectorAll('.scenario-btn').forEach(btn => {
     btn.addEventListener('click', function() {
@@ -708,6 +812,7 @@ document.querySelectorAll('.scenario-btn').forEach(btn => {
         currentLayer = this.dataset.layer;
         currentType  = 'composite';
         currentTheme = 'composite';
+        updateModelCard();
         if (geojsonData) renderLayer();
     });
 });
@@ -719,6 +824,7 @@ document.querySelectorAll('.theme-btn').forEach(btn => {
         currentLayer = this.dataset.layer;
         currentType  = 'theme';
         currentTheme = this.dataset.theme;
+        updateModelCard();
         if (geojsonData) renderLayer();
     });
 });
