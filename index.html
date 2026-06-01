@@ -718,13 +718,20 @@
         
     /* Modal Overlay Styles */
     .modal-overlay { position: fixed; inset: 0; background: rgba(58,46,57,0.85); z-index: 10000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; backdrop-filter: blur(4px); padding: 20px; }
-    .modal-overlay.open { opacity: 1; pointer-events: auto; }
-    .modal-content { background: var(--paper); width: 100%; max-width: 640px; max-height: calc(100vh - 40px); overflow-y: auto; border-radius: 20px; padding: 0; position: relative; transform: translateY(20px); transition: transform 0.3s ease; box-shadow: 0 32px 64px rgba(0,0,0,0.4); }
+    .modal-overlay.open { opacity: 1; pointer-events: auto; }    .modal-content { background: linear-gradient(to bottom, #3a2e39 0%, #3a2e39 50%, var(--paper) 50%, var(--paper) 100%); width: 100%; max-width: 640px; max-height: calc(100vh - 40px); overflow-y: auto; border-radius: 20px; padding: 0; position: relative; transform: translateY(20px); transition: transform 0.3s ease; box-shadow: 0 32px 64px rgba(0,0,0,0.4); }
     .modal-content::-webkit-scrollbar { width: 8px; }
     .modal-content::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 4px; }
     .modal-overlay.open .modal-content { transform: translateY(0); }
     .modal-close { position: absolute; top: 18px; right: 18px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,.16); width: 32px; height: 32px; border-radius: 16px; font-size: 20px; line-height: 1; cursor: pointer; color: var(--paper); transition: 0.2s; display: flex; align-items: center; justify-content: center; z-index:2; }
     .modal-close:hover { background: rgba(0,0,0,0.1); }
+
+    /* Intervention Modal Pros & Cons Grid */
+    .int-procon-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 12px; }
+    .int-procon-box { background: var(--accent-pale); border: 1px solid rgba(37, 147, 143, 0.35); padding: 16px; border-radius: 8px; }
+    .int-procon-box h4 { margin-top: 0; font-family: var(--mono); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; color: var(--accent-strong); }
+    .int-procon-list { margin: 0; padding-left: 16px; font-size: 0.8rem; color: var(--ink); list-style-position: outside; }
+    .int-procon-list li { margin-bottom: 8px; }
+
     .more-info-btn { width: 100%; margin-top: 12px; padding: 10px; background: var(--accent-pale); border: 1px solid rgba(37,147,143,.4); color: var(--accent-strong); border-radius: 6px; cursor: pointer; font-family: var(--mono); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; transition: 0.2s; font-weight: 500; }
     .more-info-btn:hover { background: var(--accent); color: var(--paper); border-color: var(--accent); }
     
@@ -786,7 +793,7 @@
     .hp-score{font-family:var(--serif);font-size:3rem;line-height:.9;color:var(--accent)}
     .hp-score span{font-family:var(--mono);font-size:.72rem;color:rgba(253,255,247,.55)}
     .hp-comp { font-family: var(--mono); font-size: 0.64rem; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(253,255,247,.62); margin-top: 8px; font-weight: 600; }
-    .hp-body{padding:24px 32px 30px}
+    .hp-body{padding:24px 32px 30px; background: var(--paper); border-radius: 0 0 20px 20px;}
     .hp-compare{display:inline-flex;align-items:center;gap:8px;margin-bottom:18px;padding:7px 10px;border-radius:999px;background:var(--accent-pale);color:var(--accent-strong);font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;text-transform:uppercase}
     .hp-section { margin-bottom: 20px; }
     .hp-sec-title { font-family: var(--mono); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--light); margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
@@ -1103,7 +1110,7 @@
 <div id="intModal" class="modal-overlay">
     <div class="modal-content">
         <button class="modal-close int-modal-close" type="button" aria-label="Close intervention details">×</button>
-        <div id="intModalBody" style="padding:28px 32px 32px"></div>
+        <div id="intModalBody"></div>
     </div>
 </div>
 
@@ -1967,28 +1974,210 @@ function closeModal() {
     document.getElementById('hoodModal').classList.remove('open');
 }
 
+// 1. The complete data from 'intervention texts.docx'
+const INTERVENTION_DETAILS = {
+    "Green-Based Solutions (GBS)": {
+        theme: "Heat Exposure",
+        type: "Infrastructure",
+        title: "Green-Based Solutions (GBS)",
+        desc: "Green infrastructure can take various forms, including street trees, parks, community gardens, green roofs, and green walls, and can reduce heat exposure in multiple different ways. Firstly, trees provide shade, which has been shown to reduce the surface temperature of sidewalks by more than 30°C in a recent Dutch study (Fabrique, 2026). Additionally, vegetation cools the surrounding environment through evapotranspiration, a process in which plants release water vapor through their leaves. As water evaporates, heat is absorbed from the surrounding air, creating a cooling effect (Brown et al., 2015). Planting additional greenery is also effective in addressing the urban heat island effect... An Australian study estimated that widespread implementation of GBS could even reduce heat related mortality by 37–99% (Chen et al., 2014).",
+        price: "Grass and bushes are generally inexpensive however they typically have limited cooling capacity. Trees have a high cooling capacity, especially if they have large canopies, however these tend to be more expensive. Green roofs and green walls vary based on the structure.",
+        pros: [
+            "Effective in reducing heat exposure and the urban heat island effect.",
+            "Green roofs and walls require very little additional space to be implemented, ideal for limited land availability.",
+            "Provides additional benefits such as improved biodiversity, enhanced air quality, stormwater management, carbon sequestration, and aesthetic improvements."
+        ],
+        cons: [
+            "Trees require sufficient space; in urban streets, the available space between buildings may need to be at least 1.5–2.5 metres.",
+            "Vegetation may require ongoing maintenance and water, which could be problematic during droughts.",
+            "Large trees in narrow streets can block airflow, working counterproductively during hot periods."
+        ],
+        rankings: [
+            { label: "Built Env.", color: "#3a7baa", width: "100%" },
+            { label: "Heat", color: "#c94a35", width: "100%" },
+            { label: "Populations", color: "#7e5a9b", width: "75%" },
+            { label: "Socioeconomic", color: "#c27728", width: "75%" }
+        ]
+    },
+    "Surface reflectiveness": {
+        theme: "Heat Exposure",
+        type: "Infrastructure",
+        title: "Surface reflectiveness",
+        desc: "Many urban surfaces, such as dark asphalt roads, concrete pavements, and traditional roofing materials, absorb large amounts of solar radiation during the day and release this stored heat over time. This contributes significantly to the urban heat island effect. Increasing the reflectiveness (also known as albedo) of urban surfaces can help reduce this heat accumulation. Reflective roofs are designed to reflect a greater proportion of sunlight and absorb less heat... An Italian study suggested that if the albedo of all surfaces was increased, temperature could be reduced by up to 2.5˚C (Morini et al. 2016).",
+        price: "Costs vary by material and scale of retrofit; cool roofs and pavements are often integrated into existing buildings and infrastructure during renovation projects.",
+        pros: [
+            "Effective in reducing surface temperatures and heat absorption.",
+            "Helps mitigate the urban heat island effect.",
+            "Suitable for densely built urban areas with limited space.",
+            "Doesn't require energy or water use, and requires little maintenance.",
+            "In air-conditioned residential buildings, solar reflectance from a cool roof can reduce peak cooling demand by 11–27%."
+        ],
+        cons: [
+            "Reflective surfaces can cause glare, potentially affecting pedestrians, drivers, and nearby buildings.",
+            "The cooling benefits may decrease over time if surfaces are not cleaned.",
+            "Some may not be able to afford or be motivated to increase the albedo of their personal property."
+        ],
+        rankings: [
+            { label: "Built Env.", color: "#3a7baa", width: "100%" },
+            { label: "Heat", color: "#c94a35", width: "100%" },
+            { label: "Populations", color: "#7e5a9b", width: "75%" },
+            { label: "Socioeconomic", color: "#c27728", width: "75%" }
+        ]
+    },
+    "Water misting systems": {
+        theme: "Heat Exposure",
+        type: "Infrastructure",
+        title: "Water misting systems",
+        desc: "Water misting systems consist of nozzles that release very small droplets of water into the air. These droplets quickly evaporate, a process that absorbs heat energy from the surrounding environment and lowers the air temperature. They can be installed in various spaces such as parks, bus stops, playgrounds or other outdoor communal areas and are particularly effective in dry environments and have been found to reduce perceived outdoor temperature by up to 6.5°C in a US study (Vanos et al., 2022).",
+        price: "Portable misting systems are generally relatively inexpensive and can be installed quickly. Operating costs depend on water consumption and energy requirements for pumping.",
+        pros: [
+            "Provides immediate cooling and heat relief.",
+            "Can be deployed rapidly during heatwaves.",
+            "Effective in public gathering spaces and high traffic pedestrian areas.",
+            "Requires relatively little physical space."
+        ],
+        cons: [
+            "Requires a reliable water supply and increases water consumption (problematic during droughts).",
+            "Less effective in humid areas.",
+            "Cooling effects are localised and temporary.",
+            "May create slippery surfaces if not properly designed."
+        ],
+        rankings: [
+            { label: "Heat", color: "#c94a35", width: "100%" },
+            { label: "Built Env.", color: "#3a7baa", width: "75%" },
+            { label: "Populations", color: "#7e5a9b", width: "50%" },
+            { label: "Socioeconomic", color: "#c27728", width: "50%" }
+        ]
+    },
+    "Indoor solar shading": {
+        theme: "Built Environment & Access",
+        type: "Housing",
+        title: "Indoor solar shading",
+        desc: "Solar shading involves the use of architectural elements that prevent sunlight from directly striking windows, walls, and other building surfaces. Common examples include window shutters, external blinds, overhangs, balconies, and recessed windows. These features act as barriers between the sun and the building, reducing solar heat gain before it enters the indoor environment. Hoof et al., (2014) suggests that it is one of the most effective climate adaptation measures for residential buildings. External shading devices are generally more effective than internal blinds because they block solar radiation before it passes through the window.",
+        price: "Window shutters and external blinds generally involve moderate installation costs. Architectural features such as balconies and overhangs can be incorporated into new buildings but may increase construction costs. Maintenance costs are generally low.",
+        pros: [
+            "Effectively reduces indoor temperatures and heat exposure.",
+            "Doesn't require energy or water use.",
+            "Provides immediate cooling benefits once installed."
+        ],
+        cons: [
+            "May be unaffordable for low income individuals, or increase housing costs.",
+            "Effectiveness depends on the type of housing and window exposure.",
+            "Only affects indoor temperature."
+        ],
+        rankings: [
+            { label: "Built Env.", color: "#3a7baa", width: "100%" },
+            { label: "Heat", color: "#c94a35", width: "75%" },
+            { label: "Populations", color: "#7e5a9b", width: "50%" },
+            { label: "Socioeconomic", color: "#c27728", width: "50%" }
+        ]
+    },
+    "Heat subsidies": {
+        theme: "Socioeconomic",
+        type: "Financial",
+        title: "Heat subsidies",
+        desc: "One of the main barriers to homeowners implementing heat adaptation measures is the upfront cost (Osberghaus & Abeling., 2022). Heat subsidies aim to address this challenge by providing financial support to property owners in the form of grants, tax reductions, or low interest loans. By lowering the financial burden associated with these interventions (such as solar shading, green roofs, and reflective roofing), governments can accelerate their adoption and increase resilience to heatwaves. Subsidies may be particularly important for low income households, who are often more vulnerable to extreme heat but may lack the financial resources to invest in adaptation measures.",
+        price: "While expensive for governments, subsidies can reduce long-term public health and energy costs associated with extreme heat.",
+        pros: [
+            "Reduces financial barriers to implementing heat adaptation measures.",
+            "Encourages adoption of cooling interventions and supports vulnerable households.",
+            "Flexible and applicable to a wide range of heat adaptation strategies.",
+            "Provides additional benefits such as reduced energy consumption."
+        ],
+        cons: [
+            "Requires substantial government funding.",
+            "Effectiveness depends on public awareness and participation.",
+            "Some studies suggest older demographics are less interested in some forms of heat adaptation despite being more vulnerable.",
+            "May disproportionately reach higher income households if not designed carefully."
+        ],
+        rankings: [
+            { label: "Socioeconomic", color: "#c27728", width: "100%" },
+            { label: "Populations", color: "#7e5a9b", width: "75%" },
+            { label: "Built Env.", color: "#3a7baa", width: "50%" },
+            { label: "Heat", color: "#c94a35", width: "25%" }
+        ]
+    }
+};
+
+// 2. The function that generates the high-contrast HTML
+function getInterventionHTML(interventionName) {
+    const data = INTERVENTION_DETAILS[interventionName];
+    
+    // Fallback if the data isn't in the object yet
+    if (!data) return `<div style="padding:40px;">No detailed data found for ${escapeHtml(interventionName)}.</div>`;
+
+    // Build the descending colored bars using your existing .hp-bar-row classes
+    const barsHtml = data.rankings.map((r, i) => `
+        <div class="hp-bar-row" style="margin-bottom: 12px;">
+            <span class="hp-bar-label" style="width: 105px;">${r.label}</span>
+            <div class="hp-bar-track" style="height: 8px;">
+                <div class="hp-bar-fill" style="width: ${r.width}; background: ${r.color}; border-radius: 4px;"></div>
+            </div>
+            <span class="hp-bar-val" style="color: ${r.color}; font-size: 0.65rem;">${i+1}</span>
+        </div>
+    `).join('');
+
+    const prosHtml = data.pros.map(p => `<li style="margin-bottom:8px;">${p}</li>`).join('');
+    const consHtml = data.cons.map(c => `<li style="margin-bottom:8px;">${c}</li>`).join('');
+
+    // Notice the border-radius applied directly to hp-hero here to fix the corners
+    return `
+    <div class="hood-popup">
+        <div class="hp-hero" style="padding: 28px 32px 32px; border-radius: 20px 20px 0 0;">
+            <div>
+                <div class="hp-kicker">${escapeHtml(data.theme)} · ${escapeHtml(data.type)}</div>
+                <h3 class="hp-title" style="font-size: 2rem;">${escapeHtml(data.title)}</h3>
+            </div>
+        </div>
+
+        <div class="hp-body" style="background: var(--paper); padding: 32px;">
+            <div class="hp-section">
+                <div class="hp-sec-title" style="color: var(--ink); border-bottom-color: var(--border);">Overview</div>
+                <div class="hp-why" style="background: transparent; border: none; padding: 0; color: var(--ink); font-size: 0.95rem;">
+                    ${escapeHtml(data.desc)}
+                </div>
+            </div>
+
+            <div class="hp-section">
+                <div class="hp-sec-title" style="color: var(--ink); border-bottom-color: var(--border);">Thematic Impact Ranking</div>
+                <div style="background: var(--warm); padding: 18px 20px 6px; border-radius: 8px; border: 1px solid var(--border);">
+                    ${barsHtml}
+                </div>
+            </div>
+
+            <div class="hp-section">
+                <div class="hp-sec-title" style="color: var(--ink); border-bottom-color: var(--border);">Pros & Cons</div>
+                <div class="int-procon-grid">
+                    <div class="int-procon-box pros">
+                        <h4>Advantages</h4>
+                        <ul class="int-procon-list">${prosHtml}</ul>
+                    </div>
+                    <div class="int-procon-box cons">
+                        <h4>Limitations</h4>
+                        <ul class="int-procon-list">${consHtml}</ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hp-section" style="margin-bottom:0">
+                <div class="hp-sec-title" style="color: var(--ink); border-bottom-color: var(--border);">Cost & Implementation</div>
+                <p style="font-size: 0.85rem; color: var(--mid); line-height: 1.5; margin: 12px 0 0 0; background: var(--warm); padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
+                    ${escapeHtml(data.price)}
+                </p>
+            </div>
+        </div>
+    </div>
+    `;
+}
+
 function openInterventionModal(id) {
     const item = getInterventionById(id);
     if (!item) return;
-    closeModal();
-    const primaryTheme = themeMetaForKey(item.themes[0]);
-    const sectionsHtml = item.sections.map(sec => `
-        <div class="int-modal-section">
-            <h4>${escapeHtml(sec.title)}</h4>
-            ${sec.body.includes('\n-') || sec.body.startsWith('-')
-                ? `<ul>${sec.body.split(/\n/).filter(Boolean).map(line => `<li>${escapeHtml(line.replace(/^-\s*/, ''))}</li>`).join('')}</ul>`
-                : `<p>${escapeHtml(sec.body)}</p>`}
-        </div>
-    `).join('');
-    document.getElementById('intModalBody').innerHTML = `
-        <div class="int-modal-kicker">${escapeHtml(primaryTheme.label)} · ${escapeHtml(item.type)}</div>
-        <h3 class="int-modal-title">${escapeHtml(item.name)}</h3>
-        <div class="int-modal-section">
-            <h4>Short description</h4>
-            <p>${escapeHtml(item.shortDesc)}</p>
-        </div>
-        ${sectionsHtml}
-    `;
+    const interventionName = item.name;
+    // 1. Generate the beautiful HTML
+    document.getElementById('intModalBody').innerHTML = getInterventionHTML(interventionName);
+    
+    // 2. Open your modal
     document.getElementById('intModal').classList.add('open');
 }
 
