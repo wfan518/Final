@@ -580,19 +580,55 @@
     .more-info-btn { width: 100%; margin-top: 12px; padding: 10px; background: var(--accent-pale); border: 1px solid rgba(37,147,143,.4); color: var(--accent-strong); border-radius: 6px; cursor: pointer; font-family: var(--mono); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; transition: 0.2s; font-weight: 500; }
     .more-info-btn:hover { background: var(--accent); color: var(--paper); border-color: var(--accent); }
     
-    /* Scenario Selection Pills */
-    .scen-pill {
-        border: none; background: transparent; padding: 6px 14px; border-radius: 99px;
-        font-family: var(--mono); font-size: 0.62rem; text-transform: uppercase;
-        cursor: pointer; color: var(--light); transition: all 0.2s;
+    /* Scenario year slider (under map) */
+    .scenario-slider-wrap {
+        margin: 14px 0 12px;
+        padding: 14px 16px;
+        background: var(--paper);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-sm);
     }
-    .scen-pill:hover { color: var(--ink); }
-    .scen-pill.active { background: var(--ink); color: #fdfff7; box-shadow: var(--shadow-sm); }
-    .scen-pill.policy { border: 1px dashed rgba(37,147,143,.4); }
-    .scen-pill.policy.active { 
-        background: linear-gradient(135deg, var(--heat) 0%, var(--accent-strong) 100%); 
-        border-color: var(--heat); 
+    .scenario-slider-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 12px;
     }
+    .scenario-slider-label {
+        font-family: var(--mono);
+        font-size: 0.62rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--light);
+    }
+    .scenario-slider-value {
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        color: var(--accent-strong);
+    }
+    .scenario-slider-control { position: relative; padding: 0 4px 22px; }
+    .scenario-slider-control input[type="range"] {
+        width: 100%;
+        margin: 0;
+        accent-color: var(--accent-strong);
+        cursor: pointer;
+    }
+    .scenario-slider-ticks {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 6px;
+        font-family: var(--mono);
+        font-size: 0.62rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--light);
+    }
+    .scenario-slider-ticks span { transition: color 0.2s, font-weight 0.2s; }
+    .scenario-slider-ticks span.on { color: var(--ink); font-weight: 600; }
 
     .hood-popup { font-family: var(--sans); }
     .hp-hero{background:linear-gradient(155deg,#3a2e39 0%,#2f2630 55%,#211a20 100%);color:var(--paper);padding:30px 32px 28px;display:grid;grid-template-columns:1fr auto;gap:18px;align-items:end}
@@ -671,7 +707,7 @@
                 <span class="stat-l">Drivers + risk score</span>
             </div>
             <div>
-                <span class="stat-n">2025–75</span>
+                <span class="stat-n">2024–2100</span>
                 <span class="stat-l">Scenarios</span>
             </div>
         </div>
@@ -768,16 +804,6 @@
                     <div style="font-family:var(--serif);font-size:1.7rem" id="rMuniName"></div>
                     <div style="font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--light);margin-top:2px" id="rMuniMeta"></div>
                 </div>
-                <!-- Scenario Selector (Visible when 'Risk' tab is active) -->
-                <div id="scenarioSelector" style="display: flex; align-items: center; gap: 8px; margin: 10px 0;">
-                    <span style="font-family: var(--mono); font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--light);">Projected Scenario:</span>
-                    <div style="display: flex; background: var(--warm); border-radius: 99px; padding: 4px; border: 1px solid var(--border);">
-                        <button class="scen-pill active" data-scen="risk_2025_baseline">2025</button>
-                        <button class="scen-pill" data-scen="risk_2050_baseline">2050</button>
-                        <button class="scen-pill" data-scen="risk_2075_baseline">2075</button>
-                        <button class="scen-pill policy" data-scen="risk_2050_greening">2050 with intervention</button>
-                    </div>
-                </div>
                 <button class="back-btn" id="backBtn">← Back to municipalities</button>
             </div>
 
@@ -800,6 +826,20 @@
                             <div class="legend-title">Composite risk score</div>
                             <div class="legend-ramp"></div>
                             <div class="legend-scale"><span>0 low</span><span>50</span><span>100 high</span></div>
+                        </div>
+                    </div>
+                    <div id="scenarioSliderWrap" class="scenario-slider-wrap" aria-label="Projection year">
+                        <div class="scenario-slider-head">
+                            <span class="scenario-slider-label">Projection year</span>
+                            <span class="scenario-slider-value" id="scenarioSliderValue">2024</span>
+                        </div>
+                        <div class="scenario-slider-control">
+                            <input type="range" id="scenarioSlider" min="0" max="2" step="1" value="0" aria-valuemin="2024" aria-valuemax="2100" aria-valuenow="2024" aria-label="Projection year">
+                            <div class="scenario-slider-ticks" id="scenarioSliderTicks">
+                                <span class="on" data-year="2024">2024</span>
+                                <span data-year="2050">2050</span>
+                                <span data-year="2100">2100</span>
+                            </div>
                         </div>
                     </div>
                     <div class="theme-tabs" id="themeTabs"></div>
@@ -952,6 +992,64 @@ function scoreValue(props, key) {
     return null;
 }
 
+const SCENARIO_YEARS = ['2024', '2050', '2100'];
+const PROPERTY_CANDIDATES = {
+    composite: {
+        '2024': ['risk_2024_baseline', 'risk_2025_baseline'],
+        '2050': ['risk_2050_baseline'],
+        '2100': ['risk_2100_baseline', 'risk_2075_baseline'],
+    },
+    theme_heat: {
+        '2024': ['theme_heat_2024', 'theme_heat'],
+        '2050': ['theme_heat_2050', 'theme_heat'],
+        '2100': ['theme_heat_2100', 'theme_heat'],
+    },
+    theme_populations: {
+        '2024': ['theme_populations_2024', 'theme_populations'],
+        '2050': ['theme_populations_2050', 'theme_populations'],
+        '2100': ['theme_populations_2100', 'theme_populations'],
+    },
+    theme_socioeconomic: {
+        '2024': ['theme_socioeconomic_2024', 'theme_socioeconomic'],
+        '2050': ['theme_socioeconomic_2050', 'theme_socioeconomic'],
+        '2100': ['theme_socioeconomic_2100', 'theme_socioeconomic'],
+    },
+    theme_built_environment_access: {
+        '2024': ['theme_built_environment_access_2024', 'theme_built_environment_access'],
+        '2050': ['theme_built_environment_access_2050', 'theme_built_environment_access'],
+        '2100': ['theme_built_environment_access_2100', 'theme_built_environment_access'],
+    },
+};
+let propertyKeyCache = {};
+
+function resolvePropertyKey(themeKey, year) {
+    const cacheKey = `${themeKey}:${year}`;
+    if (propertyKeyCache[cacheKey]) return propertyKeyCache[cacheKey];
+    const candidates = PROPERTY_CANDIDATES[themeKey]?.[year] || [];
+    const sample = geoData?.features?.[0]?.properties;
+    if (sample) {
+        for (const k of candidates) {
+            if (Object.prototype.hasOwnProperty.call(sample, k) && sample[k] != null && !isNaN(sample[k])) {
+                propertyKeyCache[cacheKey] = k;
+                return k;
+            }
+        }
+    }
+    const fallback = candidates[candidates.length - 1] || themeKey;
+    propertyKeyCache[cacheKey] = fallback;
+    return fallback;
+}
+
+function activeDataKey() {
+    const themeKey = activeTheme.key === 'composite' ? 'composite' : activeTheme.key;
+    return resolvePropertyKey(themeKey, activeScenarioYear);
+}
+
+function getFeatureScore(props, themeKey) {
+    const key = themeKey || (activeTheme.key === 'composite' ? 'composite' : activeTheme.key);
+    return scoreValue(props, resolvePropertyKey(key, activeScenarioYear));
+}
+
 const INTERVENTIONS = {
     theme_heat:{label:'Heat Exposure',color:'#91272e',items:[
         {type:'Infrastructure',name:'Urban greening corridors',desc:'Plant street trees and vegetated corridors along the hottest streets. Each mature tree reduces surrounding Physiological Equivalent Temperature by 2–4°C and provides shade for pedestrians.'},
@@ -987,7 +1085,7 @@ let activeProv = null;
 let activeMuni = null;
 let activeMuniFeats = null;
 let activeTheme = THEMES[0]; // Defaults to Composite Risk
-let activeScenario = 'risk_2025_baseline';
+let activeScenarioYear = '2024';
 let currentProvSortTheme = 'composite'; 
 let currentMuniSortTheme = 'composite'; 
 let rMap = null, rLayer = null;
@@ -1043,21 +1141,48 @@ if (rankSearchEl) rankSearchEl.addEventListener('input', () => {
     if (activeMuniFeats && activeTheme) buildRankings(activeMuniFeats, activeTheme);
 });
 
-// Scenario pill listeners
-document.querySelectorAll('.scen-pill').forEach(btn => {
-    btn.addEventListener('click', function() {
-        document.querySelectorAll('.scen-pill').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        activeScenario = this.dataset.scen;
-        if (activeMuni && activeMuniFeats) {
-            redrawLayer(activeMuniFeats);
-            buildRankings(activeMuniFeats, activeTheme);
-            buildOverview(activeMuniFeats, activeMuni);
-            buildResultSummary(activeMuniFeats, activeMuni);
-            updateMapLegend();
-        }
+function setScenarioYear(year) {
+    if (!SCENARIO_YEARS.includes(year)) return;
+    activeScenarioYear = year;
+    const idx = SCENARIO_YEARS.indexOf(year);
+    const slider = document.getElementById('scenarioSlider');
+    const valueEl = document.getElementById('scenarioSliderValue');
+    if (slider) {
+        slider.value = String(idx);
+        slider.setAttribute('aria-valuenow', year);
+    }
+    if (valueEl) valueEl.textContent = year;
+    document.querySelectorAll('#scenarioSliderTicks span').forEach(span => {
+        span.classList.toggle('on', span.dataset.year === year);
     });
+    refreshScenarioViews();
+}
+
+function refreshScenarioViews() {
+    if (!activeMuni || !activeMuniFeats) return;
+    redrawLayer(activeMuniFeats);
+    buildRankings(activeMuniFeats, activeTheme);
+    buildOverview(activeMuniFeats, activeMuni);
+    buildResultSummary(activeMuniFeats, activeMuni);
+    updateMapLegend();
+    const meta = document.getElementById('rMuniMeta');
+    if (meta) {
+        meta.textContent = `${activeMuniFeats.length} neighborhoods · ${activeProv?.name || 'Netherlands'} · ${activeScenarioYear} projection`;
+    }
+}
+
+const scenarioSliderEl = document.getElementById('scenarioSlider');
+if (scenarioSliderEl) {
+    scenarioSliderEl.addEventListener('input', () => {
+        setScenarioYear(SCENARIO_YEARS[Number(scenarioSliderEl.value)]);
+    });
+}
+document.querySelectorAll('#scenarioSliderTicks span').forEach(span => {
+    span.addEventListener('click', () => setScenarioYear(span.dataset.year));
+    span.style.cursor = 'pointer';
 });
+setScenarioYear('2024');
+
 loadGeoData();
 
 // ═══════════════════════════════════════════════════════════
@@ -1082,13 +1207,14 @@ async function loadGeoData() {
     try {
         const r = await fetch('map_scenarios.geojson');
         geoData = await r.json();
+        propertyKeyCache = {};
         // Calculate true province averages across all matching neighborhoods
         PROVINCES.forEach(p => {
             const feats = geoData.features.filter(f =>
                 p.gemeenten.some(g => normGm(f.properties.gemeentenaam) === normGm(g))
             );
             const avg = arr => { const v=arr.filter(x=>x!=null&&!isNaN(x)); return v.length?v.reduce((a,b)=>a+b,0)/v.length:0; };
-            p.avgRisk = avg(feats.map(f => f.properties.risk_2025_baseline));
+            p.avgRisk = avg(feats.map(f => getFeatureScore(f.properties, 'composite')));
             p.themes = Object.fromEntries(THEMES.map(t => [t.key, avg(feats.map(f => scoreValue(f.properties, t.key)))]));
         });
 
@@ -1228,8 +1354,8 @@ function rankGemeenten(gemeenten, sortTheme) {
         const gmData = {
             name,
             count: feats.length,
-            avgRisk: avg(feats.map(f => f.properties.risk_2025_baseline)),
-            themes: Object.fromEntries(THEMES.map(t => [t.key, avg(feats.map(f => scoreValue(f.properties, t.key)))]))
+            avgRisk: avg(feats.map(f => getFeatureScore(f.properties, 'composite'))),
+            themes: Object.fromEntries(THEMES.map(t => [t.key, avg(feats.map(f => getFeatureScore(f.properties, t.key)))]))
         };
         return gmData;
     }).filter(Boolean).sort((a,b) => {
@@ -1263,7 +1389,7 @@ function selectMuni(name) {
 
     document.getElementById('rMuniName').textContent = name;
     document.getElementById('rMuniMeta').textContent =
-        `${feats.length} neighborhoods · ${activeProv?.name||'Netherlands'} · 2025 baseline`;
+        `${feats.length} neighborhoods · ${activeProv?.name||'Netherlands'} · ${activeScenarioYear} projection`;
 
         goToStep(3);
         setMobileResultView('summary');
@@ -1306,8 +1432,7 @@ function initMap(feats) {
 
 function featStyle(f) {
     const isComp = activeTheme.key === 'composite';
-    const targetKey = isComp ? activeScenario : activeTheme.key;
-    const s = scoreValue(f.properties, targetKey);
+    const s = getFeatureScore(f.properties, isComp ? 'composite' : activeTheme.key);
     const fill = rampColor(s, isComp ? 'composite' : activeTheme.key);
     return {
         fillColor: fill,
@@ -1322,12 +1447,13 @@ function featStyle(f) {
 function buildNeighborhoodPopup(feature, id) {
     const p = feature.properties;
     const n = p.buurtnaam || 'Neighborhood';
-    const comp = p[activeScenario] != null ? Math.round(p[activeScenario]) : '—';
-    const scenLabel = activeScenario === 'risk_2050_greening' ? '2050 with intervention' : activeScenario.split('_')[1];
+    const mainScore = getFeatureScore(p, activeTheme.key === 'composite' ? 'composite' : activeTheme.key);
+    const mainVal = mainScore != null ? Math.round(mainScore) : '—';
+    const scenLabel = `${activeScenarioYear} · ${activeTheme.short}`;
 
     const statsHtml = THEMES.map(t => {
         if (t.key === 'composite') return '';
-        const s = scoreValue(p, t.key);
+        const s = getFeatureScore(p, t.key);
         const val = s != null ? Math.round(s) : '—';
         const pct = s != null ? Math.round(s) : 0;
         return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
@@ -1341,7 +1467,7 @@ function buildNeighborhoodPopup(feature, id) {
 
     return `<div style="font-family:var(--sans);padding:4px">
         <div style="font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);margin-bottom:2px;line-height:1.1">${n}</div>
-        <div style="font-family:var(--mono);font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-strong);margin-bottom:14px">${scenLabel} Risk: ${comp}/100</div>
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-strong);margin-bottom:14px">${scenLabel}: ${mainVal}/100</div>
         ${statsHtml}
         <button class="more-info-btn" type="button" data-id="${escapeHtml(id)}">Detailed Report →</button>
     </div>`;
@@ -1352,14 +1478,15 @@ function openModal(id) {
     if (!layer || !layer.feature) return;
     const p = layer.feature.properties;
     const n = p.buurtnaam || 'Neighborhood';
-    const comp = p[activeScenario] != null ? Math.round(p[activeScenario]) : '—';
-    const scenLabel = activeScenario === 'risk_2050_greening' ? '2050 with intervention' : activeScenario.split('_')[1];
+    const modalScore = getFeatureScore(p, activeTheme.key === 'composite' ? 'composite' : activeTheme.key);
+    const comp = modalScore != null ? Math.round(modalScore) : '—';
+    const scenLabel = `${activeScenarioYear} · ${activeTheme.label}`;
 
     const worstThemes = DRIVER_THEMES.map(t => ({
-        ...t, score: scoreValue(p, t.key) || 0
+        ...t, score: getFeatureScore(p, t.key) || 0
     })).sort((a,b) => b.score - a.score).slice(0, 2);
     const avg = arr => { const v=arr.filter(x=>x!=null&&!isNaN(x)); return v.length?v.reduce((a,b)=>a+b,0)/v.length:0; };
-    const muniAvg = activeMuniFeats ? Math.round(avg(activeMuniFeats.map(f=>f.properties[activeScenario]))) : null;
+    const muniAvg = activeMuniFeats ? Math.round(avg(activeMuniFeats.map(f => getFeatureScore(f.properties, activeTheme.key === 'composite' ? 'composite' : activeTheme.key)))) : null;
     const diff = muniAvg != null && comp !== '—' ? Math.round(comp - muniAvg) : null;
     const compareBadge = diff == null ? 'Municipality comparison unavailable' :
         diff > 0 ? `${diff} points above municipality average` :
@@ -1381,7 +1508,7 @@ function openModal(id) {
 
     const allHtml = THEMES.map(t => {
         if (t.key === 'composite') return '';
-        const s = scoreValue(p, t.key);
+        const s = getFeatureScore(p, t.key);
         const val = s != null ? Math.round(s) : '—';
         const pct = s != null ? Math.round(s) : 0;
         return `
@@ -1418,7 +1545,7 @@ function openModal(id) {
             </div>
             <div class="hp-score-box">
                 <div class="hp-score">${comp}<span>/100</span></div>
-                <div class="hp-comp">${escapeHtml(scenLabel)} risk</div>
+                <div class="hp-comp">${escapeHtml(scenLabel)}</div>
             </div>
         </div>
 
@@ -1467,7 +1594,7 @@ function redrawLayer(feats) {
             layer.bindPopup(() => buildNeighborhoodPopup(f, id), { maxWidth: 260 });
 
             layer.on('mouseover', function () {
-                const v = scoreValue(f.properties, activeTheme.key === 'composite' ? activeScenario : activeTheme.key);
+                const v = getFeatureScore(f.properties, activeTheme.key === 'composite' ? 'composite' : activeTheme.key);
                 this.setStyle({
                     weight: 1.7,
                     color: 'rgba(58, 46, 57, 0.55)',
@@ -1497,11 +1624,12 @@ function buildThemeTabs() {
         b.addEventListener('click', () => {
             activeTheme = t;
             document.querySelectorAll('.theme-tab').forEach(x => x.classList.toggle('on', x.dataset.key===t.key));
-            document.getElementById('scenarioSelector').style.display = (t.key === 'composite') ? 'flex' : 'none';
             updateMapLegend();
             if (activeMuni && activeMuniFeats) {
                 redrawLayer(activeMuniFeats);
                 buildRankings(activeMuniFeats, t);
+                buildOverview(activeMuniFeats, activeMuni);
+                buildResultSummary(activeMuniFeats, activeMuni);
             }
         });
         tabs.appendChild(b);
@@ -1513,18 +1641,18 @@ function buildThemeTabs() {
 // ═══════════════════════════════════════════════════════════
 function buildRankings(feats, theme) {
     const q = (document.getElementById('rankSearch')?.value || '').trim().toLowerCase();
-    const targetKey = theme.key === 'composite' ? activeScenario : theme.key;
-    let pool = feats.filter(f => scoreValue(f.properties, targetKey) != null);
+    const themeKey = theme.key === 'composite' ? 'composite' : theme.key;
+    let pool = feats.filter(f => getFeatureScore(f.properties, themeKey) != null);
     if (q) {
         pool = pool.filter(f => (f.properties.buurtnaam || '').toLowerCase().includes(q));
     }
-    const sorted = pool.sort((a,b) => scoreValue(b.properties, targetKey) - scoreValue(a.properties, targetKey));
+    const sorted = pool.sort((a,b) => getFeatureScore(b.properties, themeKey) - getFeatureScore(a.properties, themeKey));
 
     const list = document.getElementById('rankList');
-    const nAll = feats.filter(f => scoreValue(f.properties, targetKey) != null).length;
-    list.innerHTML = `<div style="font-family:var(--mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--light);margin-bottom:8px">Neighborhoods ranked — ${theme.label} · ${sorted.length}${q ? ` of ${nAll}` : ''} shown</div>`;
+    const nAll = feats.filter(f => getFeatureScore(f.properties, themeKey) != null).length;
+    list.innerHTML = `<div style="font-family:var(--mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--light);margin-bottom:8px">Neighborhoods ranked — ${theme.label} · ${activeScenarioYear} · ${sorted.length}${q ? ` of ${nAll}` : ''} shown</div>`;
     sorted.forEach((f,i) => {
-        const s = Math.round(scoreValue(f.properties, targetKey));
+        const s = Math.round(getFeatureScore(f.properties, themeKey));
         const row = document.createElement('div');
         row.className = 'rank-row';
         row.dataset.id = f.properties.buurtcode || f.properties.buurtnaam;
@@ -1551,12 +1679,11 @@ function buildRankings(feats, theme) {
 // ═══════════════════════════════════════════════════════════
 function buildOverview(feats, name) {
     const avg = arr => { const v=arr.filter(x=>x!=null&&!isNaN(x)); return v.length?v.reduce((a,b)=>a+b,0)/v.length:0; };
-    const comp = Math.round(avg(feats.map(f=>f.properties[activeScenario])));
-    const scenarioYear = activeScenario === 'risk_2050_greening' ? '2050 with intervention' : activeScenario.split('_')[1];
+    const comp = Math.round(avg(feats.map(f => getFeatureScore(f.properties, 'composite'))));
 
     const rows = THEMES.map(t => {
         if (t.key === 'composite') return '';
-        const s = Math.round(avg(feats.map(f=>scoreValue(f.properties, t.key))));
+        const s = Math.round(avg(feats.map(f => getFeatureScore(f.properties, t.key))));
         return `<div class="ov-row">
             <span class="ov-label">${t.short}</span>
             <div class="ov-track"><div class="ov-fill" style="width:${s}%;background:${t.color}"></div></div>
@@ -1565,36 +1692,38 @@ function buildOverview(feats, name) {
     }).join('');
     document.getElementById('overviewCard').innerHTML = `
         <div class="ov-name">${name}</div>
-        <span class="ov-meta">${feats.length} neighborhoods · ${scenarioYear} composite: ${comp}/100</span>
+        <span class="ov-meta">${feats.length} neighborhoods · ${activeScenarioYear} composite: ${comp}/100</span>
         <div class="ov-rows">${rows}</div>`;
 }
 
 function buildResultSummary(feats, name) {
     const avg = arr => { const v=arr.filter(x=>x!=null&&!isNaN(x)); return v.length?v.reduce((a,b)=>a+b,0)/v.length:0; };
-    const comp = Math.round(avg(feats.map(f=>f.properties[activeScenario])));
+    const comp = Math.round(avg(feats.map(f => getFeatureScore(f.properties, 'composite'))));
+    const activeLabel = activeTheme.key === 'composite' ? 'Composite risk' : activeTheme.label;
+    const activeAvg = Math.round(avg(feats.map(f => getFeatureScore(f.properties, activeTheme.key === 'composite' ? 'composite' : activeTheme.key))));
     const topDriver = DRIVER_THEMES
-        .map(t => ({...t, score:avg(feats.map(f=>scoreValue(f.properties, t.key)))}))
+        .map(t => ({...t, score:avg(feats.map(f=>getFeatureScore(f.properties, t.key)))}))
         .sort((a,b)=>b.score-a.score)[0];
     const topNeighborhood = feats
-        .filter(f => f.properties[activeScenario] != null && !isNaN(f.properties[activeScenario]))
-        .sort((a,b)=>b.properties[activeScenario]-a.properties[activeScenario])[0];
-    const scenarioLabel = activeScenario === 'risk_2050_greening' ? '2050 intervention' : activeScenario.split('_')[1];
+        .filter(f => getFeatureScore(f.properties, activeTheme.key === 'composite' ? 'composite' : activeTheme.key) != null)
+        .sort((a,b) => getFeatureScore(b.properties, activeTheme.key === 'composite' ? 'composite' : activeTheme.key) - getFeatureScore(a.properties, activeTheme.key === 'composite' ? 'composite' : activeTheme.key))[0];
+    const topNeighborhoodScore = topNeighborhood ? Math.round(getFeatureScore(topNeighborhood.properties, activeTheme.key === 'composite' ? 'composite' : activeTheme.key)) : null;
 
     document.getElementById('resultSummary').innerHTML = `
         <div class="summary-card">
-            <span class="summary-label">${escapeHtml(scenarioLabel)} risk</span>
-            <span class="summary-value">${isNaN(comp) ? '—' : comp}<span style="font-size:.62em;color:var(--light)">/100</span></span>
-            <span class="summary-note">Average composite score for ${escapeHtml(name)}.</span>
+            <span class="summary-label">${escapeHtml(activeScenarioYear)} · ${escapeHtml(activeLabel)}</span>
+            <span class="summary-value">${isNaN(activeAvg) ? '—' : activeAvg}<span style="font-size:.62em;color:var(--light)">/100</span></span>
+            <span class="summary-note">Average ${escapeHtml(activeLabel.toLowerCase())} for ${escapeHtml(name)}${activeTheme.key === 'composite' ? '' : ` · composite ${isNaN(comp) ? '—' : comp}/100`}.</span>
         </div>
         <div class="summary-card">
             <span class="summary-label">Top driver</span>
             <span class="summary-value">${escapeHtml(topDriver?.short || '—')}</span>
-            <span class="summary-note">${topDriver ? `${Math.round(topDriver.score)}/100 · ${escapeHtml(topDriver.label)}` : 'No driver data available.'}</span>
+            <span class="summary-note">${topDriver ? `${Math.round(topDriver.score)}/100 · ${escapeHtml(topDriver.label)} · ${activeScenarioYear}` : 'No driver data available.'}</span>
         </div>
         <div class="summary-card">
             <span class="summary-label">Highest-risk neighborhood</span>
             <span class="summary-value">${escapeHtml(topNeighborhood?.properties.buurtnaam || '—')}</span>
-            <span class="summary-note">${topNeighborhood ? `${Math.round(topNeighborhood.properties[activeScenario])}/100 in active scenario.` : 'No ranked neighborhoods available.'}</span>
+            <span class="summary-note">${topNeighborhood ? `${topNeighborhoodScore}/100 · ${escapeHtml(activeLabel)} · ${activeScenarioYear}` : 'No ranked neighborhoods available.'}</span>
         </div>`;
 }
 
@@ -1639,7 +1768,7 @@ function buildInterventions(feats) {
     const topDrivers = DRIVER_THEMES
         .map(t => ({
             ...t,
-            score: avg(feats.map(f => scoreValue(f.properties, t.key)))
+            score: avg(feats.map(f => getFeatureScore(f.properties, t.key)))
         }))
         .sort((a, b) => b.score - a.score)
         .slice(0, 3);
@@ -1890,7 +2019,7 @@ function updateMapLegend() {
     if (!legend) return;
     const key = activeTheme.key === 'composite' ? 'composite' : activeTheme.key;
     const ramp = RAMPS[key] || RAMPS.composite;
-    const label = activeTheme.key === 'composite' ? `Composite risk · ${activeScenario === 'risk_2050_greening' ? '2050 intervention' : activeScenario.split('_')[1]}` : activeTheme.label;
+    const label = `${activeTheme.label} · ${activeScenarioYear}`;
     legend.querySelector('.legend-title').textContent = label;
     legend.querySelector('.legend-ramp').style.background = `linear-gradient(90deg, ${ramp.join(',')})`;
 }
