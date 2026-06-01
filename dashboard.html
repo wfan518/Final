@@ -227,11 +227,6 @@
             font-family: var(--mono); font-size: 0.69rem;
             line-height: 1.65; color: rgba(253, 255, 247, 0.82);
         }
-        #debug-info {
-            font-family: var(--mono); font-size: 9px;
-            color: rgba(253, 255, 247, 0.55); margin-top: 12px;
-            letter-spacing: 0.06em; text-transform: uppercase;
-        }
         .model-explain {
             margin-top: 12px;padding-top: 12px;
             border-top: 1px solid rgba(253, 255, 247, 0.12);
@@ -408,6 +403,18 @@
             stroke-dasharray: 8 7;
             animation: dashPulse 1.1s linear infinite;
         }
+        .popup-muni {
+            font-family: var(--mono);font-size: 9px;
+            letter-spacing: 0.08em;text-transform: uppercase;
+            color: rgba(253,255,247,.52);
+            margin-top: -8px;margin-bottom: 12px;
+        }
+        .popup-hint {
+            margin-top: 10px;padding-top: 10px;
+            border-top: 1px solid rgba(253,255,247,.18);
+            font-family: var(--sans);font-size: 0.74rem;
+            line-height: 1.4;color: rgba(253,255,247,.68);
+        }
     </style>
 </head>
 <body data-page="dashboard" class="page-dashboard">
@@ -430,9 +437,9 @@
     <!-- COMPOSITE SCENARIOS -->
     <div class="control-group">
         <span class="section-label">Composite Risk Score</span>
-        <button class="scenario-btn active" data-layer="risk_2025_baseline" data-type="composite">2024 — Current Baseline</button>
-        <button class="scenario-btn" data-layer="risk_2050_baseline" data-type="composite">2050 — Medium-Term Outlook</button>
-        <button class="scenario-btn" data-layer="risk_2075_baseline" data-type="composite">2100 — Long-Term Outlook</button>
+            <button class="scenario-btn active" data-layer="risk_2025_baseline" data-type="composite">2024 — Current Baseline</button>
+            <button class="scenario-btn" data-layer="risk_2050_baseline" data-type="composite">2050 — Medium-Term Outlook</button>
+            <button class="scenario-btn" data-layer="risk_2100_baseline" data-type="composite">2100 — Long-Term Outlook</button>
     </div>
 
     <!-- THEMATIC VARIABLE LAYERS -->
@@ -472,7 +479,6 @@
         <h3 id="modelTitle">Composite vulnerability model</h3>
         <div class="formula" id="modelFormula"></div>
         <div class="model-explain" id="modelExplain"></div>
-        <div id="debug-info">Loading data…</div>
     </div>
 </div>
 
@@ -502,7 +508,7 @@ const THEME_DEFS = {
     composite:                { label: 'Composite Risk',              color: '#3a2e39' },
     heat:                     { label: 'Heat Exposure',                color: '#c94a35' },
     populations:              { label: 'Vulnerable Populations',       color: '#7e5a9b' },
-    socioeconomic:            { label: 'Socioeconomic',                color: '#c27728' },
+    socioeconomic:            { label: 'Socioeconomic Deprivation',    color: '#c27728' },
     built_environment_access: { label: 'Built Environment & Access',   color: '#3a7baa' },
 };
 
@@ -616,7 +622,7 @@ const MODEL_EXPLANATIONS = {
 const POPUP_THEMES = [
     { key:'theme_heat',         label:'Heat',     theme:'heat' },
     { key:'theme_populations',  label:'Popul.',   theme:'populations' },
-    { key:'theme_socioeconomic',label:'Socio.',   theme:'socioeconomic' },
+    { key:'theme_socioeconomic',label:'Depriv.',   theme:'socioeconomic' },
     { key:'theme_built_environment_access', label:'Built+', theme:'built_environment_access' },
 ];
 
@@ -636,6 +642,43 @@ function scoreValue(props, key) {
         return parts.length ? parts.reduce((a, b) => a + b, 0) / parts.length : null;
     }
     return null;
+}
+
+function getNeighbourhoodName(props) {
+    return (
+        props.neighbourhood_name ||
+        props.bu_naam ||
+        props.buurtnaam ||
+        props.name ||
+        'Unnamed neighbourhood'
+    );
+}
+
+function getMunicipalityName(props) {
+    return (
+        props.municipality_name ||
+        props.gm_naam ||
+        props.gemeentenaam ||
+        props.municipality ||
+        'Unknown municipality'
+    );
+}
+
+function getDominantDrivers(props) {
+    const drivers = [
+        { key: 'theme_heat', label: 'Heat Exposure', theme: 'heat', color: THEME_DEFS.heat.color },
+        { key: 'theme_populations', label: 'Vulnerable Populations', theme: 'populations', color: THEME_DEFS.populations.color },
+        { key: 'theme_socioeconomic', label: 'Socioeconomic Deprivation', theme: 'socioeconomic', color: THEME_DEFS.socioeconomic.color },
+        { key: 'theme_built_environment_access', label: 'Built Environment & Access', theme: 'built_environment_access', color: THEME_DEFS.built_environment_access.color },
+    ];
+
+    return drivers
+        .map(d => ({
+            ...d,
+            score: scoreValue(props, d.key)
+        }))
+        .filter(d => d.score != null && !isNaN(d.score))
+        .sort((a, b) => b.score - a.score);
 }
 
 function rampColor(score, themeName) {
@@ -692,38 +735,60 @@ function styleFeature(feature) {
 }
 
 function buildPopup(feature) {
-    const p    = feature.properties;
-    const name = p.buurtnaam || 'Neighborhood';
-    const fmt  = v => (v != null && !isNaN(v)) ? Math.round(v) : '—';
+    const p = feature.properties;
+
+    const name = getNeighbourhoodName(p);
+    const municipality = getMunicipalityName(p);
+
+    const fmt = v => (v != null && !isNaN(v)) ? Math.round(v) : '—';
     const activeScore = fmt(scoreValue(p, currentLayer));
+
     const activeLabel = currentType === 'composite'
         ? 'Composite Risk Score'
         : THEME_DEFS[currentTheme]?.label || 'Score';
 
+    const topDrivers = getDominantDrivers(p);
+    const dominant = topDrivers[0];
+
     const bars = POPUP_THEMES.map(t => {
-        const val  = scoreValue(p, t.key);
-        const num  = (val != null && !isNaN(val)) ? Math.round(val) : null;
-        const pct  = num != null ? num : 0;
-        const col  = THEME_DEFS[t.theme]?.color || '#888';
+        const val = scoreValue(p, t.key);
+        const num = (val != null && !isNaN(val)) ? Math.round(val) : null;
+        const pct = num != null ? num : 0;
+        const col = THEME_DEFS[t.theme]?.color || '#888';
         const isActive = currentType === 'theme' && currentLayer === t.key;
-        
-        return `<a href="methodology.html#themes" title="Read more about ${t.label} risk" class="popup-theme-row${isActive ? ' active-row' : ''}">
-            <span class="popup-theme-label">${t.label}</span>
-            <div class="popup-theme-bar-track">
-                <div class="popup-theme-bar-fill" style="width:${pct}%;background:${col}"></div>
-            </div>
-            <span class="popup-theme-val">${num != null ? num : '—'}</span>
-        </a>`;
+
+        return `
+            <a href="methodology.html#themes"
+               title="Read more about ${THEME_DEFS[t.theme]?.label || t.label}"
+               class="popup-theme-row${isActive ? ' active-row' : ''}">
+                <span class="popup-theme-label">${t.label}</span>
+                <div class="popup-theme-bar-track">
+                    <div class="popup-theme-bar-fill" style="width:${pct}%;background:${col}"></div>
+                </div>
+                <span class="popup-theme-val">${num != null ? num : '—'}</span>
+            </a>
+        `;
     }).join('');
 
-    return `<div class="popup-inner">
-        <div class="popup-name">${name}</div>
-        <div class="popup-active">
-            <div class="popup-active-label">${activeLabel}</div>
-            <div class="popup-active-score">${activeScore}<span style="font-size:11px;opacity:.5"> / 100</span></div>
+    const hint = dominant
+        ? `Main signal: ${dominant.label}. Use the main explorer for municipality-level ranking and intervention directions.`
+        : `Use the main explorer for municipality-level ranking and intervention directions.`;
+
+    return `
+        <div class="popup-inner">
+            <div class="popup-name">${name}</div>
+            <div class="popup-muni">${municipality}</div>
+
+            <div class="popup-active">
+                <div class="popup-active-label">${activeLabel}</div>
+                <div class="popup-active-score">${activeScore}<span style="font-size:11px;opacity:.5"> / 100</span></div>
+            </div>
+
+            <div class="popup-themes">${bars}</div>
+
+            <div class="popup-hint">${hint}</div>
         </div>
-        <div class="popup-themes">${bars}</div>
-    </div>`;
+    `;
 }
 
 function onEachFeature(feature, layer) {
@@ -748,14 +813,16 @@ fetch('map_scenarios.geojson')
         geojsonData = data;
         populateMunicipalitySearch();
         renderLayer();
-        document.getElementById('debug-info').innerHTML =
-            `${data.features.length.toLocaleString()} neighborhoods · prototype layers`;
+
         const loader = document.getElementById('map-loader');
-        if (loader) { loader.style.opacity = 0; loader.style.visibility = 'hidden'; }
+        if (loader) {
+            loader.style.opacity = 0;
+            loader.style.visibility = 'hidden';
+        }
     })
     .catch(() => {
-        document.getElementById('debug-info').innerHTML = 'Data load error';
-        document.getElementById('map-loader').innerHTML = '<span>Could not load map data.</span>';
+        const loader = document.getElementById('map-loader');
+        if (loader) loader.innerHTML = '<span>Could not load map data.</span>';
     });
 
 function renderLayer() {
@@ -833,8 +900,14 @@ function normalizeName(value) {
 function populateMunicipalitySearch() {
     const list = document.getElementById('municipalityOptions');
     if (!list || !geojsonData) return;
-    const names = [...new Set(geojsonData.features.map(f => f.properties.gemeentenaam).filter(Boolean))]
-        .sort((a, b) => a.localeCompare(b, 'nl'));
+
+    const names = [...new Set(
+        geojsonData.features
+            .map(f => getMunicipalityName(f.properties))
+            .filter(Boolean)
+            .filter(name => name !== 'Unknown municipality')
+    )].sort((a, b) => a.localeCompare(b, 'nl'));
+
     list.innerHTML = names.map(name => `<option value="${name}"></option>`).join('');
 }
 
@@ -848,9 +921,9 @@ function searchMunicipality() {
         return;
     }
 
-    let matches = geojsonData.features.filter(f => normalizeName(f.properties.gemeentenaam) === query);
+    let matches = geojsonData.features.filter(f => normalizeName(getMunicipalityName(f.properties)) === query);
     if (!matches.length) {
-        matches = geojsonData.features.filter(f => normalizeName(f.properties.gemeentenaam).includes(query));
+        matches = geojsonData.features.filter(f => normalizeName(getMunicipalityName(f.properties)).includes(query));
     }
     if (!matches.length) {
         if (status) status.textContent = 'No matching municipality found.';
@@ -874,8 +947,8 @@ function searchMunicipality() {
     map.fitBounds(municipalityHighlightLayer.getBounds(), { padding: [28, 28] });
 
     if (status) {
-        const shownName = matches[0].properties.gemeentenaam || input.value;
-        status.textContent = `${shownName}: ${matches.length.toLocaleString()} neighborhoods`;
+        const shownName = getMunicipalityName(matches[0].properties) || input.value;
+        status.textContent = `${shownName}: ${matches.length.toLocaleString()} neighbourhoods`;
     }
 }
 
