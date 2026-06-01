@@ -1352,7 +1352,13 @@ const INTERVENTION_LIBRARY = [
         id: 'gbs',
         name: 'Green-Based Solutions (GBS)',
         type: 'Infrastructure',
+        timing: 'structural',
+        cost: 4,
+        implementationSpeed: 2,
+        evidenceStrength: 5,
+        equityImpact: 3,
         themes: ['theme_built_environment_access', 'theme_heat'],
+        themeFit: { theme_built_environment_access: 5, theme_heat: 4 },
         shortDesc: 'Use vegetation and green infrastructure to lower heat exposure through shade, evapotranspiration, and covering heat-absorbing surfaces.',
         sections: [
             { title: 'Elaborated description', body: 'Green infrastructure can take various forms, including street trees, parks, community gardens, green roofs, and green walls, and can reduce heat exposure in multiple ways. Trees provide shade, which has been shown to reduce sidewalk surface temperature by more than 30°C in a recent Dutch study. Vegetation also cools the surrounding environment through evapotranspiration. Planting additional greenery helps mitigate the urban heat island effect by reducing solar absorption and increasing evaporative cooling. An Australian study estimated that widespread implementation of GBS could reduce heat-related mortality by 37–99%.' },
@@ -1366,7 +1372,13 @@ const INTERVENTION_LIBRARY = [
         id: 'surface_reflectiveness',
         name: 'Surface reflectiveness',
         type: 'Infrastructure',
+        timing: 'structural',
+        cost: 3,
+        implementationSpeed: 3,
+        evidenceStrength: 4,
+        equityImpact: 2,
         themes: ['theme_built_environment_access', 'theme_heat'],
+        themeFit: { theme_built_environment_access: 4, theme_heat: 3 },
         shortDesc: 'Use reflective materials on roofs, roads, and building surfaces so less solar heat is absorbed and surrounding air stays cooler.',
         sections: [
             { title: 'Elaborated description', body: 'Many urban surfaces absorb large amounts of solar radiation and release stored heat over time, contributing to the urban heat island effect. Increasing surface reflectiveness (albedo) can reduce this heat build-up. Reflective roofs reflect more sunlight and absorb less heat than conventional roofs; a British study suggested this could reduce heat-related mortality by 7%. Cool pavements use lighter or engineered materials to lower surface temperatures; an Italian study suggested city-wide albedo increases could reduce temperature by up to 2.5°C.' },
@@ -1380,7 +1392,13 @@ const INTERVENTION_LIBRARY = [
         id: 'water_misting',
         name: 'Water misting systems',
         type: 'Infrastructure',
+        timing: 'immediate',
+        cost: 2,
+        implementationSpeed: 5,
+        evidenceStrength: 3,
+        equityImpact: 2,
         themes: ['theme_heat', 'theme_built_environment_access'],
+        themeFit: { theme_heat: 5, theme_built_environment_access: 2 },
         shortDesc: 'Spray fine water droplets that evaporate in the air, absorbing heat and lowering perceived outdoor temperature.',
         sections: [
             { title: 'Elaborated description', body: 'Nozzles release very small water droplets that evaporate quickly, absorbing heat from the surrounding air. Systems can be installed in parks, bus stops, playgrounds, and other outdoor communal areas. They are particularly effective in dry environments and have been found to reduce perceived outdoor temperature by up to 6.5°C in a US study.' },
@@ -1394,7 +1412,13 @@ const INTERVENTION_LIBRARY = [
         id: 'indoor_solar_shading',
         name: 'Indoor solar shading',
         type: 'Housing',
+        timing: 'structural',
+        cost: 3,
+        implementationSpeed: 3,
+        evidenceStrength: 4,
+        equityImpact: 3,
         themes: ['theme_built_environment_access', 'theme_heat'],
+        themeFit: { theme_built_environment_access: 5, theme_heat: 3 },
         shortDesc: 'Block direct sunlight from entering homes with shutters, blinds, overhangs, and other shading so indoor temperatures stay lower.',
         sections: [
             { title: 'Elaborated description', body: 'Solar shading uses architectural elements to stop sunlight from striking windows, walls, and other surfaces—reducing solar heat gain before it enters the building. Examples include shutters, external blinds, overhangs, balconies, and recessed windows. Research suggests it is among the most effective passive cooling measures for homes. External shading is generally more effective than internal blinds because it blocks heat before it passes through glass. Many measures can be retrofitted; others can be designed into new housing.' },
@@ -1408,7 +1432,13 @@ const INTERVENTION_LIBRARY = [
         id: 'heat_subsidies',
         name: 'Heat subsidies',
         type: 'Financial',
+        timing: 'immediate',
+        cost: 5,
+        implementationSpeed: 2,
+        evidenceStrength: 3,
+        equityImpact: 5,
         themes: ['theme_socioeconomic', 'theme_populations'],
+        themeFit: { theme_socioeconomic: 5, theme_populations: 4 },
         shortDesc: 'Government grants or incentives that lower the cost of home improvements such as shading, green roofs, and reflective materials.',
         sections: [
             { title: 'Elaborated description', body: 'Upfront cost is a major barrier to heat adaptation. Heat subsidies provide grants, tax relief, or low-interest loans so owners can install measures such as solar shading, green roofs, and reflective roofing. They can accelerate adoption and build heatwave resilience, especially for low-income households who face higher vulnerability but fewer resources. Similar insulation subsidy programmes already exist in the Netherlands and could be extended toward heat stress.' },
@@ -1913,18 +1943,15 @@ function openModal(id) {
     }).join('');
 
     let intHtml = '';
-    worstThemes.forEach(wt => {
-        const item = interventionsForTheme(wt.key)[0];
-        if (item) {
-            const meta = themeMetaForKey(wt.key);
-            intHtml += `
+    selectNeighborhoodInterventions(worstThemes).forEach(({ theme, item }) => {
+        const meta = themeMetaForKey(theme.key);
+        intHtml += `
             <div class="hp-int-item">
                 <div class="hp-int-theme">${escapeHtml(meta.label)}</div>
                 <div class="hp-int-name">${escapeHtml(item.name)}</div>
                 <div class="hp-int-desc">${escapeHtml(item.shortDesc)}</div>
                 <span class="hp-int-next">Next step: scope this for the highest-risk streets</span>
             </div>`;
-        }
     });
 
     document.getElementById('modalBody').innerHTML = `
@@ -2330,7 +2357,7 @@ function buildResultSummary(feats, name) {
 }
 
 // ═══════════════════════════════════════════════════════════
-// INTERVENTIONS (based on 3 worst themes)
+// INTERVENTIONS (ranked by theme fit, evidence, equity, speed, and cost)
 // ═══════════════════════════════════════════════════════════
 function buildInterventions(feats) {
     const avg = arr => {
@@ -2338,25 +2365,17 @@ function buildInterventions(feats) {
         return v.length ? v.reduce((a, b) => a + b, 0) / v.length : 0;
     };
 
+    const driverScores = Object.fromEntries(DRIVER_THEMES.map(t => [
+        t.key,
+        avg(feats.map(f => getFeatureScore(f.properties, t.key)))
+    ]));
+
     const topDrivers = DRIVER_THEMES
-        .map(t => ({
-            ...t,
-            score: avg(feats.map(f => getFeatureScore(f.properties, t.key)))
-        }))
+        .map(t => ({ ...t, score: driverScores[t.key] || 0 }))
         .sort((a, b) => b.score - a.score)
         .slice(0, 3);
 
-    const items = INTERVENTION_LIBRARY.map(item => {
-        const driverMatch = topDrivers.find(d => item.themes.includes(d.key));
-        const meta = themeMetaForKey(driverMatch?.key || item.themes[0]);
-        return {
-            ...item,
-            theme: meta.label,
-            color: meta.color,
-            driverKey: driverMatch?.key || item.themes[0],
-            driverScore: driverMatch?.score ?? 0,
-        };
-    });
+    const items = rankInterventionsByTheme(driverScores, topDrivers);
 
     if (!items.length) {
         document.getElementById('intList').innerHTML = `
@@ -2372,11 +2391,11 @@ function buildInterventions(feats) {
     }
 
     const immediate = items
-        .filter(i => ['Services', 'Policy', 'Financial'].includes(i.type))
+        .filter(i => i.timing === 'immediate')
         .slice(0, 3);
 
     const structural = items
-        .filter(i => ['Infrastructure', 'Housing'].includes(i.type))
+        .filter(i => i.timing === 'structural')
         .slice(0, 3);
 
     const fallbackImmediate = items
@@ -2394,8 +2413,10 @@ function buildInterventions(feats) {
         <div class="int-logic">
             <div class="int-logic-title">Explanation of the scores</div>
             <p>
-            The overall risk score shows combined heat related health risk calculated based on perceived health in each neighbourhood. Higher scores indicate higher priority neighbourhoods. 
-            The theme scores show why a neighbourhood scores high or low. Heat reflects exposure, Population reflects heat-sensitive residents, Socioeconomic reflects adaptive capacity, and Built+ reflects environmental and support-related factors. 
+            The overall risk score shows combined heat related health risk calculated based on perceived health in each neighbourhood. Higher scores indicate higher priority neighbourhoods.
+            <br><br>
+            The theme scores show why a neighbourhood scores high or low. Heat reflects exposure, Population reflects heat-sensitive residents, Socioeconomic reflects adaptive capacity, and Built+ reflects environmental and support-related factors.
+            <br><br>
             These are relative comparison scores, not predictions. They show where vulnerability is higher compared with other neighbourhoods in the dashboard.
             </p>
             <a href="methodology.html" class="int-read-more-btn">Read more</a>
@@ -2451,6 +2472,66 @@ function buildInterventions(feats) {
     `;
 
     setupInterventionPager();
+}
+
+function interventionFitForTheme(item, themeKey) {
+    return item.themeFit?.[themeKey] || (item.themes.includes(themeKey) ? 3 : 0);
+}
+
+function rankInterventionsByTheme(driverScores, topDrivers) {
+    const picked = [];
+    const used = new Set();
+
+    topDrivers.forEach(driver => {
+        interventionsForTheme(driver.key)
+            .sort((a, b) => interventionFitForTheme(b, driver.key) - interventionFitForTheme(a, driver.key))
+            .forEach(item => {
+                if (used.has(item.id)) return;
+                used.add(item.id);
+                picked.push({
+                    ...item,
+                    theme: driver.label,
+                    color: driver.color,
+                    driverKey: driver.key,
+                    driverScore: driver.score,
+                    themeFitScore: interventionFitForTheme(item, driver.key),
+                });
+            });
+    });
+
+    INTERVENTION_LIBRARY.forEach(item => {
+        if (used.has(item.id)) return;
+        const key = item.themes[0];
+        const meta = themeMetaForKey(key);
+        picked.push({
+            ...item,
+            theme: meta.label,
+            color: meta.color,
+            driverKey: key,
+            driverScore: driverScores[key] || 0,
+            themeFitScore: interventionFitForTheme(item, key),
+        });
+    });
+
+    return picked.sort((a, b) =>
+        (b.driverScore * 10 + b.themeFitScore) - (a.driverScore * 10 + a.themeFitScore)
+    );
+}
+
+function selectNeighborhoodInterventions(worstThemes) {
+    const selected = [];
+    const used = new Set();
+
+    worstThemes.forEach(theme => {
+        const item = interventionsForTheme(theme.key)
+            .filter(candidate => !used.has(candidate.id))
+            .sort((a, b) => interventionFitForTheme(b, theme.key) - interventionFitForTheme(a, theme.key))[0];
+        if (!item) return;
+        used.add(item.id);
+        selected.push({ theme, item });
+    });
+
+    return selected;
 }
 
 function buildLocalChecks(topDrivers) {
