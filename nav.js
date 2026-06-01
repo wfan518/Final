@@ -3,6 +3,7 @@
         { href: 'dashboard.html', label: 'Dashboard', pageId: 'dashboard' },
         { href: 'methodology.html', label: 'Methodology', pageId: 'methodology' },
         { href: 'background.html', label: 'Background', pageId: 'background' },
+        { href: 'sources.html', label: 'Sources', pageId: 'sources' },
     ];
 
     const CTA = {
@@ -18,7 +19,6 @@
         const file = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
         if (file === '' || file === 'index.html') return 'index';
         if (file === 'dashboard.html') return 'dashboard';
-        if (file === 'explain.html') return 'explain';
         if (file === 'methodology.html') return 'methodology';
         if (file === 'background.html') return 'background';
         return file.replace(/\.html$/, '');
