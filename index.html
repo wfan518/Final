@@ -211,7 +211,120 @@
 
     /* Wizard Tabs */
     .wizard-tabs {
-        display: flex; gap: 16px; margin-top: 36px; margin-bottom: 24px; flex-wrap: wrap;
+        display: flex; gap: 16px; margin-top: 36px; margin-bottom: 16px; flex-wrap: wrap;
+    }
+    .explorer-muni-search-wrap {
+        position: relative;
+        z-index: 20;
+        margin-bottom: 28px;
+        max-width: 560px;
+    }
+    .explorer-muni-search-wrap.has-results {
+        z-index: 300;
+    }
+    .explorer-muni-search-label {
+        display: block;
+        font-family: var(--mono);
+        font-size: 0.62rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--light);
+        margin-bottom: 8px;
+    }
+    .explorer-muni-search-row {
+        display: flex;
+        align-items: stretch;
+    }
+    .explorer-muni-search-combo {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: 1;
+        min-width: 0;
+    }
+    .explorer-muni-search {
+        width: 100%;
+        max-width: none;
+        min-width: 0;
+        margin: 0;
+    }
+    .explorer-muni-search-btn {
+        flex-shrink: 0;
+        font-family: var(--mono);
+        font-size: 0.58rem;
+        font-weight: 500;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 7px 22px;
+        min-height: 0;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: var(--paper);
+        color: var(--light);
+        cursor: pointer;
+        transition: border-color 0.2s, color 0.2s, background 0.2s;
+        white-space: nowrap;
+        box-shadow: none;
+    }
+    .explorer-muni-search-btn:hover {
+        border-color: rgba(37, 147, 143, 0.45);
+        background: var(--accent-pale);
+        color: var(--accent-strong);
+    }
+    .explorer-muni-search-results {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: calc(100% + 6px);
+        z-index: 10;
+        background: #fdfff7;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: 0 12px 40px rgba(58, 46, 57, 0.16);
+        overflow: hidden;
+        max-height: 260px;
+        overflow-y: auto;
+    }
+    .explorer-muni-search-results[hidden] { display: none; }
+    .explorer-muni-result {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        padding: 12px 14px;
+        border: none;
+        border-bottom: 1px solid var(--border);
+        background: transparent;
+        text-align: left;
+        cursor: pointer;
+        font-family: var(--sans);
+        font-size: 0.92rem;
+        color: var(--ink);
+        transition: background 0.15s;
+    }
+    .explorer-muni-result:last-child { border-bottom: none; }
+    .explorer-muni-result:hover,
+    .explorer-muni-result:focus {
+        background: var(--accent-pale);
+        outline: none;
+    }
+    .explorer-muni-result-prov {
+        font-family: var(--mono);
+        font-size: 0.58rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--light);
+        flex-shrink: 0;
+    }
+    .explorer-muni-search-hint {
+        font-family: var(--mono);
+        font-size: 0.6rem;
+        letter-spacing: 0.06em;
+        color: var(--light);
+        margin: 8px 0 0;
+        min-height: 1em;
     }
     .wiz-tab {
         flex: 1; min-width: 220px;
@@ -281,6 +394,8 @@
     /* ── CONTENT PANELS ── */
     .wiz-panel {
         display: none;
+        position: relative;
+        z-index: 1;
         animation: slideIn .45s cubic-bezier(.2,.8,.2,1) forwards;
     }
     .wiz-panel.active { display: block; }
@@ -442,8 +557,24 @@
         font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;
         color:var(--light);margin-bottom:10px;
     }
+    button.int-card{
+        display:block;width:100%;text-align:left;cursor:pointer;
+        font:inherit;color:inherit;
+    }
     .int-card{border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px;overflow:hidden;background:var(--paper);box-shadow:var(--shadow-sm);animation:fadeLift .34s cubic-bezier(.2,.8,.2,1) both;transition:transform .18s ease,border-color .18s ease}
     .int-card:hover{transform:translateY(-2px);border-color:var(--accent)}
+    .int-more{
+        display:inline-block;margin-top:10px;
+        font-family:var(--mono);font-size:.58rem;letter-spacing:.08em;
+        text-transform:uppercase;color:var(--accent-strong);
+    }
+    .int-modal-kicker{font-family:var(--mono);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--light);margin-bottom:8px}
+    .int-modal-title{font-family:var(--serif);font-size:1.65rem;font-weight:700;color:var(--ink);margin:0 0 16px;line-height:1.15}
+    .int-modal-section{margin-bottom:18px}
+    .int-modal-section h4{font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-strong);margin:0 0 8px}
+    .int-modal-section p,.int-modal-section ul{font-size:.88rem;color:var(--mid);line-height:1.6;margin:0}
+    .int-modal-section ul{padding-left:18px}
+    .int-modal-section li{margin-bottom:6px}
     .int-bar{height:3px}
     .int-body{padding:13px 15px}
     .int-theme{font-family:var(--mono);font-size:.55rem;letter-spacing:.08em;text-transform:uppercase;color:var(--light);margin-bottom:5px;display:block}
@@ -453,10 +584,6 @@
         display:inline-block;font-family:var(--mono);font-size:.52rem;letter-spacing:.06em;
         text-transform:uppercase;padding:2px 6px;background:var(--warm);
         color:var(--light);border-radius:1px;margin-top:7px;
-    }
-    .int-note {
-        font-size: .82rem;line-height: 1.5;
-        color: var(--mid);margin: -4px 0 16px;
     }
     .int-logic {
         border: 1px solid var(--border);border-radius:
@@ -470,6 +597,27 @@
     .int-logic p {
         font-size: .82rem;color: var(--mid);
         line-height: 1.5;margin: 0;
+    }
+    .int-read-more-btn {
+        display: inline-block;
+        margin-top: 12px;
+        font-family: var(--mono);
+        font-size: 0.62rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        text-decoration: none;
+        color: var(--accent-strong);
+        padding: 8px 14px;
+        border: 1px solid rgba(37, 147, 143, 0.45);
+        border-radius: 999px;
+        background: var(--accent-pale);
+        transition: background 0.2s, color 0.2s, border-color 0.2s;
+    }
+    .int-read-more-btn:hover {
+        background: var(--accent-strong);
+        border-color: var(--accent-strong);
+        color: var(--paper);
     }
     .int-driver-tags {
         display: flex;flex-wrap: wrap;
@@ -494,14 +642,9 @@
         line-height: 1.45;margin: -4px 0 10px;
     }
     .local-checks {
-        border-top: 1px solid var(--border);padding-top: 14px;margin-top: 16px;
-    }
-    .local-checks ul {
-        margin: 0;padding-left: 18px;
-    }
-    .local-checks li {
-        font-size: .82rem;color: var(--mid);
-        line-height: 1.5;margin-bottom: 6px;
+        border-top: 1px solid var(--border);
+        padding-top: 14px;
+        margin-top: 16px;
     }
     .int-pager {
         display: grid;grid-template-columns: 1fr 1fr;
@@ -551,21 +694,25 @@
         font-size: .78rem;color: var(--mid);
         line-height: 1.45;margin: 0 0 12px;
     }
-    .local-checks details {
-        border-top: 1px solid var(--border);margin-top: 14px;
-        padding-top: 12px;
-    }
+    .local-checks details { margin: 0; padding: 0; }
     .local-checks summary {
-        cursor: pointer;font-family: var(--sans);
-        font-size: .82rem;font-weight: 700;
+        cursor: pointer;
+        font-family: var(--sans);
+        font-size: .82rem;
+        font-weight: 700;
         color: var(--ink);
+        list-style: none;
     }
+    .local-checks summary::-webkit-details-marker { display: none; }
     .local-checks ul {
-        margin: 10px 0 0;padding-left: 18px;
+        margin: 10px 0 0;
+        padding-left: 18px;
     }
     .local-checks li {
-        font-size: .8rem;color: var(--mid);
-        line-height: 1.5;margin-bottom: 6px;
+        font-size: .8rem;
+        color: var(--mid);
+        line-height: 1.5;
+        margin-bottom: 6px;
     }
         
     /* Modal Overlay Styles */
@@ -754,6 +901,18 @@
             </button>
         </div>
 
+        <div class="explorer-muni-search-wrap">
+            <label for="globalMuniSearch" class="explorer-muni-search-label">Search municipality</label>
+            <div class="explorer-muni-search-row">
+                <div class="explorer-muni-search-combo">
+                    <input type="search" id="globalMuniSearch" class="muni-search explorer-muni-search" placeholder="e.g. Zwijndrecht, Utrecht, Groningen…" autocomplete="off" aria-controls="globalMuniSearchResults" aria-expanded="false">
+                    <button type="button" id="globalMuniSearchBtn" class="explorer-muni-search-btn">Go</button>
+                    <div id="globalMuniSearchResults" class="explorer-muni-search-results" hidden></div>
+                </div>
+            </div>
+            <p id="globalMuniSearchHint" class="explorer-muni-search-hint">Search across all municipalities in the dataset</p>
+        </div>
+
         <!-- ── PANEL: PROVINCE ── -->
         <div class="wiz-panel active" id="panelProv">
             <div class="panel-header-row">
@@ -857,7 +1016,6 @@
                     <div class="overview-card" id="overviewCard"></div>
                     </div>
                     <div class="interventions-pane result-pane" data-result-pane="interventions">
-                        <div class="int-note" id="intNote"></div>
                         <div id="intList"></div>
                     </div>
                 </div>
@@ -937,6 +1095,14 @@
     </div>
 </div>
 
+<!-- INTERVENTION DETAIL MODAL -->
+<div id="intModal" class="modal-overlay">
+    <div class="modal-content">
+        <button class="modal-close int-modal-close" type="button" aria-label="Close intervention details">×</button>
+        <div id="intModalBody" style="padding:28px 32px 32px"></div>
+    </div>
+</div>
+
 <!-- FOOTER -->
 <footer>
     <div style="max-width:var(--w);margin:0 auto">
@@ -994,50 +1160,169 @@ function scoreValue(props, key) {
 
 const SCENARIO_YEARS = ['2024', '2050', '2100'];
 const PROPERTY_CANDIDATES = {
+    /* UI label 2024 reads 2025 columns in GeoJSON (no 2024 fields in data). */
     composite: {
-        '2024': ['risk_2024_baseline', 'risk_2025_baseline'],
-        '2050': ['risk_2050_baseline'],
-        '2100': ['risk_2100_baseline', 'risk_2075_baseline'],
+        '2024': ['overall_risk_score_2025', 'risk_2025_baseline'],
+        '2050': ['overall_risk_score_2050', 'risk_2050_baseline', 'risk_2050_score_main'],
+        '2100': ['overall_risk_score_2100', 'risk_2100_baseline', 'risk_2100_score_main'],
     },
     theme_heat: {
-        '2024': ['theme_heat_2024', 'theme_heat'],
-        '2050': ['theme_heat_2050', 'theme_heat'],
-        '2100': ['theme_heat_2100', 'theme_heat'],
+        '2024': ['heat_score_2025'],
+        '2050': ['heat_score_2050'],
+        '2100': ['heat_score_2100'],
     },
     theme_populations: {
-        '2024': ['theme_populations_2024', 'theme_populations'],
-        '2050': ['theme_populations_2050', 'theme_populations'],
-        '2100': ['theme_populations_2100', 'theme_populations'],
+        '2024': ['populations_score_2025'],
+        '2050': ['populations_score_2050'],
+        '2100': ['populations_score_2100'],
     },
     theme_socioeconomic: {
-        '2024': ['theme_socioeconomic_2024', 'theme_socioeconomic'],
-        '2050': ['theme_socioeconomic_2050', 'theme_socioeconomic'],
-        '2100': ['theme_socioeconomic_2100', 'theme_socioeconomic'],
+        '2024': ['socioeconomic_score_2025'],
+        '2050': ['socioeconomic_score_2050'],
+        '2100': ['socioeconomic_score_2100'],
     },
     theme_built_environment_access: {
-        '2024': ['theme_built_environment_access_2024', 'theme_built_environment_access'],
-        '2050': ['theme_built_environment_access_2050', 'theme_built_environment_access'],
-        '2100': ['theme_built_environment_access_2100', 'theme_built_environment_access'],
+        '2024': ['built_environment_access_score_2025'],
+        '2050': ['built_environment_access_score_2050'],
+        '2100': ['built_environment_access_score_2100'],
     },
 };
 let propertyKeyCache = {};
 
-function resolvePropertyKey(themeKey, year) {
-    const cacheKey = `${themeKey}:${year}`;
+function propertyHasScore(props, key) {
+    return props && Object.prototype.hasOwnProperty.call(props, key) && props[key] != null && !isNaN(props[key]);
+}
+
+function resolvePropertyKey(themeKey, uiYear) {
+    const cacheKey = `${themeKey}:${uiYear}`;
     if (propertyKeyCache[cacheKey]) return propertyKeyCache[cacheKey];
-    const candidates = PROPERTY_CANDIDATES[themeKey]?.[year] || [];
+
+    const candidates = PROPERTY_CANDIDATES[themeKey]?.[uiYear] || [];
     const sample = geoData?.features?.[0]?.properties;
+
     if (sample) {
         for (const k of candidates) {
-            if (Object.prototype.hasOwnProperty.call(sample, k) && sample[k] != null && !isNaN(sample[k])) {
+            if (propertyHasScore(sample, k)) {
                 propertyKeyCache[cacheKey] = k;
                 return k;
             }
         }
     }
-    const fallback = candidates[candidates.length - 1] || themeKey;
-    propertyKeyCache[cacheKey] = fallback;
-    return fallback;
+
+    propertyKeyCache[cacheKey] = null;
+    return null;
+}
+
+function muniName(props) {
+    return props.gemeentenaam || props.gm_naam || props.municipality_name || '';
+}
+
+function hoodName(props) {
+    return props.buurtnaam || props.bu_naam || props.neighbourhood_name || 'Neighborhood';
+}
+
+function hoodId(props) {
+    return props.buurtcode || props.bu_code || hoodName(props);
+}
+
+function findProvinceForMuni(name) {
+    const n = normGm(name);
+    return PROVINCES.find(p => p.gemeenten.some(g => normGm(g) === n)) || null;
+}
+
+function buildMunicipalityIndex() {
+    municipalityIndex = [];
+    if (!geoData) return;
+    const seen = new Set();
+    geoData.features.forEach(f => {
+        const name = muniName(f.properties);
+        const key = normGm(name);
+        if (!name || seen.has(key)) return;
+        seen.add(key);
+        municipalityIndex.push({ name, prov: findProvinceForMuni(name) });
+    });
+    municipalityIndex.sort((a, b) => a.name.localeCompare(b.name, 'nl'));
+    const hint = document.getElementById('globalMuniSearchHint');
+    if (hint) hint.textContent = `${municipalityIndex.length.toLocaleString()} municipalities in dataset`;
+}
+
+function renderGlobalMuniResults(query) {
+    const box = document.getElementById('globalMuniSearchResults');
+    const input = document.getElementById('globalMuniSearch');
+    const hint = document.getElementById('globalMuniSearchHint');
+    const wrap = document.querySelector('.explorer-muni-search-wrap');
+    if (!box || !input) return;
+
+    const q = query.trim().toLowerCase();
+    if (!q) {
+        box.hidden = true;
+        box.innerHTML = '';
+        input.setAttribute('aria-expanded', 'false');
+        wrap?.classList.remove('has-results');
+        if (hint && geoData) hint.textContent = `${municipalityIndex.length.toLocaleString()} municipalities in dataset`;
+        return;
+    }
+
+    if (!geoData) {
+        wrap?.classList.remove('has-results');
+        if (hint) hint.textContent = 'Loading municipality data…';
+        return;
+    }
+
+    const matches = municipalityIndex.filter(m => m.name.toLowerCase().includes(q)).slice(0, 10);
+    if (!matches.length) {
+        box.hidden = true;
+        box.innerHTML = '';
+        input.setAttribute('aria-expanded', 'false');
+        wrap?.classList.remove('has-results');
+        if (hint) hint.textContent = 'No municipalities found. Try another spelling.';
+        return;
+    }
+
+    box.hidden = false;
+    wrap?.classList.add('has-results');
+    input.setAttribute('aria-expanded', 'true');
+    box.innerHTML = matches.map(m => `
+        <button type="button" class="explorer-muni-result" data-name="${escapeHtml(m.name)}">
+            <span>${escapeHtml(m.name)}</span>
+            <span class="explorer-muni-result-prov">${escapeHtml(m.prov ? m.prov.name : 'Netherlands')}</span>
+        </button>
+    `).join('');
+    if (hint) hint.textContent = `${matches.length} match${matches.length === 1 ? '' : 'es'} — click or press Go`;
+}
+
+function openMunicipalityFromSearch(rawName) {
+    if (!geoData) {
+        alert('Data not yet loaded. Please wait a moment.');
+        return;
+    }
+    const trimmed = rawName.trim();
+    if (!trimmed) return;
+
+    let entry = municipalityIndex.find(m => normGm(m.name) === normGm(trimmed));
+    if (!entry) {
+        entry = municipalityIndex.find(m => m.name.toLowerCase().includes(trimmed.toLowerCase()));
+    }
+    if (!entry) {
+        const hint = document.getElementById('globalMuniSearchHint');
+        if (hint) hint.textContent = 'Municipality not found in dataset.';
+        return;
+    }
+
+    if (entry.prov) selectProvince(entry.prov);
+    selectMuni(entry.name);
+
+    const input = document.getElementById('globalMuniSearch');
+    const box = document.getElementById('globalMuniSearchResults');
+    if (input) {
+        input.value = entry.name;
+        input.setAttribute('aria-expanded', 'false');
+    }
+    if (box) {
+        box.hidden = true;
+        box.innerHTML = '';
+    }
+    document.querySelector('.explorer-muni-search-wrap')?.classList.remove('has-results');
 }
 
 function activeDataKey() {
@@ -1047,40 +1332,101 @@ function activeDataKey() {
 
 function getFeatureScore(props, themeKey) {
     const key = themeKey || (activeTheme.key === 'composite' ? 'composite' : activeTheme.key);
-    return scoreValue(props, resolvePropertyKey(key, activeScenarioYear));
+    const resolved = resolvePropertyKey(key, activeScenarioYear);
+    if (!resolved) return null;
+    return scoreValue(props, resolved);
 }
 
-const INTERVENTIONS = {
-    theme_heat:{label:'Heat Exposure',color:'#91272e',items:[
-        {type:'Infrastructure',name:'Urban greening corridors',desc:'Plant street trees and vegetated corridors along the hottest streets. Each mature tree reduces surrounding Physiological Equivalent Temperature by 2–4°C and provides shade for pedestrians.'},
-        {type:'Infrastructure',name:'Blue-green infrastructure',desc:'Introduce water channels, retention ponds, and misting stations in high-density zones. Open water surfaces cool the air through evaporation during heat events.'},
-        {type:'Housing',name:'Reflective and green roofing',desc:'Subsidise installation of green roofs and light-coloured reflective roofing for residential buildings. Green roofs can reduce rooftop temperatures by up to 30°C on hot days.'},
-        {type:'Policy',name:'Heat island priority zoning',desc:'Use PET data to designate heat priority zones. Require shade structures, cool paving, and a minimum green space ratio in all new developments within those zones.'},
-    ]},
-    theme_populations:{label:'Vulnerable Populations',color:'#3a2e39',items:[
-        {type:'Services',name:'Proactive heat wave outreach',desc:'Train neighbourhood workers to conduct door-to-door welfare checks on elderly people living alone and families with young children during orange and red heat alerts from KNMI.'},
-        {type:'Services',name:'Community buddy program',desc:'Match isolated elderly residents with trained volunteer neighbours for regular contact. A simple check-in during heat waves can prevent heat-related illness and death.'},
-        {type:'Services',name:'Cool rest spaces in care facilities',desc:'Ensure all care homes, daycare centres, and community centres have at least one air-conditioned rest room available to residents and neighbourhood visitors during heat events.'},
-        {type:'Policy',name:'Heat emergency protocol for frail residents',desc:'Develop a tiered response protocol triggered by KNMI heat warnings, with automatic outreach to care providers and high-risk individuals identified via health records.'},
-    ]},
-    theme_socioeconomic:{label:'Socioeconomic Deprivation',color:'#91272e',items:[
-        {type:'Financial',name:'Free cooling equipment distribution',desc:'Distribute fans and portable cooling devices to households below social minimum. Prioritise families with elderly members, infants, or chronically ill individuals registered with GGD.'},
-        {type:'Housing',name:'Targeted home insulation subsidies',desc:'Offer income-based grants for low-cost heat adaptation: internal blinds, door and window sealing, and secondary glazing for pre-2000 housing stock in deprived neighbourhoods.'},
-        {type:'Services',name:'Multilingual heat communication',desc:'Translate all heat-health alerts and guidance into the top five community languages. Use WhatsApp, community radio, and trusted local organisations to reach residents with limited digital access.'},
-        {type:'Policy',name:'Landlord minimum heat standards',desc:'Introduce a local ordinance requiring landlords to ensure rental properties meet minimum indoor thermal comfort standards, with enforcement through existing housing inspection routes.'},
-    ]},
-    theme_built_environment_access:{label:'Built Environment & Access',color:'#3a2e39',items:[
-        {type:'Infrastructure',name:'Shaded public routes and stops',desc:'Install shade structures over key pedestrian routes, cycle paths, and bus stops in neighbourhoods dominated by pre-2010 housing. Prioritise routes used by elderly and mobility-limited residents.'},
-        {type:'Housing',name:'Building heat retrofit programme',desc:'Target pre-2010 housing blocks for a phased insulation and passive ventilation retrofit. Include loft insulation, draft-proofing, and low-cost window shading as the minimum standard.'},
-        {type:'Services',name:'Mobile GP and health units',desc:'Deploy mobile health units to underserved neighbourhoods during heat events to provide GP consultations and early heat-illness screening close to where people live.'},
-        {type:'Services',name:'Cool zone map and signage',desc:'Map and publicise all nearest accessible cooling spaces — libraries, community centres, large supermarkets. Install multilingual signage and maintain a live online map.'},
-    ]},
-};
+const INTERVENTION_LIBRARY = [
+    {
+        id: 'gbs',
+        name: 'Green-Based Solutions (GBS)',
+        type: 'Infrastructure',
+        themes: ['theme_built_environment_access', 'theme_heat'],
+        shortDesc: 'Use vegetation and green infrastructure to lower heat exposure through shade, evapotranspiration, and covering heat-absorbing surfaces.',
+        sections: [
+            { title: 'Elaborated description', body: 'Green infrastructure can take various forms, including street trees, parks, community gardens, green roofs, and green walls, and can reduce heat exposure in multiple ways. Trees provide shade, which has been shown to reduce sidewalk surface temperature by more than 30°C in a recent Dutch study. Vegetation also cools the surrounding environment through evapotranspiration. Planting additional greenery helps mitigate the urban heat island effect by reducing solar absorption and increasing evaporative cooling. An Australian study estimated that widespread implementation of GBS could reduce heat-related mortality by 37–99%.' },
+            { title: 'Price', body: 'Grass and bushes are generally inexpensive but have limited cooling capacity compared to larger vegetation. Trees have high cooling capacity but tend to be more expensive. Green roofs and green walls require little additional land.' },
+            { title: 'Pros', body: 'Effective in reducing heat exposure; green roofs and walls suit areas with limited land; helps reduce the urban heat island effect; additional benefits include biodiversity, air quality, stormwater management, and carbon sequestration.' },
+            { title: 'Cons', body: 'Trees need sufficient space (often 1.5–2.5 m between buildings); vegetation may need maintenance and water during droughts; large trees in narrow streets can block airflow and work against cooling during hot periods.' },
+            { title: 'Where it fits best', body: 'Highly adaptable in most places. Dense urban areas benefit from green roofs and walls; areas with open space can maximise cooling through large canopy trees and parks.' },
+        ],
+    },
+    {
+        id: 'surface_reflectiveness',
+        name: 'Surface reflectiveness',
+        type: 'Infrastructure',
+        themes: ['theme_built_environment_access', 'theme_heat'],
+        shortDesc: 'Use reflective materials on roofs, roads, and building surfaces so less solar heat is absorbed and surrounding air stays cooler.',
+        sections: [
+            { title: 'Elaborated description', body: 'Many urban surfaces absorb large amounts of solar radiation and release stored heat over time, contributing to the urban heat island effect. Increasing surface reflectiveness (albedo) can reduce this heat build-up. Reflective roofs reflect more sunlight and absorb less heat than conventional roofs; a British study suggested this could reduce heat-related mortality by 7%. Cool pavements use lighter or engineered materials to lower surface temperatures; an Italian study suggested city-wide albedo increases could reduce temperature by up to 2.5°C.' },
+            { title: 'Price', body: 'Costs vary by material and scale of retrofit; cool roofs and pavements are often integrated during renovation rather than as standalone projects.' },
+            { title: 'Pros', body: 'Reduces surface temperatures and heat absorption; mitigates urban heat islands; suitable for dense areas with limited space for vegetation; low maintenance after installation; can be added during renovation; no ongoing energy or water use; cool roofs can cut peak cooling demand by 11–27% in air-conditioned homes.' },
+            { title: 'Cons', body: 'Reflective surfaces can cause glare for pedestrians, drivers, and nearby buildings; cooling benefits may fade if surfaces are not cleaned; not all property owners can afford or choose to upgrade.' },
+            { title: 'Where it fits best', body: 'Works in new and existing built environments, especially dense areas with lots of concrete and asphalt and limited room for greenery. Cool roofs also help on larger rural buildings with sun-exposed roofs.' },
+        ],
+    },
+    {
+        id: 'water_misting',
+        name: 'Water misting systems',
+        type: 'Infrastructure',
+        themes: ['theme_heat', 'theme_built_environment_access'],
+        shortDesc: 'Spray fine water droplets that evaporate in the air, absorbing heat and lowering perceived outdoor temperature.',
+        sections: [
+            { title: 'Elaborated description', body: 'Nozzles release very small water droplets that evaporate quickly, absorbing heat from the surrounding air. Systems can be installed in parks, bus stops, playgrounds, and other outdoor communal areas. They are particularly effective in dry environments and have been found to reduce perceived outdoor temperature by up to 6.5°C in a US study.' },
+            { title: 'Price', body: 'Portable misting systems are relatively inexpensive and quick to install. Operating costs depend on water use and pumping energy.' },
+            { title: 'Pros', body: 'Provides immediate cooling; can be deployed rapidly during heatwaves; effective in busy public spaces; needs relatively little physical space.' },
+            { title: 'Cons', body: 'Requires a reliable water supply; increases water consumption during droughts; less effective in humid areas; cooling is local and temporary; poorly designed systems can create slippery surfaces.' },
+            { title: 'Where it fits best', body: 'Most suitable for high-traffic public spaces during events or gatherings. Less effective near large bodies of water or in already humid parts of the Netherlands.' },
+        ],
+    },
+    {
+        id: 'indoor_solar_shading',
+        name: 'Indoor solar shading',
+        type: 'Housing',
+        themes: ['theme_built_environment_access', 'theme_heat'],
+        shortDesc: 'Block direct sunlight from entering homes with shutters, blinds, overhangs, and other shading so indoor temperatures stay lower.',
+        sections: [
+            { title: 'Elaborated description', body: 'Solar shading uses architectural elements to stop sunlight from striking windows, walls, and other surfaces—reducing solar heat gain before it enters the building. Examples include shutters, external blinds, overhangs, balconies, and recessed windows. Research suggests it is among the most effective passive cooling measures for homes. External shading is generally more effective than internal blinds because it blocks heat before it passes through glass. Many measures can be retrofitted; others can be designed into new housing.' },
+            { title: 'Price', body: 'Shutters and external blinds involve moderate installation costs and can often be added to existing buildings. Balconies and overhangs raise construction costs in new builds. Maintenance is usually low.' },
+            { title: 'Pros', body: 'Effectively lowers indoor temperatures; uses no energy or water; provides immediate benefit once installed.' },
+            { title: 'Cons', body: 'May be unaffordable for low-income households or raise housing costs; effectiveness depends on housing type and window exposure; only affects indoor conditions.' },
+            { title: 'Where it fits best', body: 'Can be applied in many settings, especially buildings with large window areas exposed to direct sun in urban and suburban neighbourhoods.' },
+        ],
+    },
+    {
+        id: 'heat_subsidies',
+        name: 'Heat subsidies',
+        type: 'Financial',
+        themes: ['theme_socioeconomic', 'theme_populations'],
+        shortDesc: 'Government grants or incentives that lower the cost of home improvements such as shading, green roofs, and reflective materials.',
+        sections: [
+            { title: 'Elaborated description', body: 'Upfront cost is a major barrier to heat adaptation. Heat subsidies provide grants, tax relief, or low-interest loans so owners can install measures such as solar shading, green roofs, and reflective roofing. They can accelerate adoption and build heatwave resilience, especially for low-income households who face higher vulnerability but fewer resources. Similar insulation subsidy programmes already exist in the Netherlands and could be extended toward heat stress.' },
+            { title: 'Price', body: 'Costly for governments, but may reduce long-term health and energy burdens linked to extreme heat.' },
+            { title: 'Pros', body: 'Lowers financial barriers; encourages uptake of cooling measures; can target vulnerable and low-income households; flexible across many intervention types; can also cut energy use.' },
+            { title: 'Cons', body: 'Requires substantial public funding; depends on awareness and uptake; older groups may be less likely to adopt some measures; without careful design, subsidies may reach higher-income households more often.' },
+            { title: 'Where it fits best', body: 'Highly adaptable and can be tailored to priority groups such as low-income households, older residents, and people in heat-vulnerable housing.' },
+        ],
+    },
+];
+
+function themeMetaForKey(themeKey) {
+    return DRIVER_THEMES.find(t => t.key === themeKey) || { label: 'Vulnerability', color: '#3a2e39', short: 'Theme' };
+}
+
+function interventionsForTheme(themeKey) {
+    return INTERVENTION_LIBRARY.filter(i => i.themes.includes(themeKey));
+}
+
+function getInterventionById(id) {
+    return INTERVENTION_LIBRARY.find(i => i.id === id);
+}
 
 // ═══════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════
 let geoData = null;
+let municipalityIndex = [];
 let activeProv = null;
 let activeMuni = null;
 let activeMuniFeats = null;
@@ -1102,7 +1448,7 @@ function normGm(s) {
 function featsForGemeente(name) {
     if (!geoData) return [];
     const n = normGm(name);
-    return geoData.features.filter(f => normGm(f.properties.gemeentenaam) === n);
+    return geoData.features.filter(f => normGm(muniName(f.properties)) === n);
 }
 // ═══════════════════════════════════════════════════════════
 // BOOT
@@ -1117,10 +1463,18 @@ document.querySelectorAll('.wiz-tab[data-step]').forEach(btn => {
 document.getElementById('hoodModal')?.addEventListener('click', e => {
     if (e.target.id === 'hoodModal') closeModal();
 });
-document.querySelector('.modal-close')?.addEventListener('click', closeModal);
+document.getElementById('intModal')?.addEventListener('click', e => {
+    if (e.target.id === 'intModal') closeInterventionModal();
+});
+document.querySelector('#hoodModal .modal-close')?.addEventListener('click', closeModal);
+document.querySelectorAll('.int-modal-close').forEach(btn => btn.addEventListener('click', closeInterventionModal));
 document.addEventListener('click', e => {
     const moreInfo = e.target.closest('.more-info-btn[data-id]');
     if (moreInfo) openModal(moreInfo.dataset.id);
+});
+document.querySelector('.interventions-pane')?.addEventListener('click', e => {
+    const card = e.target.closest('[data-int-id]');
+    if (card) openInterventionModal(card.dataset.intId);
 });
 document.getElementById('resultMobileTabs')?.addEventListener('click', e => {
     const btn = e.target.closest('button[data-result-view]');
@@ -1139,6 +1493,32 @@ if (muniSearchEl) muniSearchEl.addEventListener('input', () => { if (activeProv)
 const rankSearchEl = document.getElementById('rankSearch');
 if (rankSearchEl) rankSearchEl.addEventListener('input', () => {
     if (activeMuniFeats && activeTheme) buildRankings(activeMuniFeats, activeTheme);
+});
+
+const globalMuniSearchEl = document.getElementById('globalMuniSearch');
+const globalMuniSearchBtn = document.getElementById('globalMuniSearchBtn');
+const globalMuniSearchResults = document.getElementById('globalMuniSearchResults');
+if (globalMuniSearchEl) {
+    globalMuniSearchEl.addEventListener('input', () => renderGlobalMuniResults(globalMuniSearchEl.value));
+    globalMuniSearchEl.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            openMunicipalityFromSearch(globalMuniSearchEl.value);
+        }
+        if (e.key === 'Escape') renderGlobalMuniResults('');
+    });
+}
+if (globalMuniSearchBtn) {
+    globalMuniSearchBtn.addEventListener('click', () => openMunicipalityFromSearch(globalMuniSearchEl?.value || ''));
+}
+if (globalMuniSearchResults) {
+    globalMuniSearchResults.addEventListener('click', e => {
+        const btn = e.target.closest('.explorer-muni-result');
+        if (btn?.dataset.name) openMunicipalityFromSearch(btn.dataset.name);
+    });
+}
+document.addEventListener('click', e => {
+    if (!e.target.closest('.explorer-muni-search-wrap')) renderGlobalMuniResults('');
 });
 
 function setScenarioYear(year) {
@@ -1208,10 +1588,11 @@ async function loadGeoData() {
         const r = await fetch('map_scenarios.geojson');
         geoData = await r.json();
         propertyKeyCache = {};
+        buildMunicipalityIndex();
         // Calculate true province averages across all matching neighborhoods
         PROVINCES.forEach(p => {
             const feats = geoData.features.filter(f =>
-                p.gemeenten.some(g => normGm(f.properties.gemeentenaam) === normGm(g))
+                p.gemeenten.some(g => normGm(muniName(f.properties)) === normGm(g))
             );
             const avg = arr => { const v=arr.filter(x=>x!=null&&!isNaN(x)); return v.length?v.reduce((a,b)=>a+b,0)/v.length:0; };
             p.avgRisk = avg(feats.map(f => getFeatureScore(f.properties, 'composite')));
@@ -1446,7 +1827,7 @@ function featStyle(f) {
 
 function buildNeighborhoodPopup(feature, id) {
     const p = feature.properties;
-    const n = p.buurtnaam || 'Neighborhood';
+    const n = hoodName(p);
     const mainScore = getFeatureScore(p, activeTheme.key === 'composite' ? 'composite' : activeTheme.key);
     const mainVal = mainScore != null ? Math.round(mainScore) : '—';
     const scenLabel = `${activeScenarioYear} · ${activeTheme.short}`;
@@ -1477,7 +1858,7 @@ function openModal(id) {
     const layer = layerMap[id];
     if (!layer || !layer.feature) return;
     const p = layer.feature.properties;
-    const n = p.buurtnaam || 'Neighborhood';
+    const n = hoodName(p);
     const modalScore = getFeatureScore(p, activeTheme.key === 'composite' ? 'composite' : activeTheme.key);
     const comp = modalScore != null ? Math.round(modalScore) : '—';
     const scenLabel = `${activeScenarioYear} · ${activeTheme.label}`;
@@ -1523,14 +1904,14 @@ function openModal(id) {
 
     let intHtml = '';
     worstThemes.forEach(wt => {
-        const cfg = INTERVENTIONS[wt.key];
-        if(cfg && cfg.items.length) {
-            const item = cfg.items[0];
+        const item = interventionsForTheme(wt.key)[0];
+        if (item) {
+            const meta = themeMetaForKey(wt.key);
             intHtml += `
             <div class="hp-int-item">
-                <div class="hp-int-theme">${escapeHtml(cfg.label)}</div>
+                <div class="hp-int-theme">${escapeHtml(meta.label)}</div>
                 <div class="hp-int-name">${escapeHtml(item.name)}</div>
-                <div class="hp-int-desc">${escapeHtml(item.desc)}</div>
+                <div class="hp-int-desc">${escapeHtml(item.shortDesc)}</div>
                 <span class="hp-int-next">Next step: scope this for the highest-risk streets</span>
             </div>`;
         }
@@ -1583,13 +1964,42 @@ function closeModal() {
     document.getElementById('hoodModal').classList.remove('open');
 }
 
+function openInterventionModal(id) {
+    const item = getInterventionById(id);
+    if (!item) return;
+    closeModal();
+    const primaryTheme = themeMetaForKey(item.themes[0]);
+    const sectionsHtml = item.sections.map(sec => `
+        <div class="int-modal-section">
+            <h4>${escapeHtml(sec.title)}</h4>
+            ${sec.body.includes('\n-') || sec.body.startsWith('-')
+                ? `<ul>${sec.body.split(/\n/).filter(Boolean).map(line => `<li>${escapeHtml(line.replace(/^-\s*/, ''))}</li>`).join('')}</ul>`
+                : `<p>${escapeHtml(sec.body)}</p>`}
+        </div>
+    `).join('');
+    document.getElementById('intModalBody').innerHTML = `
+        <div class="int-modal-kicker">${escapeHtml(primaryTheme.label)} · ${escapeHtml(item.type)}</div>
+        <h3 class="int-modal-title">${escapeHtml(item.name)}</h3>
+        <div class="int-modal-section">
+            <h4>Short description</h4>
+            <p>${escapeHtml(item.shortDesc)}</p>
+        </div>
+        ${sectionsHtml}
+    `;
+    document.getElementById('intModal').classList.add('open');
+}
+
+function closeInterventionModal() {
+    document.getElementById('intModal').classList.remove('open');
+}
+
 function redrawLayer(feats) {
     if (rLayer) rMap.removeLayer(rLayer);
     layerMap = {};
     rLayer = L.geoJson({ type: 'FeatureCollection', features: feats }, {
         style: featStyle,
         onEachFeature: (f, layer) => {
-            const id = f.properties.buurtcode || f.properties.buurtnaam;
+            const id = hoodId(f.properties);
             layerMap[id] = layer;
             layer.bindPopup(() => buildNeighborhoodPopup(f, id), { maxWidth: 260 });
 
@@ -1644,7 +2054,7 @@ function buildRankings(feats, theme) {
     const themeKey = theme.key === 'composite' ? 'composite' : theme.key;
     let pool = feats.filter(f => getFeatureScore(f.properties, themeKey) != null);
     if (q) {
-        pool = pool.filter(f => (f.properties.buurtnaam || '').toLowerCase().includes(q));
+        pool = pool.filter(f => hoodName(f.properties).toLowerCase().includes(q));
     }
     const sorted = pool.sort((a,b) => getFeatureScore(b.properties, themeKey) - getFeatureScore(a.properties, themeKey));
 
@@ -1655,13 +2065,13 @@ function buildRankings(feats, theme) {
         const s = Math.round(getFeatureScore(f.properties, themeKey));
         const row = document.createElement('div');
         row.className = 'rank-row';
-        row.dataset.id = f.properties.buurtcode || f.properties.buurtnaam;
+        row.dataset.id = hoodId(f.properties);
         row.style.animationDelay = `${Math.min(i * 0.015, 0.18)}s`;
         row.style.cursor = 'pointer';
-        row.innerHTML = `<span class="r-pos">${i+1}</span><span class="r-name">${escapeHtml(f.properties.buurtnaam||'—')}</span><div class="r-bar"><div class="r-fill" style="width:${s}%;background:${theme.color}"></div></div><span class="r-val">${s}</span>`;
+        row.innerHTML = `<span class="r-pos">${i+1}</span><span class="r-name">${escapeHtml(hoodName(f.properties))}</span><div class="r-bar"><div class="r-fill" style="width:${s}%;background:${theme.color}"></div></div><span class="r-val">${s}</span>`;
         
         row.addEventListener('click', () => {
-            const id = f.properties.buurtcode || f.properties.buurtnaam;
+            const id = hoodId(f.properties);
             const layer = layerMap[id];
             if (layer) {
                 rMap.fitBounds(layer.getBounds(), { padding: [30, 30], maxZoom: 13 });
@@ -1722,7 +2132,7 @@ function buildResultSummary(feats, name) {
         </div>
         <div class="summary-card">
             <span class="summary-label">Highest-risk neighborhood</span>
-            <span class="summary-value">${escapeHtml(topNeighborhood?.properties.buurtnaam || '—')}</span>
+            <span class="summary-value">${escapeHtml(topNeighborhood ? hoodName(topNeighborhood.properties) : '—')}</span>
             <span class="summary-note">${topNeighborhood ? `${topNeighborhoodScore}/100 · ${escapeHtml(activeLabel)} · ${activeScenarioYear}` : 'No ranked neighborhoods available.'}</span>
         </div>`;
 }
@@ -1730,35 +2140,6 @@ function buildResultSummary(feats, name) {
 // ═══════════════════════════════════════════════════════════
 // INTERVENTIONS (based on 3 worst themes)
 // ═══════════════════════════════════════════════════════════
-function buildInterventionNote(topDrivers) {
-    const noteEl = document.getElementById('intNote');
-    if (!noteEl || !topDrivers.length) return;
-
-    const topTwo = topDrivers.slice(0, 2);
-    const topNames = topTwo.map(d => d.label.toLowerCase()).join(' and ');
-    const topKeys = topTwo.map(d => d.key);
-    const has = key => topKeys.includes(key);
-
-    let text = `For this municipality, the intervention list is shaped mainly by ${topNames}. The suggestions below translate these driver patterns into possible action areas for local discussion and feasibility checks.`;
-
-    if (has('theme_heat') && has('theme_built_environment_access')) {
-        text = 'Because high heat exposure overlaps with built-environment and access constraints, the intervention directions focus on cooling routes, shaded public space, housing adaptation, and accessible cool zones.';
-    } else if (has('theme_heat') && has('theme_populations')) {
-        text = 'Because high heat exposure overlaps with heat-sensitive population groups, the intervention directions focus on targeted outreach, heat-health communication, cooling access, and protection during heat alerts.';
-    } else if (has('theme_socioeconomic') && has('theme_built_environment_access')) {
-        text = 'Because socioeconomic deprivation overlaps with built-environment and access constraints, the intervention directions focus on affordable adaptation, rental housing conditions, cooling access, and support that does not depend on private resources.';
-    } else if (has('theme_populations') && has('theme_socioeconomic')) {
-        text = 'Because population sensitivity overlaps with socioeconomic deprivation, the intervention directions focus on residents who may be both physiologically vulnerable and less able to adapt without public support.';
-    } else if (has('theme_heat') && has('theme_socioeconomic')) {
-        text = 'Because heat exposure overlaps with socioeconomic deprivation, the intervention directions focus on low-cost cooling support, accessible communication, and neighbourhoods where residents may have fewer private adaptation options.';
-    } else if (has('theme_populations') && has('theme_built_environment_access')) {
-        text = 'Because vulnerable population groups overlap with built-environment and access constraints, the intervention directions focus on reachable cooling spaces, care-linked outreach, and safer routes between homes and services.';
-    }
-
-    noteEl.textContent = text;
-}
-
-
 function buildInterventions(feats) {
     const avg = arr => {
         const v = arr.filter(x => x != null && !isNaN(x));
@@ -1773,25 +2154,16 @@ function buildInterventions(feats) {
         .sort((a, b) => b.score - a.score)
         .slice(0, 3);
 
-    buildInterventionNote(topDrivers);
-
-    const topDriverNames = topDrivers.map(d => d.label).join(', ');
-
-    const items = [];
-
-    topDrivers.forEach(driver => {
-        const cfg = INTERVENTIONS[driver.key];
-        if (!cfg) return;
-
-        cfg.items.forEach(item => {
-            items.push({
-                ...item,
-                theme: cfg.label,
-                color: cfg.color,
-                driverKey: driver.key,
-                driverScore: driver.score
-            });
-        });
+    const items = INTERVENTION_LIBRARY.map(item => {
+        const driverMatch = topDrivers.find(d => item.themes.includes(d.key));
+        const meta = themeMetaForKey(driverMatch?.key || item.themes[0]);
+        return {
+            ...item,
+            theme: meta.label,
+            color: meta.color,
+            driverKey: driverMatch?.key || item.themes[0],
+            driverScore: driverMatch?.score ?? 0,
+        };
     });
 
     if (!items.length) {
@@ -1828,20 +2200,11 @@ function buildInterventions(feats) {
 
     document.getElementById('intList').innerHTML = `
         <div class="int-logic">
-            <div class="int-logic-title">From drivers to action</div>
+            <div class="int-logic-title">Explanation of the scores</div>
             <p>
-                In this municipality, the strongest driver signals are ${topDriverNames}.
-                The intervention flow starts from actions that fit existing municipal and GGD routines,
-                then opens toward longer-term adaptation choices. This helps translate vulnerability data
-                into policy questions that local actors can recognise, discuss, and adjust.
+                Each score runs from 0 to 100 at neighbourhood level. Higher values point to greater relative vulnerability for the active theme or composite index in the selected projection year. The map ranks areas within the municipality so you can compare patterns—not absolute temperature readings.
             </p>
-            <div class="int-driver-tags">
-                ${topDrivers.map(d => `
-                    <span class="int-driver-tag" style="background:${d.color}">
-                        ${d.short} · ${Math.round(d.score)}
-                    </span>
-                `).join('')}
-            </div>
+            <a href="explain.html" class="int-read-more-btn">Read more</a>
         </div>
 
         <div class="int-pager" role="tablist" aria-label="Intervention timing">
@@ -1896,34 +2259,6 @@ function buildInterventions(feats) {
     setupInterventionPager();
 }
 
-function buildInterventionNote(topDrivers) {
-    const noteEl = document.getElementById('intNote');
-    if (!noteEl || !topDrivers.length) return;
-
-    const topTwo = topDrivers.slice(0, 2);
-    const topNames = topTwo.map(d => d.label.toLowerCase()).join(' and ');
-    const topKeys = topTwo.map(d => d.key);
-    const has = key => topKeys.includes(key);
-
-    let text = `For this municipality, the intervention list is shaped mainly by ${topNames}. The suggestions below translate these driver patterns into possible action areas for local discussion and feasibility checks.`;
-
-    if (has('theme_heat') && has('theme_built_environment_access')) {
-        text = 'Because high heat exposure overlaps with built-environment and access constraints, the intervention directions focus on cooling routes, shaded public space, housing adaptation, and accessible cool zones.';
-    } else if (has('theme_heat') && has('theme_populations')) {
-        text = 'Because high heat exposure overlaps with heat-sensitive population groups, the intervention directions focus on targeted outreach, heat-health communication, cooling access, and protection during heat alerts.';
-    } else if (has('theme_socioeconomic') && has('theme_built_environment_access')) {
-        text = 'Because socioeconomic deprivation overlaps with built-environment and access constraints, the intervention directions focus on affordable adaptation, rental housing conditions, cooling access, and support that does not depend on private resources.';
-    } else if (has('theme_populations') && has('theme_socioeconomic')) {
-        text = 'Because population sensitivity overlaps with socioeconomic deprivation, the intervention directions focus on residents who may be both physiologically vulnerable and less able to adapt without public support.';
-    } else if (has('theme_heat') && has('theme_socioeconomic')) {
-        text = 'Because heat exposure overlaps with socioeconomic deprivation, the intervention directions focus on low-cost cooling support, accessible communication, and neighbourhoods where residents may have fewer private adaptation options.';
-    } else if (has('theme_populations') && has('theme_built_environment_access')) {
-        text = 'Because vulnerable population groups overlap with built-environment and access constraints, the intervention directions focus on reachable cooling spaces, care-linked outreach, and safer routes between homes and services.';
-    }
-
-    noteEl.textContent = text;
-}
-
 function buildLocalChecks(topDrivers) {
     const keys = topDrivers.map(d => d.key);
     const checks = [];
@@ -1951,14 +2286,15 @@ function buildLocalChecks(topDrivers) {
 
 function renderInterventionItem(item) {
     return `
-        <div class="int-card">
+        <button type="button" class="int-card" data-int-id="${escapeHtml(item.id)}" aria-label="Open full description for ${escapeHtml(item.name)}">
             <div class="int-bar" style="background:${item.color}"></div>
             <div class="int-body">
-                <span class="int-theme">${item.theme} · ${item.type}</span>
-                <div class="int-name">${item.name}</div>
-                <div class="int-desc">${item.desc}</div>
+                <span class="int-theme">${escapeHtml(item.theme)} · ${escapeHtml(item.type)}</span>
+                <div class="int-name">${escapeHtml(item.name)}</div>
+                <div class="int-desc">${escapeHtml(item.shortDesc)}</div>
+                <span class="int-more">Read full description →</span>
             </div>
-        </div>
+        </button>
     `;
 }
 
