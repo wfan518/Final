@@ -150,11 +150,31 @@
             margin-top: 10px;font-size: .78rem;
             line-height: 1.45;color: var(--sidebar-muted);
         }
-        .layer-grid {
-            grid-template-columns: 1fr;
+        .composite-focus {
+            margin-bottom: 10px;
         }
-        .layer-grid .theme-btn {
-            min-height: 58px;
+        .composite-btn {
+            width: 100%;min-height: 64px;
+            background: linear-gradient(135deg, rgba(37,147,143,.18), rgba(255,255,255,.04));
+            border-color: rgba(37,147,143,.42);
+        }
+        .composite-btn .th-name {
+            font-size: 0.72rem;color: var(--sidebar-heading);
+        }
+        .composite-btn .th-vars {
+            font-size: 0.72rem;
+        }
+        .driver-grid {
+            display: grid;grid-template-columns: 1fr 1fr;gap: 8px;
+        }
+        .driver-grid .theme-btn {
+            min-height: 92px;
+        }
+        .driver-grid .theme-btn .th-name {
+            font-size: 0.58rem;
+        }
+        .driver-grid .theme-btn .th-vars {
+            font-size: 0.66rem;
         }
 
         .section-label {
@@ -300,8 +320,11 @@
 
         /* ── MAP STAGE ── */
         .map-stage-wrap {
-            flex: 1; display: flex; flex-direction: column;
-            padding: 16px 16px 16px 0; min-width: 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 10px 16px 16px 0;
+            min-width: 0;
             background: linear-gradient(180deg, rgba(253,255,247,.72) 0%, transparent 120px);
             animation: fadeLift .66s cubic-bezier(.2,.8,.2,1) .15s both;
         }
@@ -508,14 +531,15 @@
     <!-- THEMATIC VARIABLE LAYERS -->
     <div class="control-group">
         <span class="section-label">Layer focus</span>
-        <div class="theme-grid layer-grid">
-
-            <button class="theme-btn active" style="--theme-color:#fdfff7"
+        <div class="composite-focus">
+            <button class="theme-btn composite-btn active" style="--theme-color:#fdfff7"
                     data-layer="composite" data-type="composite" data-theme="composite">
                 <span class="th-name">Composite Risk</span>
                 <span class="th-vars">Four drivers · selected time horizon</span>
             </button>
+        </div>
 
+        <div class="theme-grid driver-grid">
             <button class="theme-btn" style="--theme-color:var(--c-heat)"
                     data-layer="theme_heat" data-type="theme" data-theme="heat">
                 <span class="th-name">Heat Exposure</span>
@@ -539,7 +563,6 @@
                 <span class="th-name">Built Environment & Access</span>
                 <span class="th-vars">Shade · GP access · cooling · green space</span>
             </button>
-
         </div>
     </div>
 
@@ -552,16 +575,6 @@
 </div>
 
 <div class="map-stage-wrap">
-    <div class="map-chrome">
-        <div class="map-chrome-title">
-            Netherlands map
-            <span>Choropleth · CBS buurt boundaries · Zoom &amp; pan</span>
-        </div>
-        <div class="map-badge-row">
-            <span class="map-badge accent">Live layer</span>
-            <span class="map-badge">Basemap: CARTO Voyager</span>
-        </div>
-    </div>
     <div class="map-frame">
         <div id="map"></div>
         <div id="map-loader">
