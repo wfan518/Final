@@ -652,30 +652,15 @@
     .leaflet-interactive.explorer-feature:hover{stroke-dasharray:6 6;animation:dashPulse 1.1s linear infinite}
     </style>
 </head>
-<body>
-
-<!-- NAV -->
-<nav>
-    <div class="nav-inner">
-        <a href="index.html" class="nav-logo" aria-label="Go to Heat & Health NL homepage">
-            <img src="favicon.svg" alt="" class="nav-logo-img">
-            <span>Heat &amp; Health NL</span>
-        </a>
-        <div class="nav-links">
-            <a href="dashboard.html" class="nav-lk">Dashboard</a>
-            <a href="explain.html" class="nav-lk">Methodology</a>
-            <a href="#explorer" class="nav-btn">Start Exploring →</a>
-        </div>
-    </div>
-</nav>
+<body data-page="index">
 
 <!-- ═══════════ HERO ═══════════ -->
 <div style="max-width:var(--w);margin:0 auto">
 <section id="hero">
     <div class="hero-left">
-        <span class="hero-tag">Climate Health Research · Netherlands 2025</span>
-        <h1>Heat does not<br>discriminate —<br><em>but vulnerability does.</em></h1>
-        <p>As climate change intensifies heat waves across the Netherlands, health risk concentrates in neighborhoods shaped by poverty, aging, social isolation, and housing that traps heat. This tool maps where the crisis is deepest — and what municipalities can do about it.</p>
+        <span class="hero-tag">Climate Health Research · University of Amsterdam, CSSCI capstone project</span>
+        <h1>Neighbourhood level policy interventions<em>Including climate and health data into municipal policymaking</em></h1>
+        <p>Rising temperatures are becoming a growing challenge in the Netherlands, with impacts varying across neighbourhoods due to local conditions and interventions. This tool highlights climate-related health risks across four key themes, identifies the most vulnerable areas and suggests potential interventions to help policymakers and communities with addressing it effectively. </p>
         <div class="hero-stats">
             <div>
                 <span class="stat-n">11,554</span>
@@ -832,7 +817,6 @@
                     <div class="overview-card" id="overviewCard"></div>
                     </div>
                     <div class="interventions-pane result-pane" data-result-pane="interventions">
-                        <div class="int-title">Intervention directions</div>
                         <div class="int-note" id="intNote"></div>
                         <div id="intList"></div>
                     </div>
@@ -1922,5 +1906,6 @@ function rampColor(score, key) {
     return '#'+[r1+(r2-r1)*t,g1+(g2-g1)*t,b1+(b2-b1)*t].map(v=>Math.round(v).toString(16).padStart(2,'0')).join('');
 }
 </script>
+<script src="nav.js" defer></script>
 </body>
 </html>

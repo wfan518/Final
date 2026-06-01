@@ -80,34 +80,8 @@
         #sidebar > *:nth-child(4) { animation-delay: .20s; }
         #sidebar > *:nth-child(5) { animation-delay: .25s; }
         #sidebar > *:nth-child(6) { animation-delay: .30s; }
-        #sidebar > *:nth-child(7) { animation-delay: .35s; }
         #sidebar::-webkit-scrollbar { width: 6px; }
         #sidebar::-webkit-scrollbar-thumb { background: rgba(253, 255, 247, 0.24); border-radius: 3px; }
-
-        .top-nav-group { display: flex; gap: 10px; margin-bottom: 26px; }
-
-        .nav-link {
-            flex: 1;
-            font-family: var(--mono); font-size: 0.65rem;
-            letter-spacing: 0.1em; text-transform: uppercase;
-            color: var(--sidebar-heading); background: rgba(255, 255, 255, 0.06);
-            border: 1px solid var(--sidebar-border);
-            text-decoration: none; padding: 11px 10px;
-            text-align: center; border-radius: var(--radius-sm);
-            transition: 0.2s; display: block;
-        }
-        .nav-link:hover {
-            background: var(--accent-dim); border-color: rgba(37, 147, 143, 0.42); color: var(--accent-hover);
-        }
-        .nav-link.primary {
-            background: var(--accent);
-            border-color: var(--accent);
-            color: var(--map-bg);
-        }
-        .nav-link.primary:hover {
-            background: var(--accent-hover);
-            color: var(--map-bg);
-        }
 
         .dash-brand {
             font-family: var(--mono); font-size: 0.62rem;
@@ -436,14 +410,9 @@
         }
     </style>
 </head>
-<body>
+<body data-page="dashboard" class="page-dashboard">
 
 <div id="sidebar">
-    <div class="top-nav-group">
-        <a href="index.html#explorer" class="nav-link primary">Start Exploring →</a>
-        <a href="explain.html" class="nav-link">Methodology</a>
-    </div>
-
     <div class="dash-brand">National vulnerability atlas</div>
     <h1>Heat risk dashboard</h1>
     <p class="subtitle">Explore composite scenarios and four vulnerability drivers at neighbourhood scale.</p>
@@ -889,5 +858,6 @@ document.getElementById('municipalitySearch')?.addEventListener('keydown', e => 
     if (e.key === 'Enter') searchMunicipality();
 });
 </script>
+<script src="nav.js" defer></script>
 </body>
 </html>
