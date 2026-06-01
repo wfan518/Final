@@ -498,6 +498,13 @@
     .leaflet-control-zoom a{width:32px!important;height:32px!important;line-height:32px!important;background:var(--paper)!important;color:#334155!important}
     .leaflet-control-attribution{font-size:10px!important;background:rgba(255,255,255,.88)!important;border-radius:6px!important;padding:3px 8px!important}
     .leaflet-control-scale-line{border-color:rgba(58,46,57,.2)!important;background:rgba(253,255,247,.92)!important;font-family:var(--mono)!important;font-size:10px!important}
+    .leaflet-tooltip.neighborhood-hover-label{
+        background:var(--ink);color:var(--paper);border:1px solid rgba(253,255,247,.18);
+        border-radius:6px;box-shadow:var(--shadow-md);font-family:var(--mono);font-size:.62rem;
+        font-weight:600;letter-spacing:.04em;padding:6px 9px;text-transform:uppercase;
+    }
+    .leaflet-tooltip-top.neighborhood-hover-label::before{border-top-color:var(--ink)}
+    .leaflet-tooltip-bottom.neighborhood-hover-label::before{border-bottom-color:var(--ink)}
     .map-legend{
         position:absolute;right:14px;bottom:14px;z-index:450;
         width:min(220px,calc(100% - 28px));padding:12px 13px;border:1px solid rgba(58,46,57,.16);
@@ -784,6 +791,29 @@
     }
     .scenario-slider-ticks span { transition: color 0.2s, font-weight 0.2s; }
     .scenario-slider-ticks span.on { color: var(--ink); font-weight: 600; }
+    .scenario-disclaimer {
+        margin: -2px 2px 0;
+        font-family: var(--mono);
+        font-size: 0.58rem;
+        line-height: 1.45;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--light);
+    }
+    .scenario-disclaimer sup {
+        color: var(--heat);
+        font-weight: 700;
+        margin-right: 3px;
+    }
+    .scenario-disclaimer a {
+        color: var(--accent-strong);
+        text-decoration: none;
+        border-bottom: 1px solid rgba(37, 147, 143, 0.35);
+    }
+    .scenario-disclaimer a:hover {
+        color: var(--ink);
+        border-bottom-color: var(--ink);
+    }
 
     .hood-popup { font-family: var(--sans); }
     .hp-hero{background:linear-gradient(155deg,#3a2e39 0%,#2f2630 55%,#211a20 100%);color:var(--paper);padding:30px 32px 28px;display:grid;grid-template-columns:1fr auto;gap:18px;align-items:end}
@@ -1004,13 +1034,17 @@
                             <span class="scenario-slider-value" id="scenarioSliderValue">2024</span>
                         </div>
                         <div class="scenario-slider-control">
-                            <input type="range" id="scenarioSlider" min="0" max="2" step="1" value="0" aria-valuemin="2024" aria-valuemax="2100" aria-valuenow="2024" aria-label="Projection year">
+                            <input type="range" id="scenarioSlider" min="0" max="2" step="1" value="0" aria-valuemin="2024" aria-valuemax="2100" aria-valuenow="2024" aria-label="Projection year" aria-describedby="scenarioDisclaimer">
                             <div class="scenario-slider-ticks" id="scenarioSliderTicks">
                                 <span class="on" data-year="2024">2024</span>
                                 <span data-year="2050">2050</span>
                                 <span data-year="2100">2100</span>
                             </div>
                         </div>
+                        <p class="scenario-disclaimer" id="scenarioDisclaimer">
+                            <sup>*</sup>Future years are scenario assumptions, not exact predictions.
+                            <a href="methodology.html#future">How future risk is calculated</a>
+                        </p>
                     </div>
                     <div class="theme-tabs" id="themeTabs"></div>
                     </div>
@@ -2220,6 +2254,13 @@ function redrawLayer(feats) {
         onEachFeature: (f, layer) => {
             const id = hoodId(f.properties);
             layerMap[id] = layer;
+            layer.bindTooltip(escapeHtml(hoodName(f.properties)), {
+                className: 'neighborhood-hover-label',
+                direction: 'top',
+                offset: [0, -6],
+                opacity: 0.96,
+                sticky: true,
+            });
             layer.bindPopup(() => buildNeighborhoodPopup(f, id), { maxWidth: 260 });
 
             layer.on('mouseover', function () {
