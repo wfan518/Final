@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Understanding Heat Vulnerability — Heat &amp; Health NL</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;500;600&family=Lora:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="global.css">
+    <style>
+        body { background: linear-gradient(180deg, #fdfff7 0%, var(--paper) 35%, rgba(37,147,143,.08) 100%); line-height: 1.7; overflow-x: hidden; }
+
+        .nav-inner { max-width: 920px; }
+        .nav-logo { color: var(--accent-strong); }
+        .nav-btn:hover { background: var(--accent-strong); }
+
+        /* ── HERO ── */
+        .hero { position: relative; background: linear-gradient(165deg, #3a2e39 0%, #2f2630 45%, #211a20 100%); color: #fdfff7; padding: 120px 40px 88px; overflow: hidden; }
+        .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 75% 55% at 75% 35%, rgba(37,147,143,0.14) 0%, transparent 60%), radial-gradient(ellipse 45% 70% at 12% 85%, rgba(145,39,46,0.10) 0%, transparent 55%); }
+        .hero::after { content: ''; position: absolute; right: -80px; top: 50%; transform: translateY(-50%); width: 400px; height: 400px; border-radius: 50%; border: 1px solid rgba(37,147,143,0.14); box-shadow: 0 0 0 40px rgba(37,147,143,0.06), 0 0 0 80px rgba(37,147,143,0.035), 0 0 0 120px rgba(37,147,143,0.025); }
+        .hero-inner { position: relative; max-width: 920px; margin: 0 auto; z-index: 1; }
+        .hero-label { display: inline-flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; color: #25938f; border: 1px solid rgba(37,147,143,0.42); padding: 6px 16px; border-radius: 999px; margin-bottom: 32px; opacity: 0; animation: fadeUp 0.6s ease 0.1s forwards; }
+        .hero-label::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2s ease infinite; }
+        @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+        .hero h1 { font-family: var(--serif); font-size: clamp(2.8rem, 6vw, 5rem); line-height: 1.08; margin-bottom: 28px; opacity: 0; animation: fadeUp 0.7s ease 0.2s forwards; }
+        .hero h1 em { font-style: italic; color: #91272e; }
+        .hero p { font-size: 1.08rem; color: rgba(253,255,247,0.78); max-width: 540px; line-height: 1.75; opacity: 0; animation: fadeUp 0.7s ease 0.35s forwards; }
+
+        /* ── STICKY TABS ── */
+        .sticky-nav { position: sticky; top: 58px; z-index: 99; background: rgba(255,255,255,0.94); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); padding: 0 40px; }
+        .sticky-nav-inner { max-width: 920px; margin: 0 auto; display: flex; align-items: center; gap: 0; overflow-x: auto; }
+        .sticky-nav a { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--light); text-decoration: none; padding: 16px 18px; white-space: nowrap; border-bottom: 2px solid transparent; transition: all 0.2s; }
+        .sticky-nav a:hover { color: var(--accent-strong); border-bottom-color: rgba(37,147,143,.38); }
+        .sticky-nav a.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+        /* ── MAIN LAYOUT ── */
+        .container { max-width: 860px; margin: 0 auto; padding: 0 40px 100px; }
+        .section { padding: 80px 0 0; }
+        .section-header { display: flex; align-items: baseline; gap: 20px; margin-bottom: 40px; }
+        .section-num { font-family: var(--mono); font-size: 0.72rem; color: var(--accent); letter-spacing: 0.1em; flex-shrink: 0; }
+        .section h2 { font-family: var(--serif); font-size: clamp(1.8rem, 3.5vw, 2.6rem); color: var(--ink); line-height: 1.15; }
+        .section h3 { font-family: var(--sans); font-size: 1rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--mid); margin: 36px 0 14px; }
+        .section p { color: var(--mid); margin-bottom: 16px; font-size: 1.02rem; }
+
+        /* ── INTRO CARD ── */
+        .intro-card {
+            background: linear-gradient(145deg, #3a2e39 0%, #2f2630 55%, #211a20 100%);
+            color: #fdfff7; padding: 44px 48px;
+            border-radius: 12px; position: relative; overflow: hidden;
+            border: 1px solid rgba(253,255,247,.14);
+            margin-bottom: 8px;
+        }
+        .intro-card::before {
+            content: '';
+            position: absolute; inset: 0;
+            background:
+                radial-gradient(ellipse 60% 80% at 90% 50%, rgba(37,147,143,0.14) 0%, transparent 60%),
+                radial-gradient(ellipse 40% 60% at 0% 100%, rgba(145,39,46,0.08) 0%, transparent 55%);
+            pointer-events: none;
+        }
+        .intro-card::after {
+            content: '1.1°C';
+            position: absolute; right: 36px; bottom: 20px;
+            font-family: var(--serif); font-style: italic;
+            font-size: 6rem; line-height: 1; color: rgba(37,147,143,0.08);
+            pointer-events: none; user-select: none;
+        }
+        .intro-card p { color: rgba(250,248,245,0.8); font-size: 1.05rem; line-height: 1.8; margin-bottom: 14px; position: relative; z-index: 1; }
+        .intro-card p:last-child { margin-bottom: 0; }
+        .intro-card strong { color: var(--paper); }
+        .intro-card .accent-text { color: var(--accent); }
+
+        /* ── STAT STRIP ── */
+        .stat-strip {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
+            background: var(--border); border-radius: 10px; overflow: hidden;
+            border: 1px solid var(--border); margin: 32px 0;
+        }
+        .stat-cell {
+            background: var(--paper); padding: 28px 24px;
+            display: flex; flex-direction: column; gap: 6px;
+        }
+        .stat-val { font-family: var(--serif); font-size: 2.4rem; line-height: 1; color: var(--ink); }
+        .stat-val em { font-style: italic; color: var(--heat); }
+        .stat-label { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--light); line-height: 1.5; }
+        .stat-source { font-family: var(--mono); font-size: 0.56rem; letter-spacing: 0.06em; color: rgba(58,46,57,.35); margin-top: 2px; }
+
+        /* ── CHART SECTION ── */
+        .chart-card {
+            background: var(--paper); border: 1.5px solid var(--border);
+            border-radius: 10px; overflow: hidden; margin: 32px 0;
+        }
+        .chart-header {
+            padding: 20px 28px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+        }
+        .chart-title { font-family: var(--serif); font-size: 1.15rem; color: var(--ink); margin-bottom: 4px; }
+        .chart-sub { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--light); }
+        .chart-legend { display: flex; gap: 16px; align-items: center; flex-shrink: 0; }
+        .legend-item { display: flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--light); }
+        .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+        .chart-body { padding: 28px 28px 20px; }
+        .chart-area { position: relative; height: 220px; display: flex; align-items: flex-end; gap: 6px; }
+        .bar-group { flex: 1; display: flex; gap: 3px; align-items: flex-end; position: relative; }
+        .bar {
+            flex: 1; border-radius: 3px 3px 0 0;
+            transition: filter 0.15s;
+            cursor: default;
+            position: relative;
+        }
+        .bar:hover { filter: brightness(1.08); }
+        .bar-tooltip {
+            position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+            background: var(--ink); color: var(--paper);
+            font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.04em;
+            padding: 4px 8px; border-radius: 4px; white-space: nowrap;
+            opacity: 0; pointer-events: none; transition: opacity 0.15s;
+            z-index: 10;
+        }
+        .bar:hover .bar-tooltip { opacity: 1; }
+        .bar-tooltip::after {
+            content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+            border: 4px solid transparent; border-top-color: var(--ink);
+        }
+        .x-labels { display: flex; gap: 6px; margin-top: 10px; }
+        .x-label { flex: 1; text-align: center; font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--light); }
+        .y-axis { position: absolute; left: -32px; top: 0; bottom: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 0; }
+        .y-label { font-family: var(--mono); font-size: 0.56rem; color: var(--light); white-space: nowrap; }
+        .gridlines { position: absolute; inset: 0; pointer-events: none; }
+        .gridline { position: absolute; left: 0; right: 0; border-top: 1px dashed rgba(58,46,57,.09); }
+        .chart-caption { padding: 12px 28px 20px; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.06em; color: var(--light); border-top: 1px solid var(--border); }
+
+        /* ── THEME CARDS ── */
+        .themes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 28px 0; }
+        .theme-card {
+            border: 1px solid var(--border); border-radius: 10px; padding: 28px;
+            background: rgba(253,255,247,.92);
+            transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 12px rgba(58,46,57,.04);
+        }
+        .theme-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(58,46,57,.1);
+        }
+        .theme-num { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 6px; }
+        .theme-icon-wrap {
+            width: 36px; height: 36px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; margin-bottom: 12px;
+        }
+        .theme-title { font-family: var(--serif); font-size: 1.32rem; color: var(--ink); margin-bottom: 12px; }
+        .theme-desc { font-size: 0.91rem; color: var(--mid); line-height: 1.68; margin: 0; }
+
+        /* ── QUOTE CARD ── */
+        .quote-card {
+            border-left: 3px solid var(--accent);
+            background: var(--accent-pale);
+            padding: 24px 28px;
+            border-radius: 0 8px 8px 0;
+            margin: 24px 0;
+        }
+        .quote-text { font-family: var(--serif); font-style: italic; font-size: 1.08rem; color: var(--ink); line-height: 1.72; margin-bottom: 10px; }
+        .quote-attr { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--light); }
+
+        /* ── CAVEATS ── */
+        .caveat-item { display: flex; gap: 20px; padding: 22px 0; border-bottom: 1px solid var(--border); }
+        .caveat-item:last-child { border-bottom: none; }
+        .caveat-num { font-family: var(--mono); font-size: 0.7rem; color: var(--accent); letter-spacing: 0.1em; flex-shrink: 0; padding-top: 4px; min-width: 28px; }
+        .caveat-body strong { color: var(--ink); font-weight: 600; display: block; margin-bottom: 4px; }
+        .caveat-body { font-size: 0.96rem; color: var(--mid); line-height: 1.7; }
+
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 680px) {
+            .themes-grid { grid-template-columns: 1fr; }
+            .stat-strip { grid-template-columns: 1fr; }
+            .hero::after { display: none; }
+            .chart-header { flex-direction: column; }
+            .chart-legend { display: none; }
+        }
+        @media (max-width: 480px) {
+            .container { padding: 0 20px 80px; }
+            .intro-card { padding: 28px 24px; }
+            nav.top-nav .nav-inner, .sticky-nav { padding: 0 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="top-nav">
+    <div class="nav-inner">
+        <span class="nav-logo">Heat &amp; Health NL</span>
+        <div class="nav-links">
+            <a href="dashboard.html" class="nav-lk">Dashboard</a>
+            <a href="explain.html" class="nav-lk">Methodology</a>
+            <a href="index.html" class="nav-lk">Explore Regions</a>
+            <a href="index.html#explorer" class="nav-btn">Start Exploring →</a>
+        </div>
+    </div>
+</nav>
+
+<header class="hero">
+    <div class="hero-inner">
+        <div class="hero-label">Context &amp; Background</div>
+        <h1>Understanding <em>heat related </em><br>vulnerability</h1>
+        <p>Why rising temperatures are a public health challenge in the Netherlands and why the risk is not the same for everyone.</p>
+    </div>
+</header>
+
+<nav class="sticky-nav" id="stickyNav">
+    <div class="sticky-nav-inner">
+        <a href="#context"     data-section="context">The Challenge</a>
+        <a href="#inequality"  data-section="inequality">Unequal Risk</a>
+        <a href="#themes"      data-section="themes">Four Themes</a>
+    </div>
+</nav>
+
+<div class="container">
+
+    <!-- ── 01 CONTEXT ── -->
+    <section id="context" class="section">
+        <div class="section-header">
+            <span class="section-num">01</span>
+            <h2>The Challenge</h2>
+        </div>
+
+        <div class="intro-card">
+            <p>Heat is becoming an increasingly significant public health challenge in the Netherlands. Over the past 30 years, the average temperature has risen by approximately <strong>1.1°C</strong>, while the number of tropical days (above 30°C) has risen from around 2 to 5 per year</p>
+            <p>Climate projections suggest this could increase to as many as <strong>35 tropical days annually</strong> by the end of the century. The health consequences are already visible, with an estimated <strong>250 heat-related deaths</strong> occurring in the Netherlands each year.</p>
+        </div>
+
+        <!-- Stat strip -->
+        <div class="stat-strip">
+            <div class="stat-cell">
+                <span class="stat-val"><em>+1.1°C</em></span>
+                <span class="stat-label">Average temperature rise over the past 30 years</span>
+                <span class="stat-source">Ministerie van Volksgezondheid, 2025</span>
+            </div>
+            <div class="stat-cell">
+                <span class="stat-val">~250</span>
+                <span class="stat-label">Heat-related deaths per year in the Netherlands</span>
+                <span class="stat-source">Betgen et al., 2024</span>
+            </div>
+            <div class="stat-cell">
+                <span class="stat-val"><em>35</em></span>
+                <span class="stat-label">Projected tropical days per year by end of century</span>
+                <span class="stat-source">KNMI, 2024</span>
+            </div>
+        </div>
+
+        <!-- Bar chart: tropical days -->
+        <div class="chart-card">
+            <div class="chart-header">
+                <div>
+                    <div class="chart-title">Tropical Days per Year in the Netherlands</div>
+                    <div class="chart-sub">Days above 30°C - historical average vs projected scenarios</div>
+                </div>
+                <div class="chart-legend">
+                    <div class="legend-item"><div class="legend-dot" style="background:#25938f"></div>Historical</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:#c94a35"></div>Projected</div>
+                </div>
+            </div>
+            <div class="chart-body">
+                <div style="position:relative;padding-left:38px">
+                    <div class="y-axis" style="left:0;top:0;bottom:32px;width:32px;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end;position:absolute">
+                        <span class="y-label">35</span>
+                        <span class="y-label">26</span>
+                        <span class="y-label">18</span>
+                        <span class="y-label">9</span>
+                        <span class="y-label">0</span>
+                    </div>
+                    <div class="chart-area" style="padding-bottom:0">
+                        <div class="gridlines">
+                            <div class="gridline" style="bottom:25%"></div>
+                            <div class="gridline" style="bottom:50%"></div>
+                            <div class="gridline" style="bottom:75%"></div>
+                            <div class="gridline" style="bottom:100%"></div>
+                        </div>
+                        <!-- 30 years ago ~2 days -->
+                        <div class="bar-group">
+                            <div class="bar" style="height:calc(220px * 2/35);background:#25938f;opacity:0.85">
+                                <div class="bar-tooltip">~2 days</div>
+                            </div>
+                        </div>
+                        <!-- Today ~5 days -->
+                        <div class="bar-group">
+                            <div class="bar" style="height:calc(220px * 5/35);background:#25938f">
+                                <div class="bar-tooltip">~5 days</div>
+                            </div>
+                        </div>
+                        <!-- 2100 projected ~35 -->
+                        <div class="bar-group">
+                            <div class="bar" style="height:calc(220px * 35/35);background:#c94a35">
+                                <div class="bar-tooltip">~35 days (proj.)</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="x-labels">
+                        <div class="x-label">1990 </div>
+                        <div class="x-label">2026 </div>
+                        <div class="x-label">2100 (70 years prediction)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="chart-caption">Sources: Ministerie van Volksgezondheid 2025 · KNMI 2024 · Projected figures reflect high-end climate scenario</div>
+        </div>
+
+        <p>As climate change intensifies, both the frequency and severity of heat-related health impacts are expected to increase. Preparing for these challenges requires targeted, informed action from policymakers at every level.</p>
+    </section>
+
+    <!-- ── 02 UNEQUAL RISK ── -->
+    <section id="inequality" class="section">
+        <div class="section-header">
+            <span class="section-num">02</span>
+            <h2>Heat Risk Is Not Equal</h2>
+        </div>
+
+        <p>Preparing for these challenges requires targeted and informed action. 
+            However, heat risk is not distributed equally across the population. 
+            Certain groups, such as elderly and children are physiologically more vulnerable to extreme temperatures, 
+            however people with fragile health and those experiencing chronic stress also face more barriers when protecting themselves. 
+            Additionally social and economic factors also play crucial roles in determining who is most at risk. 
+            For example low incomes can limit access to cooling, while social isolation reduces the likelihood of receiving support during heat alerts. 
+            This is particularly concerning given that 98% of heat-related deaths occur at home with the majority living only by themselves (Public Health Ontario, 2023). </p>
+        <p>All these different factors should be contemplated by municipal policymakers. However, due to the complex nature of heat vulnerability, this is not an easy feat. To make this information more digestible, this tool examines heat vulnerability through four main categories.</p>
+    </section>
+
+    <!-- ── 03 FOUR THEMES ── -->
+    <section id="themes" class="section">
+        <div class="section-header">
+            <span class="section-num">03</span>
+            <h2>Four Dimensions of Vulnerability</h2>
+        </div>
+
+        <p>Each theme captures a distinct aspect of heat vulnerability. Together they form a complete picture of which neighbourhoods face the greatest risk and why.</p>
+
+        <div class="themes-grid">
+
+            <!-- Heat Exposure -->
+            <div class="theme-card" style="border-top: 4px solid var(--c-heat)">
+                <div class="theme-num" style="color:var(--c-heat)">Theme 01</div>
+                <div class="theme-icon-wrap" style="background:rgba(201,74,53,0.12);color:var(--c-heat)">🌡️</div>
+                <div class="theme-title">Heat Exposure</div>
+                <p class="theme-desc">Heat exposure refers to the intensity and duration of heat experienced by residents. Dense urban areas with asphalt, concrete, and buildings absorb and retain heat throughout the day, creating the <strong>urban heat island effect</strong>. Areas with limited vegetation also cool down more slowly at night, meaning residents in highly urbanised neighbourhoods often face prolonged heat stress.</p>
+            </div>
+
+            <!-- Vulnerable Populations -->
+            <div class="theme-card" style="border-top: 4px solid var(--c-pop)">
+                <div class="theme-num" style="color:var(--c-pop)">Theme 02</div>
+                <div class="theme-icon-wrap" style="background:rgba(126,90,155,0.12);color:var(--c-pop)">👥</div>
+                <div class="theme-title">Vulnerable Populations</div>
+                <p class="theme-desc">Some groups are physiologically more susceptible to the health impacts of heat. Older adults are less able to regulate body temperature and more likely to have underlying health conditions. Young children heat up more quickly and depend on caregivers to recognise distress. Individuals with chronic illness or mobility limitations face additional challenges. Neighbourhoods with larger concentrations of these residents are more likely to experience adverse health outcomes during extreme heat events.</p>
+            </div>
+
+            <!-- Socioeconomic -->
+            <div class="theme-card" style="border-top: 4px solid var(--c-socio)">
+                <div class="theme-num" style="color:var(--c-socio)">Theme 03</div>
+                <div class="theme-icon-wrap" style="background:rgba(194,119,40,0.12);color:var(--c-socio)">💶</div>
+                <div class="theme-title">Socioeconomic Conditions</div>
+                <p class="theme-desc">Socioeconomic circumstances strongly influence a person's ability to prepare for and respond to heat. Lower income households may be less able to afford cooling measures, energy costs, or home improvements that reduce indoor temperatures. Social isolation can also increase risk, as people living alone may have fewer opportunities to seek assistance or receive welfare checks during extreme heat. Communities experiencing higher levels of deprivation often have fewer resources available to adapt to increasing temperatures, making them more vulnerable to heat related health impacts.</p>
+                <div class="quote-card" style="margin-top:16px;margin-bottom:0">
+                    <p class="quote-text">"I'd like to have air conditioning but I can't afford it. It costs like a thousand euros to get one installed and then you also have to pay for electricity."</p>
+                    <span class="quote-attr">— A.D.</span>
+                </div>
+            </div>
+
+            <!-- Built Environment -->
+            <div class="theme-card" style="border-top: 4px solid var(--c-built)">
+                <div class="theme-num" style="color:var(--c-built)">Theme 04</div>
+                <div class="theme-icon-wrap" style="background:rgba(58,123,170,0.12);color:var(--c-built)">🏗️</div>
+                <div class="theme-title">Built Environment &amp; Access</div>
+                <p class="theme-desc">The characteristics of the built environment can either increase or reduce vulnerability to heat. Older or poorly insulated housing may trap heat indoors, creating dangerous conditions even after outdoor temperatures begin to fall. Access to green spaces, shaded areas, cooling centres and other public services can help residents manage heat stress and recover from heat related illness. Conversely, neighbourhoods lacking these protective features may face greater health risks during prolonged periods of extreme heat.</p>
+                <div class="quote-card" style="margin-top:16px;margin-bottom:0">
+                    <p class="quote-text">"My apartment gets super hot because it's an old building and in the living room there is only one window that opens. It is often over 30°C there during the summer."</p>
+                    <span class="quote-attr">— T.M.</span>
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+</div>
+
+<footer>
+    <p>
+        <strong>Heat Vulnerability Tool</strong> · Developed by Computational Social Science students <br>
+    </p>
+</footer>
+
+<script>
+    const sections = ['context', 'inequality', 'themes'];
+    const navLinks = document.querySelectorAll('.sticky-nav a[data-section]');
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                navLinks.forEach(link => {
+                    link.classList.toggle('active', link.dataset.section === entry.target.id);
+                });
+            }
+        });
+    }, { rootMargin: '-30% 0px -65% 0px' });
+
+    sections.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) observer.observe(el);
+    });
+</script>
+
+</body>
+</html>
