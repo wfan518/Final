@@ -652,23 +652,7 @@
     .leaflet-interactive.explorer-feature:hover{stroke-dasharray:6 6;animation:dashPulse 1.1s linear infinite}
     </style>
 </head>
-<body>
-
-<!-- NAV -->
-<nav>
-    <div class="nav-inner">
-        <a href="index.html" class="nav-logo" aria-label="Go to Heat & Health NL homepage">
-            <img src="favicon.svg" alt="" class="nav-logo-img">
-            <span>Heat &amp; Health NL</span>
-        </a>
-        <div class="nav-links">
-            <a href="dashboard.html" class="nav-lk">Dashboard</a>
-            <a href="background.html" class="nav-lk">Background</a>
-            <a href="explain.html" class="nav-lk">Methodology</a>
-            <a href="#explorer" class="nav-btn">Start Exploring →</a>
-        </div>
-    </div>
-</nav>
+<body data-page="index">
 
 <!-- ═══════════ HERO ═══════════ -->
 <div style="max-width:var(--w);margin:0 auto">
@@ -1922,5 +1906,6 @@ function rampColor(score, key) {
     return '#'+[r1+(r2-r1)*t,g1+(g2-g1)*t,b1+(b2-b1)*t].map(v=>Math.round(v).toString(16).padStart(2,'0')).join('');
 }
 </script>
+<script src="nav.js" defer></script>
 </body>
 </html>

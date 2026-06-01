@@ -11,10 +11,6 @@
     <style>
         body { background: linear-gradient(180deg, #fdfff7 0%, var(--paper) 35%, rgba(37,147,143,.08) 100%); line-height: 1.7; overflow-x: hidden; }
         
-        /* Overrides for this page */
-        .nav-inner { max-width: 920px; }
-        .nav-btn:hover { background: var(--accent-strong); }
-
         /* ── HERO ── */
         .hero { position: relative; background: linear-gradient(165deg, #3a2e39 0%, #2f2630 45%, #211a20 100%); color: #fdfff7; padding: 120px 40px 88px; overflow: hidden; }
         .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 75% 55% at 75% 35%, rgba(37,147,143,0.14) 0%, transparent 60%), radial-gradient(ellipse 45% 70% at 12% 85%, rgba(145,39,46,0.10) 0%, transparent 55%); }
@@ -218,21 +214,7 @@
         }
     </style>
 </head>
-<body>
-
-<nav class="top-nav">
-    <div class="nav-inner">
-        <a href="index.html" class="nav-logo" aria-label="Go to Heat & Health NL homepage">
-            <img src="favicon.svg" alt="" class="nav-logo-img">
-            <span>Heat &amp; Health NL</span>
-        </a>
-        <div class="nav-links">
-            <a href="dashboard.html" class="nav-lk">Dashboard</a>
-            <a href="background.html" class="nav-lk">Background</a>
-            <a href="index.html#explorer" class="nav-btn">Start Exploring →</a>
-        </div>
-    </div>
-</nav>
+<body data-page="explain" class="layout-narrow">
 
 <header class="hero">
     <div class="hero-inner">
@@ -452,6 +434,7 @@
         if (el) observer.observe(el);
     });
 </script>
+<script src="nav.js" defer></script>
 
 </body>
 </html>

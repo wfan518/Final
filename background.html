@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Understanding Heat Vulnerability — Heat &amp; Health NL</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -9,10 +10,6 @@
     <link rel="stylesheet" href="global.css">
     <style>
         body { background: linear-gradient(180deg, #fdfff7 0%, var(--paper) 35%, rgba(37,147,143,.08) 100%); line-height: 1.7; overflow-x: hidden; }
-
-        .nav-inner { max-width: 920px; }
-        .nav-logo { color: var(--accent-strong); }
-        .nav-btn:hover { background: var(--accent-strong); }
 
         /* ── HERO ── */
         .hero { position: relative; background: linear-gradient(165deg, #3a2e39 0%, #2f2630 45%, #211a20 100%); color: #fdfff7; padding: 120px 40px 88px; overflow: hidden; }
@@ -186,19 +183,7 @@
         }
     </style>
 </head>
-<body>
-
-<nav class="top-nav">
-    <div class="nav-inner">
-        <span class="nav-logo">Heat &amp; Health NL</span>
-        <div class="nav-links">
-            <a href="dashboard.html" class="nav-lk">Dashboard</a>
-            <a href="explain.html" class="nav-lk">Methodology</a>
-            <a href="index.html" class="nav-lk">Explore Regions</a>
-            <a href="index.html#explorer" class="nav-btn">Start Exploring →</a>
-        </div>
-    </div>
-</nav>
+<body data-page="background" class="layout-narrow">
 
 <header class="hero">
     <div class="hero-inner">
@@ -408,6 +393,7 @@
         if (el) observer.observe(el);
     });
 </script>
+<script src="nav.js" defer></script>
 
 </body>
 </html>
