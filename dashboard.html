@@ -430,9 +430,9 @@
     <!-- COMPOSITE SCENARIOS -->
     <div class="control-group">
         <span class="section-label">Composite Risk Score</span>
-        <button class="scenario-btn active" data-layer="risk_2025_baseline" data-type="composite">2025 — Current Baseline</button>
+        <button class="scenario-btn active" data-layer="risk_2025_baseline" data-type="composite">2024 — Current Baseline</button>
         <button class="scenario-btn" data-layer="risk_2050_baseline" data-type="composite">2050 — Medium-Term Outlook</button>
-        <button class="scenario-btn" data-layer="risk_2075_baseline" data-type="composite">2075 — Long-Term Outlook</button>
+        <button class="scenario-btn" data-layer="risk_2075_baseline" data-type="composite">2100 — Long-Term Outlook</button>
     </div>
 
     <!-- THEMATIC VARIABLE LAYERS -->
@@ -443,25 +443,25 @@
             <button class="theme-btn" style="--theme-color:var(--c-heat)"
                     data-layer="theme_heat" data-type="theme" data-theme="heat">
                 <span class="th-name">Heat Exposure</span>
-                <span class="th-vars">PET temp · RIVM class</span>
+                <span class="th-vars">Climate · PET · shade · cooling access</span>
             </button>
 
             <button class="theme-btn" style="--theme-color:var(--c-pop)"
                     data-layer="theme_populations" data-type="theme" data-theme="populations">
                 <span class="th-name">Vulnerable Populations</span>
-                <span class="th-vars">Elderly · Children · Single HH · Frailty</span>
+                <span class="th-vars">Age · density · disability · low income</span>
             </button>
 
             <button class="theme-btn" style="--theme-color:var(--c-socio)"
                     data-layer="theme_socioeconomic" data-type="theme" data-theme="socioeconomic">
-                <span class="th-name">Socioeconomic</span>
-                <span class="th-vars">Income · Education · Social min · Rental</span>
+                <span class="th-name">Socioeconomic Deprivation</span>
+                <span class="th-vars">Income · poverty · education · housing</span>
             </button>
 
             <button class="theme-btn" style="--theme-color:var(--c-built)"
                     data-layer="theme_built_environment_access" data-type="theme" data-theme="built_environment_access">
                 <span class="th-name">Built Environment & Access</span>
-                <span class="th-vars">Housing · Shade · GP dist · Cooling</span>
+                <span class="th-vars">Shade · GP access · cooling · green space</span>
             </button>
 
         </div>
@@ -510,7 +510,7 @@ const MODEL_EXPLANATIONS = {
     composite: {
         title: 'Composite vulnerability model',
         formula: `
-            Vulnerability ≈ f(<br>
+            Composite Risk ≈ f(<br>
             &nbsp;&nbsp;<span style="color:#c94a35">Heat exposure</span>,<br>
             &nbsp;&nbsp;<span style="color:#7e5a9b">Vulnerable populations</span>,<br>
             &nbsp;&nbsp;<span style="color:#c27728">Socioeconomic deprivation</span>,<br>
@@ -518,8 +518,12 @@ const MODEL_EXPLANATIONS = {
             )
         `,
         explain: `
-            <strong>Composite Risk Score</strong> combines the four vulnerability drivers into one relative neighbourhood score. 
-            It should be used to compare spatial patterns and identify areas for closer local interpretation, not as an exact health forecast.
+            <strong>Composite Risk Score</strong> summarises four vulnerability drivers into one relative neighbourhood score.
+            It is intended for spatial comparison and policy discussion, not as an exact health forecast.
+            <ul class="model-bullets">
+                <li>Use it to locate neighbourhoods that may need closer local interpretation.</li>
+                <li>Switch to individual drivers to understand what may be pushing the score upward.</li>
+            </ul>
         `
     },
 
@@ -527,14 +531,20 @@ const MODEL_EXPLANATIONS = {
         title: 'Heat exposure',
         formula: `
             Heat Exposure ≈ f(<br>
+            &nbsp;&nbsp;<span style="color:#c94a35">yearly mean temperature</span>,<br>
+            &nbsp;&nbsp;<span style="color:#c94a35">rainfall and evaporation</span>,<br>
             &nbsp;&nbsp;<span style="color:#c94a35">PET temperature</span>,<br>
-            &nbsp;&nbsp;<span style="color:#c94a35">RIVM heat class</span>,<br>
-            &nbsp;&nbsp;<span style="color:#c94a35">urban heat intensity</span><br>
+            &nbsp;&nbsp;<span style="color:#c94a35">shade and address density</span>,<br>
+            &nbsp;&nbsp;<span style="color:#c94a35">indoor and outdoor cooling access</span><br>
             )
         `,
         explain: `
-            <strong>Heat Exposure</strong> describes where outdoor heat stress is likely to be higher. 
-            It helps identify neighbourhoods where physical exposure to heat may require shading, cooling routes, or green-blue infrastructure.
+            <strong>Heat Exposure</strong> describes the physical heat burden of a neighbourhood and the immediate cooling conditions around residents.
+            It combines climate indicators, perceived heat stress, shade, density, and whether people report being able to find cooling indoors or outdoors.
+            <ul class="model-bullets">
+                <li>Relevant indicators include temperature, rainfall, evaporation, PET, shade score, address density, and cooling access.</li>
+                <li>High scores suggest that shading, cooling routes, public cool spaces, or green-blue infrastructure may be especially relevant.</li>
+            </ul>
         `
     },
 
@@ -542,14 +552,20 @@ const MODEL_EXPLANATIONS = {
         title: 'Vulnerable populations',
         formula: `
             Vulnerable Populations ≈ f(<br>
-            &nbsp;&nbsp;<span style="color:#7e5a9b">elderly residents</span>,<br>
-            &nbsp;&nbsp;<span style="color:#7e5a9b">young children</span>,<br>
-            &nbsp;&nbsp;<span style="color:#7e5a9b">frailty indicators</span><br>
+            &nbsp;&nbsp;<span style="color:#7e5a9b">population density</span>,<br>
+            &nbsp;&nbsp;<span style="color:#7e5a9b">low-income households</span>,<br>
+            &nbsp;&nbsp;<span style="color:#7e5a9b">residents aged 65+</span>,<br>
+            &nbsp;&nbsp;<span style="color:#7e5a9b">children aged 0–14</span>,<br>
+            &nbsp;&nbsp;<span style="color:#7e5a9b">disability benefit recipients</span><br>
             )
         `,
         explain: `
-            <strong>Vulnerable Populations</strong> captures groups that may be physiologically more sensitive to heat. 
-            It supports targeted outreach, care coordination, and heat-health communication during heat events.
+            <strong>Vulnerable Populations</strong> identifies where heat-sensitive groups are concentrated.
+            It includes age-related vulnerability, disability-related vulnerability, household income conditions, and population density.
+            <ul class="model-bullets">
+                <li>This driver helps identify where outreach, care coordination, and heat-health communication may need to be targeted.</li>
+                <li>High scores do not mean all residents are vulnerable; they indicate a higher concentration of sensitivity-related indicators.</li>
+            </ul>
         `
     },
 
@@ -557,15 +573,20 @@ const MODEL_EXPLANATIONS = {
         title: 'Socioeconomic deprivation',
         formula: `
             Socioeconomic Deprivation ≈ f(<br>
-            &nbsp;&nbsp;<span style="color:#c27728">low income</span>,<br>
-            &nbsp;&nbsp;<span style="color:#c27728">education level</span>,<br>
-            &nbsp;&nbsp;<span style="color:#c27728">social minimum</span>,<br>
-            &nbsp;&nbsp;<span style="color:#c27728">rental housing</span><br>
+            &nbsp;&nbsp;<span style="color:#c27728">population density</span>,<br>
+            &nbsp;&nbsp;<span style="color:#c27728">older housing stock</span>,<br>
+            &nbsp;&nbsp;<span style="color:#c27728">low-income households</span>,<br>
+            &nbsp;&nbsp;<span style="color:#c27728">employment rate</span>,<br>
+            &nbsp;&nbsp;<span style="color:#c27728">poverty and low education</span><br>
             )
         `,
         explain: `
-            <strong>Socioeconomic Deprivation</strong> points to limited adaptive capacity. 
-            High scores may indicate that residents face financial, legal, language, or housing barriers when trying to protect themselves from heat.
+            <strong>Socioeconomic Deprivation</strong> captures limited adaptive capacity.
+            It combines income, employment, poverty, education, housing-age, and density indicators that may affect residents’ ability to protect themselves from heat.
+            <ul class="model-bullets">
+                <li>High scores may point to financial, housing, language, legal, or service-access barriers.</li>
+                <li>This driver is useful for thinking about affordability, rental conditions, communication channels, and targeted support.</li>
+            </ul>
         `
     },
 
@@ -573,15 +594,20 @@ const MODEL_EXPLANATIONS = {
         title: 'Built environment & access',
         formula: `
             Built Environment &amp; Access ≈ f(<br>
-            &nbsp;&nbsp;<span style="color:#3a7baa">older housing</span>,<br>
-            &nbsp;&nbsp;<span style="color:#3a7baa">shade and green access</span>,<br>
-            &nbsp;&nbsp;<span style="color:#3a7baa">cooling spaces</span>,<br>
-            &nbsp;&nbsp;<span style="color:#3a7baa">health-service access</span><br>
+            &nbsp;&nbsp;<span style="color:#3a7baa">shade score and density</span>,<br>
+            &nbsp;&nbsp;<span style="color:#3a7baa">older housing stock</span>,<br>
+            &nbsp;&nbsp;<span style="color:#3a7baa">distance to GP practice</span>,<br>
+            &nbsp;&nbsp;<span style="color:#3a7baa">distance to cooling locations</span>,<br>
+            &nbsp;&nbsp;<span style="color:#3a7baa">green-space satisfaction and cooling access</span><br>
             )
         `,
         explain: `
-            <strong>Built Environment & Access</strong> describes whether the physical and service environment helps or limits adaptation. 
-            It links housing, public space, green access, cooling locations, and service proximity to heat-health vulnerability.
+            <strong>Built Environment & Access</strong> describes whether the neighbourhood environment helps or limits adaptation.
+            It links shade, density, housing age, access to GP services, estimated distance to cooling, satisfaction with green space, and reported cooling access.
+            <ul class="model-bullets">
+                <li>High scores may indicate a need for shaded routes, accessible cooling spaces, housing adaptation, or better service access.</li>
+                <li>This driver connects physical planning with public-health accessibility.</li>
+            </ul>
         `
     }
 };
