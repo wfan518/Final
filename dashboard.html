@@ -704,13 +704,104 @@ const RAMPS = {
     built_environment_access:['#fdfff7','#cce3f0','#68b0d8','#3a7baa','#3a2e39'],
 };
 
-function scoreValue(props, key) {
+const SCENARIO_YEARS = ['2024', '2050', '2100'];
+
+const PROPERTY_CANDIDATES = {
+    composite: {
+        // UI label 2024 reads the baseline columns currently available in the GeoJSON.
+        '2024': ['overall_risk_score_2025', 'risk_2025_baseline'],
+        '2050': ['overall_risk_score_2050', 'risk_2050_baseline', 'risk_2050_score_main'],
+        '2100': ['overall_risk_score_2100', 'risk_2100_baseline', 'risk_2100_score_main'],
+    },
+    theme_heat: {
+        '2024': ['heat_score_2025', 'theme_heat'],
+        '2050': ['heat_score_2050'],
+        '2100': ['heat_score_2100'],
+    },
+    theme_populations: {
+        '2024': ['populations_score_2025', 'theme_populations'],
+        '2050': ['populations_score_2050'],
+        '2100': ['populations_score_2100'],
+    },
+    theme_socioeconomic: {
+        '2024': ['socioeconomic_score_2025', 'theme_socioeconomic'],
+        '2050': ['socioeconomic_score_2050'],
+        '2100': ['socioeconomic_score_2100'],
+    },
+    theme_built_environment_access: {
+        '2024': ['built_environment_access_score_2025', 'theme_built_environment_access', 'theme_built_env', 'theme_access'],
+        '2050': ['built_environment_access_score_2050'],
+        '2100': ['built_environment_access_score_2100'],
+    },
+};
+
+const THEME_KEY_BY_NAME = {
+    composite: 'composite',
+    heat: 'theme_heat',
+    populations: 'theme_populations',
+    socioeconomic: 'theme_socioeconomic',
+    built_environment_access: 'theme_built_environment_access',
+};
+
+let propertyKeyCache = {};
+
+function rawScoreValue(props, key) {
     if (props[key] != null && !isNaN(props[key])) return props[key];
+
+    // Fallback for older files where built environment and access were separate.
     if (key === 'theme_built_environment_access') {
         const parts = [props.theme_built_env, props.theme_access].filter(v => v != null && !isNaN(v));
         return parts.length ? parts.reduce((a, b) => a + b, 0) / parts.length : null;
     }
+
     return null;
+}
+
+function propertyHasScore(props, key) {
+    return props && Object.prototype.hasOwnProperty.call(props, key) && props[key] != null && !isNaN(props[key]);
+}
+
+function resolvePropertyKey(themeKey, uiYear) {
+    const cacheKey = `${themeKey}:${uiYear}`;
+    if (propertyKeyCache[cacheKey]) return propertyKeyCache[cacheKey];
+
+    const candidates = PROPERTY_CANDIDATES[themeKey]?.[uiYear] || [];
+    const sample = geojsonData?.features?.[0]?.properties;
+
+    if (sample) {
+        for (const k of candidates) {
+            if (propertyHasScore(sample, k)) {
+                propertyKeyCache[cacheKey] = k;
+                return k;
+            }
+        }
+    }
+
+    // Before data loads, keep a sensible first candidate so the state does not collapse.
+    return candidates[0] || null;
+}
+
+function activeThemeKey() {
+    return THEME_KEY_BY_NAME[currentTheme] || 'composite';
+}
+
+function getFeatureScore(props, themeKey) {
+    const key = themeKey || activeThemeKey();
+    const year = TIME_HORIZONS[currentTimeIndex]?.year || '2024';
+    const resolved = resolvePropertyKey(key, year);
+
+    if (!resolved) return null;
+
+    // If built access falls back to old split fields, calculate from both.
+    if (key === 'theme_built_environment_access' && resolved === 'theme_built_environment_access') {
+        const direct = rawScoreValue(props, resolved);
+        if (direct != null && !isNaN(direct)) return direct;
+
+        const parts = [props.theme_built_env, props.theme_access].filter(v => v != null && !isNaN(v));
+        return parts.length ? parts.reduce((a, b) => a + b, 0) / parts.length : null;
+    }
+
+    return rawScoreValue(props, resolved);
 }
 
 function getNeighbourhoodName(props) {
@@ -744,7 +835,7 @@ function getDominantDrivers(props) {
     return drivers
         .map(d => ({
             ...d,
-            score: scoreValue(props, d.key)
+            score: getFeatureScore(props, d.key)
         }))
         .filter(d => d.score != null && !isNaN(d.score))
         .sort((a, b) => b.score - a.score);
@@ -819,12 +910,13 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r
 
 // ─── STYLING ─────────────────────────────────────────────────────────────────
 function styleFeature(feature) {
-    const score = scoreValue(feature.properties, currentLayer);
+    const score = getFeatureScore(feature.properties, activeThemeKey());
+
     return {
-        fillColor:   rampColor(score, currentTheme),
-        weight:      0.35,
-        opacity:     1,
-        color:       'rgba(58, 46, 57, 0.28)',
+        fillColor: rampColor(score, currentTheme),
+        weight: 0.35,
+        opacity: 1,
+        color: 'rgba(58, 46, 57, 0.28)',
         fillOpacity: score == null || isNaN(score) ? 0.35 : 0.78,
     };
 }
@@ -836,21 +928,22 @@ function buildPopup(feature) {
     const municipality = getMunicipalityName(p);
 
     const fmt = v => (v != null && !isNaN(v)) ? Math.round(v) : '—';
-    const activeScore = fmt(scoreValue(p, currentLayer));
+    const activeScore = fmt(getFeatureScore(p, activeThemeKey()));
 
+    const year = TIME_HORIZONS[currentTimeIndex]?.year || '2024';
     const activeLabel = currentType === 'composite'
-        ? 'Composite Risk Score'
-        : THEME_DEFS[currentTheme]?.label || 'Score';
+        ? `${year} · Composite Risk Score`
+        : `${year} · ${THEME_DEFS[currentTheme]?.label || 'Score'}`;
 
     const topDrivers = getDominantDrivers(p);
     const dominant = topDrivers[0];
 
     const bars = POPUP_THEMES.map(t => {
-        const val = scoreValue(p, t.key);
+        const val = getFeatureScore(p, t.key);
         const num = (val != null && !isNaN(val)) ? Math.round(val) : null;
         const pct = num != null ? num : 0;
         const col = THEME_DEFS[t.theme]?.color || '#888';
-        const isActive = currentType === 'theme' && currentLayer === t.key;
+        const isActive = currentType === 'theme' && activeThemeKey() === t.key;
 
         return `
             <a href="methodology.html#themes"
@@ -866,7 +959,7 @@ function buildPopup(feature) {
     }).join('');
 
     const hint = dominant
-        ? `Main signal: ${dominant.label}. Use the main explorer for municipality-level ranking and intervention directions.`
+        ? `Main ${year} signal: ${dominant.label}. Use the main explorer for municipality-level ranking and intervention directions.`
         : `Use the main explorer for municipality-level ranking and intervention directions.`;
 
     return `
@@ -889,7 +982,7 @@ function buildPopup(feature) {
 function onEachFeature(feature, layer) {
     layer.bindPopup(() => buildPopup(feature), { maxWidth: 280 });
     layer.on('mouseover', function() {
-        const s = scoreValue(feature.properties, currentLayer);
+        const s = getFeatureScore(feature.properties, activeThemeKey());
         this.setStyle({
             weight: 1.75,
             color: 'rgba(58, 46, 57, 0.65)',
@@ -921,11 +1014,15 @@ fetch('map_scenarios.geojson')
     });
 
 function renderLayer() {
+    map.closePopup();
+
     if (geojsonLayer) map.removeLayer(geojsonLayer);
+
     geojsonLayer = L.geoJson(geojsonData, {
         style: styleFeature,
         onEachFeature: onEachFeature
     }).addTo(map);
+
     updateLegend();
 }
 
@@ -939,12 +1036,16 @@ legendControl.addTo(map);
 
 function updateLegend() {
     const themeLabel = THEME_DEFS[currentTheme]?.label || 'Risk';
+    const year = TIME_HORIZONS[currentTimeIndex]?.year || '2024';
     const ramp = RAMPS[currentTheme] || RAMPS.composite;
     const labels = ['0–20 Minimal', '20–40 Low', '40–60 Moderate', '60–80 High', '80–100 Critical'];
-    let html = `<strong>${themeLabel}</strong>`;
+
+    let html = `<strong>${year} · ${themeLabel}</strong>`;
+
     ramp.forEach((color, i) => {
         html += `<div class="legend-row"><div class="legend-swatch" style="background:${color}"></div>${labels[i]}</div>`;
     });
+
     legendControl._div.innerHTML = html;
 }
 
@@ -979,9 +1080,7 @@ function setTimeHorizon(index) {
         btn.classList.toggle('active', Number(btn.dataset.timeIndex) === currentTimeIndex);
     });
 
-    if (currentType === 'composite') {
-        currentLayer = getCompositeLayerForCurrentTime();
-    }
+    currentLayer = resolvePropertyKey(activeThemeKey(), horizon.year);
 
     updateModelCard();
     if (geojsonData) renderLayer();
@@ -994,11 +1093,8 @@ function setLayerFocus(btn) {
     currentType = btn.dataset.type;
     currentTheme = btn.dataset.theme;
 
-    if (currentType === 'composite') {
-        currentLayer = getCompositeLayerForCurrentTime();
-    } else {
-        currentLayer = btn.dataset.layer;
-    }
+    const horizon = TIME_HORIZONS[currentTimeIndex];
+    currentLayer = resolvePropertyKey(activeThemeKey(), horizon.year);
 
     updateModelCard();
     if (geojsonData) renderLayer();
