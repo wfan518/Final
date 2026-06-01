@@ -103,12 +103,65 @@
             margin-top: 22px; padding-top: 18px;
             border-top: 1px solid var(--sidebar-border);
         }
+        .timeline-control {
+            position: relative;
+            padding: 10px 2px 4px;
+        }
+        .timeline-range {
+            width: 100%;appearance: none;
+            height: 6px;border-radius: 999px;
+            background: linear-gradient(90deg, rgba(37,147,143,.85), rgba(253,255,247,.20));
+            outline: none;cursor: pointer;
+        }
+        .timeline-range::-webkit-slider-thumb {
+            appearance: none;width: 18px;
+            height: 18px;border-radius: 50%;
+            background: var(--accent);border: 2px solid var(--sidebar-heading);
+            box-shadow: 0 0 0 4px rgba(37,147,143,.18);cursor: pointer;
+        }
+        .timeline-range::-moz-range-thumb {
+            width: 18px;height: 18px;
+            border-radius: 50%;background: var(--accent);
+            border: 2px solid var(--sidebar-heading);
+            box-shadow: 0 0 0 4px rgba(37,147,143,.18);
+            cursor: pointer;
+        }
+        .timeline-labels {
+            display: grid;grid-template-columns: repeat(3, 1fr);
+            gap: 8px;margin-top: 10px;
+        }
+        .time-label {
+            border: 1px solid var(--sidebar-border);
+            background: rgba(255,255,255,.04);
+            color: var(--sidebar-muted);border-radius: 999px;
+            padding: 7px 8px;font-family: var(--sans);
+            font-size: .78rem;font-weight: 700;
+            cursor: pointer;transition: .18s ease;
+        }
+        .time-label:hover {
+            color: var(--sidebar-heading);
+            border-color: rgba(37,147,143,.42);
+        }
+        .time-label.active {
+            background: var(--accent);border-color: var(--accent);
+            color: var(--map-bg);
+        }
+        .time-copy {
+            margin-top: 10px;font-size: .78rem;
+            line-height: 1.45;color: var(--sidebar-muted);
+        }
+        .layer-grid {
+            grid-template-columns: 1fr;
+        }
+        .layer-grid .theme-btn {
+            min-height: 58px;
+        }
+
         .section-label {
             font-family: var(--mono); font-size: 0.62rem;
             letter-spacing: 0.14em; text-transform: uppercase;
             display: block; margin-bottom: 11px; color: var(--sidebar-muted);
         }
-
         .scenario-btn {
             position: relative;
             display: block; width: 100%;
@@ -436,16 +489,32 @@
 
     <!-- COMPOSITE SCENARIOS -->
     <div class="control-group">
-        <span class="section-label">Composite Risk Score</span>
-            <button class="scenario-btn active" data-layer="risk_2025_baseline" data-type="composite">2024 — Current Baseline</button>
-            <button class="scenario-btn" data-layer="risk_2050_baseline" data-type="composite">2050 — Medium-Term Outlook</button>
-            <button class="scenario-btn" data-layer="risk_2100_baseline" data-type="composite">2100 — Long-Term Outlook</button>
+        <span class="section-label">Time horizon</span>
+
+        <div class="timeline-control" aria-label="Select time horizon">
+            <input id="timeHorizon" class="timeline-range" type="range" min="0" max="2" step="1" value="0">
+            <div class="timeline-labels">
+                <button type="button" class="time-label active" data-time-index="0">2024</button>
+                <button type="button" class="time-label" data-time-index="1">2050</button>
+                <button type="button" class="time-label" data-time-index="2">2100</button>
+            </div>
+        </div>
+
+        <div class="time-copy" id="timeCopy">
+            Current baseline
+        </div>
     </div>
 
     <!-- THEMATIC VARIABLE LAYERS -->
     <div class="control-group">
-        <span class="section-label">Variable Themes</span>
-        <div class="theme-grid">
+        <span class="section-label">Layer focus</span>
+        <div class="theme-grid layer-grid">
+
+            <button class="theme-btn active" style="--theme-color:#fdfff7"
+                    data-layer="composite" data-type="composite" data-theme="composite">
+                <span class="th-name">Composite Risk</span>
+                <span class="th-vars">Four drivers · selected time horizon</span>
+            </button>
 
             <button class="theme-btn" style="--theme-color:var(--c-heat)"
                     data-layer="theme_heat" data-type="theme" data-theme="heat">
@@ -525,9 +594,9 @@ const MODEL_EXPLANATIONS = {
         `,
         explain: `
             <strong>Composite Risk Score</strong> summarises four vulnerability drivers into one relative neighbourhood score.
-            It is intended for spatial comparison and policy discussion, not as an exact health forecast.
+            The time horizon control changes the composite scenario layer; individual driver layers show the underlying vulnerability structure used for interpretation.
             <ul class="model-bullets">
-                <li>Use it to locate neighbourhoods that may need closer local interpretation.</li>
+                <li>Use the timeline to compare composite risk patterns across 2024, 2050, and 2100.</li>
                 <li>Switch to individual drivers to understand what may be pushing the score upward.</li>
             </ul>
         `
@@ -697,11 +766,37 @@ function interpolateHex(a, b, t) {
 }
 
 // ─── STATE ────────────────────────────────────────────────────────────────────
-var currentLayer = 'risk_2025_baseline';
+const TIME_HORIZONS = [
+    {
+        index: 0,
+        year: '2024',
+        layer: 'risk_2025_baseline',
+        label: 'Current baseline',
+        copy: 'Current baseline conditions shown as the starting point for comparison.'
+    },
+    {
+        index: 1,
+        year: '2050',
+        layer: 'risk_2050_baseline',
+        label: 'Medium-term outlook',
+        copy: 'Medium-term outlook for comparing how vulnerability patterns may shift over time.'
+    },
+    {
+        index: 2,
+        year: '2100',
+        layer: 'risk_2100_baseline',
+        label: 'Long-term outlook',
+        copy: 'Long-term outlook for identifying where heat-health vulnerability may become more persistent.'
+    }
+];
+
+var currentTimeIndex = 0;
+var currentLayer = TIME_HORIZONS[currentTimeIndex].layer;
 var currentType  = 'composite';
 var currentTheme = 'composite';
 
 updateModelCard();
+setTimeHorizon(0);
 
 // ─── MAP ──────────────────────────────────────────────────────────────────────
 const netherlandsBounds = L.latLngBounds(L.latLng(50.5, 3.0), L.latLng(53.7, 7.5));
@@ -866,28 +961,64 @@ function updateModelCard() {
     if (explainEl) explainEl.innerHTML = cfg.explain;
 }
 
+function getCompositeLayerForCurrentTime() {
+    return TIME_HORIZONS[currentTimeIndex].layer;
+}
+
+function setTimeHorizon(index) {
+    currentTimeIndex = Number(index);
+
+    const horizon = TIME_HORIZONS[currentTimeIndex];
+    const range = document.getElementById('timeHorizon');
+    const copy = document.getElementById('timeCopy');
+
+    if (range) range.value = currentTimeIndex;
+    if (copy) copy.textContent = horizon.copy;
+
+    document.querySelectorAll('.time-label').forEach(btn => {
+        btn.classList.toggle('active', Number(btn.dataset.timeIndex) === currentTimeIndex);
+    });
+
+    if (currentType === 'composite') {
+        currentLayer = getCompositeLayerForCurrentTime();
+    }
+
+    updateModelCard();
+    if (geojsonData) renderLayer();
+}
+
+function setLayerFocus(btn) {
+    document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    currentType = btn.dataset.type;
+    currentTheme = btn.dataset.theme;
+
+    if (currentType === 'composite') {
+        currentLayer = getCompositeLayerForCurrentTime();
+    } else {
+        currentLayer = btn.dataset.layer;
+    }
+
+    updateModelCard();
+    if (geojsonData) renderLayer();
+}
+
 // ─── BUTTON EVENTS ────────────────────────────────────────────────────────────
-document.querySelectorAll('.scenario-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        document.querySelectorAll('.scenario-btn, .theme-btn').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        currentLayer = this.dataset.layer;
-        currentType  = 'composite';
-        currentTheme = 'composite';
-        updateModelCard();
-        if (geojsonData) renderLayer();
+
+document.getElementById('timeHorizon')?.addEventListener('input', e => {
+    setTimeHorizon(e.target.value);
+});
+
+document.querySelectorAll('.time-label').forEach(btn => {
+    btn.addEventListener('click', () => {
+        setTimeHorizon(btn.dataset.timeIndex);
     });
 });
 
 document.querySelectorAll('.theme-btn').forEach(btn => {
     btn.addEventListener('click', function() {
-        document.querySelectorAll('.scenario-btn, .theme-btn').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        currentLayer = this.dataset.layer;
-        currentType  = 'theme';
-        currentTheme = this.dataset.theme;
-        updateModelCard();
-        if (geojsonData) renderLayer();
+        setLayerFocus(this);
     });
 });
 
