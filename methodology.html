@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <title>Methodology — Heat Vulnerability Tool</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700;800&family=Lora:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+:root {
+    --ink:#3a2e39; --paper:#fdfff7; --surface:#fdfff7;
+    --warm:rgba(58,46,57,.09);
+    --accent:#25938f; --accent-pale:rgba(37,147,143,.14); --accent-strong:#1e7774;
+    --heat:#91272e;
+    --green:#25938f;
+    --mid:rgba(58,46,57,.78); 
+    --light:rgba(58,46,57,.65); /* Increased opacity from .58 for A11y */
+    --border:rgba(58,46,57,.18);
+    --shadow-sm:0 1px 2px rgba(58,46,57,.08);
+    --shadow-md:0 12px 40px rgba(58,46,57,.12);
+    --radius:10px;
+    --serif:'Lora',Georgia,serif;
+    --sans:'Inter',system-ui,sans-serif;
+    --mono:'Fira Code',monospace;
+    --w:1180px;
+    --c-heat:#c94a35; --c-pop:#7e5a9b; --c-socio:#c27728;
+    --c-built:#3a7baa;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+    font-family:var(--sans);
+    background-color: var(--surface);
+    color:var(--ink);
+    line-height:1.62;
+    font-weight:500;
+}
+
+/* Animations */
+@keyframes fadeLift{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeSlide{from{opacity:0;transform:translateX(-16px)}to{opacity:1;transform:translateX(0)}}
+@keyframes activeGlow{0%,100%{box-shadow:0 0 0 rgba(37,147,143,0)}50%{box-shadow:0 0 24px rgba(37,147,143,.2)}}
+@keyframes mapBreath{0%,100%{box-shadow:var(--shadow-md),0 0 0 rgba(37,147,143,0)}50%{box-shadow:var(--shadow-md),0 0 34px rgba(37,147,143,.18)}}
+@keyframes dashPulse{to{stroke-dashoffset:-28}}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{
+        animation-duration:.001ms!important;
+        animation-iteration-count:1!important;
+        scroll-behavior:auto!important;
+        transition-duration:.001ms!important;
+    }
+}
+
+/* Generic Section Headers */
+.sec-inner{max-width:var(--w);margin:0 auto;position:relative;z-index:1}
+.sec-tag{font-family:var(--mono);font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent-strong);margin-bottom:12px;display:block}
+.sec-h{font-family:var(--serif);font-size:clamp(1.8rem,3vw,2.6rem);font-weight:700;line-height:1.15;margin-bottom:14px}
+.sec-sub{font-size:1rem;color:var(--mid);max-width:580px;line-height:1.65;margin-bottom:52px}
+
+/* Main Navigation */
+nav.top-nav, nav {
+    position:fixed;top:0;left:0;right:0;height:58px;
+    background:rgba(253,255,247,.9);backdrop-filter:saturate(1.2) blur(16px);
+    border-bottom:1px solid var(--border);z-index:1000;
+    display:flex;align-items:center;
+    box-shadow:var(--shadow-sm);
+}
+.nav-inner{
+    max-width:var(--w);margin:0 auto;padding:0 32px;width:100%;
+    display:flex;align-items:center;justify-content:space-between;
+}
+.nav-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--serif);
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    text-transform: none;
+    color: var(--ink);
+    text-decoration: none;
+    cursor: pointer;
+    transition: color .18s ease;}
+.nav-logo:hover {color: var(--accent-strong);}
+.nav-logo-img {width: 26px;height: 26px;display: block;flex-shrink: 0;transition: transform .18s ease;}
+.nav-logo:hover .nav-logo-img {transform: scale(1.06);}
+.nav-links{display:flex;gap:20px;align-items:center}
+.nav-lk{font-family:var(--mono);font-size:0.65rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--light);text-decoration:none;transition:.2s}
+.nav-lk:hover{color:var(--ink)}
+.nav-btn{font-family:var(--mono);font-size:0.65rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;background:var(--ink);color:var(--paper);text-decoration:none;padding:10px 20px;border-radius:999px;transition:.2s;box-shadow:var(--shadow-sm)}
+.nav-btn:hover{background:var(--accent-strong);transform:translateY(-1px)}
+
+/* Footer */
+footer{background:linear-gradient(180deg,#3a2e39,#211a20);color:rgba(253,255,247,.58);padding:40px 32px;text-align:center;border-top:1px solid rgba(253,255,247,.12)}
+footer p{font-family:var(--mono);font-size:.65rem;letter-spacing:.06em}
+footer a{color:rgba(253,255,247,.68);text-decoration:none}
+footer a:hover{color:#fdfff7}
+
+/* Utility */
+.spinner {
+    display: inline-block;
+    width: 14px; height: 14px;
+    border: 2px solid rgba(58,46,57,.2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+
+/* Methodology page styles built on global.css */
+:root{
+    --text-mid:var(--mid);
+    --text-light:var(--light);
+    --warm-mid:var(--warm);
+    --accent-dark:var(--accent-strong);
+    --gold:var(--accent);
+    --blue:var(--accent);
+    --purple:var(--ink);
+}
+body{overflow-x:hidden;background:var(--paper);}
+.hero{
+    position:relative;
+    margin-top:58px;
+    min-height:430px;
+    padding:98px 32px 76px;
+    overflow:hidden;
+    color:var(--paper);
+    background:
+        radial-gradient(ellipse 70% 75% at 92% 42%, rgba(37,147,143,.07) 0%, transparent 55%),
+        linear-gradient(150deg,#3a2e39 0%,#2e2630 50%,#211a20 100%);
+}
+.hero::before{
+    content:'';
+    position:absolute;inset:0;
+    background:radial-gradient(ellipse 55% 70% at 70% 24%, rgba(145,39,46,.10) 0%, transparent 56%);
+    pointer-events:none;
+}
+.hero::after{
+    content:'';
+    position:absolute;
+    right:-90px;top:50%;transform:translateY(-50%);
+    width:430px;height:430px;border-radius:50%;
+    border:1px solid rgba(37,147,143,.12);
+    box-shadow:0 0 0 52px rgba(37,147,143,.055),0 0 0 104px rgba(253,255,247,.025),0 0 0 156px rgba(58,46,57,.18);
+    pointer-events:none;
+}
+.hero-inner{max-width:1180px;margin:0 auto;position:relative;z-index:1;animation:fadeLift .7s ease both;}
+.hero-label{
+    display:inline-flex;align-items:center;gap:9px;
+    font-family:var(--mono);font-size:.68rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;
+    color:rgba(37,147,143,.92);border:1px solid rgba(37,147,143,.36);
+    background:rgba(58,46,57,.22);padding:7px 16px;border-radius:999px;margin-bottom:30px;
+}
+.hero-label::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 18px rgba(37,147,143,.55);}
+.hero h1{font-family:var(--serif);font-size:clamp(2.8rem,5.2vw,5.05rem);line-height:1.03;letter-spacing:-.045em;margin-bottom:24px;max-width:760px;color:#fdfff7;}
+.hero h1 em{font-style:italic;color:var(--heat);font-weight:600;}
+.hero p{font-size:1.06rem;line-height:1.72;color:rgba(253,255,247,.76);max-width:620px;font-weight:600;}
+.sticky-nav{
+    position:sticky;top:58px;z-index:99;
+    background:rgba(253,255,247,.92);backdrop-filter:saturate(1.2) blur(14px);
+    border-bottom:1px solid var(--border);padding:0 32px;
+}
+.sticky-nav-inner{max-width:980px;margin:0 auto;display:flex;align-items:center;overflow-x:auto;scrollbar-width:none;}
+.sticky-nav-inner::-webkit-scrollbar{display:none;}
+.sticky-nav a{
+    font-family:var(--mono);font-size:.66rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--light);text-decoration:none;padding:16px 17px;border-bottom:2px solid transparent;white-space:nowrap;transition:.18s ease;
+}
+.sticky-nav a:hover,.sticky-nav a.active{color:var(--accent-strong);border-bottom-color:var(--accent);}
+.container{max-width:980px;margin:0 auto;padding:0 32px 108px;}
+.section{padding:78px 0 0;animation:fadeLift .7s ease both;}
+.section-header{display:flex;align-items:baseline;gap:18px;margin-bottom:30px;}
+.section-num{font-family:var(--mono);font-size:.7rem;font-weight:600;color:var(--accent-strong);letter-spacing:.12em;flex-shrink:0;}
+.section h2{font-family:var(--serif);font-size:clamp(1.9rem,3vw,2.65rem);font-weight:700;letter-spacing:-.025em;line-height:1.13;color:var(--ink);}
+.section h3{font-family:var(--sans);font-size:1rem;font-weight:800;letter-spacing:.055em;text-transform:uppercase;color:var(--ink);margin:30px 0 12px;}
+.section p{color:var(--mid);font-size:1rem;line-height:1.72;margin-bottom:16px;}
+.score-spotlight{
+    position:relative;overflow:hidden;border-radius:calc(var(--radius) + 8px);padding:42px;
+    background:linear-gradient(155deg,#3a2e39 0%,#2f2630 55%,#211a20 100%);
+    color:var(--paper);box-shadow:var(--shadow-md);
+}
+.score-spotlight::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 90% at 92% 18%,rgba(253,255,247,.12),transparent 58%);pointer-events:none;}
+.score-spotlight>*{position:relative;z-index:1;}
+.score-label{display:inline-flex;font-family:var(--mono);font-size:.64rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);border:1px solid rgba(175,233,230,.32);padding:6px 12px;border-radius:999px;margin-bottom:18px;}
+.score-spotlight h3{font-family:var(--serif);font-size:clamp(1.7rem,3.5vw,2.7rem);line-height:1.15;letter-spacing:-.025em;margin:0 0 15px;color:var(--paper);text-transform:none;}
+.score-spotlight p{color:rgba(253,255,247,.80);max-width:690px;}
+.score-legend{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:24px;}
+.score-chip{background:rgba(253,255,247,.08);border:1px solid rgba(253,255,247,.16);border-radius:var(--radius);padding:14px 16px;}
+.score-chip span{display:block;font-family:var(--mono);font-size:.72rem;font-weight:700;color:#afe9e6;margin-bottom:4px;}
+.score-chip strong{font-size:.88rem;color:var(--paper);line-height:1.35;}
+.score-compare{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:22px;}
+.score-explain-card,.pipe-step,.note-card,.mini-panel,.math-box,.formula-block{
+    background:rgba(253,255,247,.88);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);
+}
+.score-explain-card{padding:26px;border-top:4px solid var(--accent);}
+.score-explain-card h4,.math-box h4,.mini-panel h4{font-family:var(--serif);font-size:1.35rem;line-height:1.2;color:var(--ink);margin-bottom:10px;}
+.score-explain-card p,.mini-panel p,.math-box p{font-size:.95rem;line-height:1.65;margin-bottom:12px;color:var(--mid);}
+.score-explain-card ul{padding-left:18px;color:var(--mid);font-size:.92rem;line-height:1.65;}
+.score-explain-card li{margin:6px 0;}
+.pipeline{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:28px 0;}
+.pipe-step{padding:22px;border-top:4px solid var(--accent);transition:.18s ease;}
+.pipe-step:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);}
+.kicker{font-family:var(--mono);font-size:.64rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-strong);margin-bottom:8px;}
+.pipe-step strong{display:block;color:var(--ink);font-weight:800;line-height:1.25;margin-bottom:8px;}
+.pipe-step p{font-size:.88rem;line-height:1.55;margin:0;color:var(--mid);}
+.formula-block{overflow:hidden;margin:28px 0;}
+.formula-header{background:var(--ink);padding:16px 24px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
+.formula-header strong{font-family:var(--mono);font-size:.68rem;letter-spacing:.13em;text-transform:uppercase;color:#afe9e6;}
+.formula-header span{font-family:var(--mono);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:rgba(253,255,247,.58);}
+.formula-body{padding:24px;}
+.formula-equation{font-family:var(--mono);font-size:.84rem;line-height:1.9;color:var(--ink);background:var(--warm);border:1px solid var(--border);border-radius:var(--radius);padding:17px 18px;overflow-x:auto;margin-bottom:18px;}
+.formula-equation .var{color:var(--accent-strong);font-weight:600;}.formula-equation .coef{color:var(--accent-strong);font-weight:600;}.formula-equation .base{color:var(--light);}
+.note-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.note-card{padding:16px;border-left:4px solid var(--accent);}
+.note-card strong{display:block;font-family:var(--mono);font-size:.68rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink);margin-bottom:6px;}
+.note-card p{font-size:.86rem;line-height:1.55;margin:0;color:var(--mid);}
+.themes-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:28px 0;}
+.theme-flip{perspective:1200px;min-height:315px;border:0;padding:0;background:transparent;text-align:left;cursor:pointer;font:inherit;color:inherit;}
+.theme-flip-inner{position:relative;width:100%;min-height:315px;transition:transform .55s ease;transform-style:preserve-3d;}
+.theme-flip.is-flipped .theme-flip-inner{transform:rotateY(180deg);}
+.theme-face{position:absolute;inset:0;border:1px solid var(--border);border-top:4px solid var(--accent);border-radius:var(--radius);padding:26px;background:rgba(253,255,247,.92);backface-visibility:hidden;box-shadow:var(--shadow-sm);transition:.18s ease;overflow:hidden;}
+.theme-flip:hover .theme-face{box-shadow:var(--shadow-md);border-color:rgba(37,147,143,.34);} /* hover only highlights; cards flip only after click */
+.theme-back{transform:rotateY(180deg);background:linear-gradient(135deg,#3a2e39 0%,#31494d 64%,rgba(37,147,143,.90) 138%);color:var(--paper);border-color:rgba(58,46,57,.9);}
+.theme-code{font-family:var(--mono);font-size:.66rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-strong);margin-bottom:10px;}
+.theme-title{font-family:var(--serif);font-size:1.42rem;font-weight:700;letter-spacing:-.02em;line-height:1.15;color:var(--ink);margin-bottom:12px;}
+.theme-desc{font-size:.93rem;line-height:1.62;color:var(--mid);}
+.theme-click{position:absolute;left:26px;bottom:20px;font-family:var(--mono);font-size:.64rem;font-weight:600;letter-spacing:.10em;text-transform:uppercase;color:var(--accent-strong);}
+.theme-back .theme-code{color:#afe9e6;}.theme-back .theme-title{color:var(--paper);font-size:1.24rem;margin-bottom:14px;}.theme-back ul{padding-left:18px;color:rgba(253,255,247,.82);font-size:.88rem;line-height:1.52;}.theme-back li{margin-bottom:7px;}.theme-back .theme-click{left:auto;right:26px;text-align:right;color:rgba(253,255,247,.56);}
+.math-box{border-left:4px solid var(--accent);padding:28px 30px;margin:24px 0;}
+.steps-list{list-style:none;counter-reset:step;margin:12px 0 0;}
+.steps-list li{counter-increment:step;display:flex;gap:16px;padding:16px 0;border-bottom:1px solid var(--border);font-size:.93rem;color:var(--mid);line-height:1.62;}
+.steps-list li:last-child{border-bottom:0;}.steps-list li::before{content:counter(step,decimal-leading-zero);font-family:var(--mono);font-size:.72rem;font-weight:600;color:var(--accent-strong);flex-shrink:0;padding-top:2px;min-width:28px;}.steps-list li strong{color:var(--ink);}
+code{font-family:var(--mono);font-size:.85em;background:var(--warm);padding:1px 5px;border-radius:4px;}
+.split-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:24px;}.mini-panel{padding:25px;}
+.caveat-item{display:flex;gap:18px;padding:20px 0;border-bottom:1px solid var(--border);}.caveat-item:last-child{border-bottom:0;}.caveat-num{font-family:var(--mono);font-size:.68rem;font-weight:600;color:var(--accent-strong);letter-spacing:.1em;flex-shrink:0;padding-top:4px;min-width:28px;}.caveat-body{font-size:.95rem;color:var(--mid);line-height:1.7;}.caveat-body strong{display:block;color:var(--ink);font-weight:800;margin-bottom:4px;}
+footer strong{color:var(--paper);}
+footer p{line-height:1.8;}
+@media(max-width:900px){.pipeline{grid-template-columns:1fr 1fr}.score-legend,.score-compare,.note-row{grid-template-columns:1fr}.themes-grid,.split-grid{grid-template-columns:1fr}.theme-flip,.theme-flip-inner{min-height:330px}}
+@media(max-width:680px){.hero{padding:92px 22px 62px}.hero::after{display:none}.container{padding:0 22px 84px}.section{padding-top:62px}.sticky-nav{padding:0 18px}.pipeline{grid-template-columns:1fr}.score-spotlight{padding:30px 24px}.theme-flip,.theme-flip-inner{min-height:380px}.nav-inner{padding:0 20px}.nav-links{gap:12px}.nav-lk{display:none}}
+
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="nav-inner">
+        <a href="index.html" class="nav-logo" aria-label="Go to Heat & Health NL homepage">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Crect x='2' y='2' width='10' height='10' rx='1.8' fill='%2325938f'/%3E%3Crect x='16' y='2' width='10' height='10' rx='1.8' fill='%2391272e'/%3E%3Crect x='2' y='16' width='10' height='10' rx='1.8' fill='%233a2e39' fill-opacity='.82'/%3E%3Crect x='16' y='16' width='10' height='10' rx='1.8' fill='%2325938f' fill-opacity='.18'/%3E%3C/svg%3E" alt="" class="nav-logo-img">
+            <span>Heat &amp; Health NL</span>
+        </a>
+        <div class="nav-links">
+            <a href="dashboard.html" class="nav-lk">Dashboard</a>
+            <a href="explain.html" class="nav-lk">Methodology</a>
+            <a href="index.html#explorer" class="nav-btn">Start Exploring →</a>
+        </div>
+    </div>
+</nav>
+
+<header class="hero">
+    <div class="hero-inner">
+        <div class="hero-label">Methodology &amp; Science</div>
+        <h1>How <em>health risk</em><br>is measured</h1>
+        <p>This page explains how neighbourhood data is transformed into theme scores, how the model combines them, and how present and future heat-health vulnerability should be interpreted.</p>
+    </div>
+</header>
+
+<nav class="sticky-nav" id="stickyNav">
+    <div class="sticky-nav-inner">
+        <a href="#overview" data-section="overview">Score meaning</a>
+        <a href="#calculation" data-section="calculation">Calculation</a>
+        <a href="#themes" data-section="themes">4 Themes</a>
+        <a href="#model" data-section="model">Model</a>
+        <a href="#future" data-section="future">Future</a>
+        <a href="#limits" data-section="limits">Limits</a>
+    </div>
+</nav>
+
+<div class="container">
+
+    <section id="overview" class="section">
+        <div class="section-header">
+            <span class="section-num">01</span>
+            <h2>What do the risk scores represent?</h2>
+        </div>
+
+        <div class="score-spotlight">
+            <h3>The score is a relative vulnerability score, not a medical prediction.</h3>
+            <p>It tells us how vulnerable one neighbourhood looks compared with other Dutch neighbourhoods when heat exposure, population sensitivity, social conditions and the built environment are considered together.</p>
+            <p>A higher score means that more heat-related risk factors are present in the same place. It does not mean that a certain percentage of residents will become ill.</p>
+
+            <div class="score-legend">
+                <div class="score-chip">
+                    <span>0–30</span>
+                    <strong>Lower relative vulnerability</strong>
+                </div>
+                <div class="score-chip">
+                    <span>30–70</span>
+                    <strong>Moderate relative vulnerability</strong>
+                </div>
+                <div class="score-chip">
+                    <span>70–100+</span>
+                    <strong>Higher relative vulnerability</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="score-compare">
+            <div class="score-explain-card">
+                <h4>Overall risk score</h4>
+                <p>The overall score is the final number shown on the map. It combines the four theme scores into one heat-health vulnerability estimate.</p>
+                <ul>
+                    <li>Use it to compare neighbourhoods with each other.</li>
+                    <li>Higher means more overall vulnerability.</li>
+                    <li>Scores above 100 can appear in future scenarios when projected risk goes beyond today’s highest baseline value.</li>
+                </ul>
+            </div>
+
+            <div class="score-explain-card theme-score">
+                <h4>Theme scores</h4>
+                <p>Theme scores explain what is driving the overall score. They show whether risk comes more from heat exposure, population sensitivity, socioeconomic conditions or the built environment.</p>
+                <ul>
+                    <li>Use them to understand why a neighbourhood scores high or low.</li>
+                    <li>Higher means more vulnerability within that specific theme.</li>
+                    <li>Two neighbourhoods can have the same overall score for very different reasons.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section id="calculation" class="section">
+        <div class="section-header">
+            <span class="section-num">02</span>
+            <h2>From neighbourhood data to one score</h2>
+        </div>
+
+        <p>The score is built in four steps. First, the different variables are made comparable. Then they are grouped into four broader vulnerability themes. The model uses these themes to estimate risk and the final result is converted into the 0–100 score shown on the map.</p>
+
+        <div class="pipeline">
+            <div class="pipe-step">
+                <div class="kicker">Step 01</div>
+                <strong>Make variables comparable</strong>
+                <p>The variables come in different units: percentages, distances, temperatures and survey scores. We convert them to the same scale so the model can compare them fairly.</p>
+            </div>
+            <div class="pipe-step">
+                <div class="kicker">Step 02</div>
+                <strong>Build four theme scores</strong>
+                <p>Related variables are combined into four themes. This makes the dashboard easier to read and shows what kind of vulnerability is driving the risk.</p>
+            </div>
+            <div class="pipe-step">
+                <div class="kicker">Step 03</div>
+                <strong>Combine the themes</strong>
+                <p>The four themes are passed into a ridge regression model. The model learns how strongly each theme is connected to the overall heat-health risk outcome.</p>
+            </div>
+            <div class="pipe-step">
+                <div class="kicker">Step 04</div>
+                <strong>Show the final score</strong>
+                <p>The model output is converted into a clear 0–100 score, so neighbourhoods can be compared easily on the map.</p>
+            </div>
+        </div>
+
+        <div class="formula-block">
+            <div class="formula-header">
+                <strong>What happens behind the score</strong>
+                <span>variables → four themes → model prediction → dashboard score</span>
+            </div>
+            <div class="formula-body">
+                <div class="formula-equation">
+                    <span class="var">z-score</span> = (<span class="var">value</span> − <span class="base">dataset mean</span>) / <span class="base">standard deviation</span><br>
+                    <span class="var">Theme score</span> = weighted factor score based on related z-scored variables<br>
+                    <span class="var">Model prediction</span> = <span class="base">β₀</span> + <span class="coef">β₁</span><span class="var">Theme₁</span> + <span class="coef">β₂</span><span class="var">Theme₂</span> + <span class="coef">β₃</span><span class="var">Theme₃</span> + <span class="coef">β₄</span><span class="var">Theme₄</span><br>
+                    <span class="var">Dashboard score</span> = rescaled model prediction on a 0–100 range
+                </div>
+                <div class="note-row">
+                    <div class="note-card">
+                        <strong>Standardisation</strong>
+                        <p>Puts all inputs on a fair scale before they are combined.</p>
+                    </div>
+                    <div class="note-card">
+                        <strong>Factor analysis</strong>
+                        <p>Finds patterns between related indicators and turns them into theme scores.</p>
+                    </div>
+                    <div class="note-card">
+                        <strong>Ridge regression</strong>
+                        <p>Combines the themes in a more stable way when predictors overlap.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="themes" class="section">
+        <div class="section-header">
+            <span class="section-num">03</span>
+            <h2>The four themes</h2>
+        </div>
+
+        <p>The dashboard groups many neighbourhood indicators into four themes. Each theme captures one side of heat-health vulnerability.</p>
+
+        <div class="themes-grid">
+            <button class="theme-flip" type="button" aria-label="Show variables for heat and climate exposure">
+                <div class="theme-flip-inner">
+                    <div class="theme-face theme-front" style="border-top: 4px solid var(--accent);">
+                        <div class="theme-code" style="color: var(--accent);">Theme 01</div>
+                        <div class="theme-title">Heat &amp; climate exposure</div>
+                        <div class="theme-desc">Shows how strongly a neighbourhood is exposed to heat and related climate stress. This includes direct heat, dry conditions, limited shade, dense surroundings and whether people can find places to cool down.</div>
+                        <div class="theme-click">Click to see variables</div>
+                    </div>
+                    <div class="theme-face theme-back">
+                        <div class="theme-code">Variables used</div>
+                        <div class="theme-title">Heat &amp; climate exposure</div>
+                        <ul>
+                            <li>Average yearly temperature</li>
+                            <li>Total yearly rainfall</li>
+                            <li>Total yearly evaporation</li>
+                            <li>Perceived Equivalent Temperature, meaning how hot it feels to the body</li>
+                            <li>Shade availability</li>
+                            <li>Address density</li>
+                            <li>Ability to find cooling indoors</li>
+                            <li>Ability to find cooling outdoors</li>
+                        </ul>
+                        <div class="theme-click">Click to flip back</div>
+                    </div>
+                </div>
+            </button>
+
+            <button class="theme-flip" type="button" aria-label="Show variables for population sensitivity">
+                <div class="theme-flip-inner">
+                    <div class="theme-face theme-front" style="border-top: 4px solid var(--accent);">
+                        <div class="theme-code" style="color: var(--accent);">Theme 02</div>
+                        <div class="theme-title">Population sensitivity</div>
+                        <div class="theme-desc">Captures who lives in the neighbourhood and whether the population is more sensitive to heat. Older residents, children, people with limited health or income and crowded areas can all increase vulnerability.</div>
+                        <div class="theme-click">Click to see variables</div>
+                    </div>
+                    <div class="theme-face theme-back">
+                        <div class="theme-code">Variables used</div>
+                        <div class="theme-title">Population sensitivity</div>
+                        <ul>
+                            <li>Population density</li>
+                            <li>Low-income households</li>
+                            <li>Residents aged 65 and older</li>
+                            <li>Children aged 0 to 14</li>
+                            <li>Disability benefit recipients</li>
+                        </ul>
+                        <div class="theme-click">Click to flip back</div>
+                    </div>
+                </div>
+            </button>
+
+            <button class="theme-flip" type="button" aria-label="Show variables for socioeconomic vulnerability">
+                <div class="theme-flip-inner">
+                    <div class="theme-face theme-front" style="border-top: 4px solid var(--gold);">
+                        <div class="theme-code" style="color: var(--gold);">Theme 03</div>
+                        <div class="theme-title">Socioeconomic vulnerability</div>
+                        <div class="theme-desc">Represents the social and financial conditions that can make it harder to prepare for heat, recover from it or adapt housing and daily routines.</div>
+                        <div class="theme-click">Click to see variables</div>
+                    </div>
+                    <div class="theme-face theme-back">
+                        <div class="theme-code">Variables used</div>
+                        <div class="theme-title">Socioeconomic vulnerability</div>
+                        <ul>
+                            <li>Population density</li>
+                            <li>Homes built more than 10 years ago</li>
+                            <li>Low-income households</li>
+                            <li>Employment level</li>
+                            <li>People living in poverty</li>
+                            <li>Low education level</li>
+                        </ul>
+                        <div class="theme-click">Click to flip back</div>
+                    </div>
+                </div>
+            </button>
+
+            <button class="theme-flip" type="button" aria-label="Show variables for built environment and access">
+                <div class="theme-flip-inner">
+                    <div class="theme-face theme-front" style="border-top: 4px solid var(--accent);">
+                        <div class="theme-code" style="color: var(--accent);">Theme 04</div>
+                        <div class="theme-title">Built environment &amp; access</div>
+                        <div class="theme-desc">Looks at how the physical neighbourhood can either protect people or make heat harder to escape. It combines housing, density, shade, green space, cooling access and distance to health services.</div>
+                        <div class="theme-click">Click to see variables</div>
+                    </div>
+                    <div class="theme-face theme-back">
+                        <div class="theme-code">Variables used</div>
+                        <div class="theme-title">Built environment &amp; access</div>
+                        <ul>
+                            <li>Shade availability</li>
+                            <li>Address density</li>
+                            <li>Homes built more than 10 years ago</li>
+                            <li>Distance to the nearest GP practice</li>
+                            <li>Estimated distance to a cooling location</li>
+                            <li>Satisfaction with green space</li>
+                            <li>Ability to find cooling indoors</li>
+                            <li>Ability to find cooling outdoors</li>
+                        </ul>
+                        <div class="theme-click">Click to flip back</div>
+                    </div>
+                </div>
+            </button>
+        </div>
+
+        <div class="math-box">
+            <h4>How a theme score is made</h4>
+            <p>For each theme, the variables are first put on the same scale. Protective variables are reversed, so that the meaning stays consistent: higher always means more vulnerable. A factor analysis model then finds the common pattern shared by the variables in that theme. That common pattern becomes the theme score.</p>
+            <p>The theme score is finally converted to a 0–100 scale, so it is easy to compare across neighbourhoods and across themes.</p>
+        </div>
+    </section>
+
+    <section id="model" class="section">
+        <div class="section-header">
+            <span class="section-num">04</span>
+            <h2>What the model actually does</h2>
+        </div>
+
+        <p>The model is the step that turns the four separate theme scores into one overall heat-health risk score. The theme scores tell us what kind of vulnerability a neighbourhood has. The model decides how strongly those themes should count together.</p>
+
+        <div class="formula-block">
+            <div class="formula-header">
+                <strong>Model logic</strong>
+                <span>four theme scores → one risk estimate</span>
+            </div>
+            <div class="formula-body">
+                <div class="formula-equation">
+                    overall risk estimate = weighted mix of the 4 theme scores<br>
+                    dashboard score = overall risk estimate rescaled for comparison
+                </div>
+                <div class="note-row">
+                    <div class="note-card">
+                        <strong>Input</strong>
+                        <p>The model receives the four theme scores, not every raw variable separately.</p>
+                    </div>
+                    <div class="note-card">
+                        <strong>Learning step</strong>
+                        <p>It estimates how much each theme contributes to the overall risk pattern.</p>
+                    </div>
+                    <div class="note-card">
+                        <strong>Output</strong>
+                        <p>It produces one score that can be compared across neighbourhoods.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="split-grid">
+            <div class="mini-panel">
+                <h4>Why not just average the themes?</h4>
+                <p>A simple average would assume that every theme matters equally. That is too simplistic and does not capture real life events. Heat exposure, population sensitivity, socioeconomic conditions and the built environment do not contribute to risk in exactly the same way. The model lets the data decide the balance between them.</p>
+            </div>
+            <div class="mini-panel">
+                <h4>Why ridge regression?</h4>
+                <p>Many neighbourhood characteristics overlap. Places with dense housing may also have less green space or more socioeconomic pressure. Ridge regression is useful here because it keeps the model stable when predictors are related. It reduces extreme weights and makes the final score less dependent on one noisy pattern.</p>
+            </div>
+        </div>
+
+        <div class="math-box">
+            <h4>How to read the model result</h4>
+            <p>The model result should be read as a risk index. It is not saying exactly how many people will become ill during a heatwave. It shows where several risk drivers come together more strongly than in other neighbourhoods.</p>
+            <p>This is why the theme scores remain important. The overall score tells us where risk is high. The themes explain why it is high.</p>
+        </div>
+    </section>
+
+    <section id="future" class="section">
+        <div class="section-header">
+            <span class="section-num">05</span>
+            <h2>How future risk is calculated</h2>
+        </div>
+
+        <p>The future score is a scenario calculation. We do not train a new model for the future. Instead, we start with the current neighbourhood data and adjust only the variables for which we have a reasonable assumption from climate scenarios or supporting literature.</p>
+
+        <div class="math-box">
+            <h4>The future score is calculated in five steps</h4>
+            <ol class="steps-list">
+                <li><strong>Use the present as the baseline:</strong> each neighbourhood starts from its current data and current theme scores.</li>
+                <li><strong>Change selected inputs:</strong> climate-related variables are adjusted using future heat and weather assumptions. Population or density variables are only changed where the literature gives a defensible direction for change.</li>
+                <li><strong>Leave unsupported variables unchanged:</strong> when there is no clear evidence for a future change, the variable stays the same. This avoids pretending that we know more than we actually do.</li>
+                <li><strong>Recalculate the themes:</strong> after the selected inputs are updated, the four theme scores are calculated again using the same theme structure as the present-day model.</li>
+                <li><strong>Apply the same ridge model:</strong> the future theme scores go through the same model logic, so the future score can be compared with the present score.</li>
+            </ol>
+        </div>
+
+        <div class="split-grid">
+            <div class="mini-panel">
+                <h4>What the future score means</h4>
+                <p>If a neighbourhood has a higher future score, it means that the scenario assumptions make its heat-health vulnerability worse. The increase comes from changed inputs, such as stronger heat exposure or population pressure, not from changing the scoring method.</p>
+            </div>
+            <div class="mini-panel">
+                <h4>Why scores can go above 100</h4>
+                <p>The baseline score is scaled from 0 to 100 using the present-day range. Future scores are compared against that same baseline range. If a future score is above 100, it means the projected risk is higher than the highest risk observed in the current data.</p>
+            </div>
+        </div>
+
+        <div class="formula-block">
+            <div class="formula-header">
+                <strong>Future scenario logic</strong>
+                <span>same model, changed evidence-based inputs</span>
+            </div>
+            <div class="formula-body">
+                <div class="formula-equation">
+                    current neighbourhood data + literature-based assumptions<br>
+                    → updated future inputs<br>
+                    → recalculated theme scores<br>
+                    → same ridge model<br>
+                    → future risk score compared with the present baseline
+                </div>
+            </div>
+        </div>
+
+        <p>The future results should therefore be read as a structured “what if” scenario. They do not claim to predict the exact future. They show how neighbourhood vulnerability could shift if the assumptions used in the scenario become reality.</p>
+    </section>
+
+    <section id="limits" class="section">
+        <div class="section-header">
+            <span class="section-num">06</span>
+            <h2>Limits of the score</h2>
+        </div>
+
+        <div>
+            <div class="caveat-item">
+                <div class="caveat-num">01</div>
+                <div class="caveat-body">
+                    <strong>It is a relative score, not a medical forecast.</strong>
+                    A score of 80 means higher vulnerability compared with other neighbourhoods. It does not mean that 80% of residents will become ill.
+                </div>
+            </div>
+            <div class="caveat-item">
+                <div class="caveat-num">02</div>
+                <div class="caveat-body">
+                    <strong>We assume no behavioural adaptation.</strong>
+                    In reality, residents may buy air conditioning, relocate, renovate their homes or build mutual support networks. The long-term projections therefore show risk under the model assumptions, not a guaranteed future.
+                </div>
+            </div>
+            <div class="caveat-item">
+                <div class="caveat-num">03</div>
+                <div class="caveat-body">
+                    <strong>Health data gaps exist.</strong>
+                    11,554 of 14,668 neighbourhoods have complete health data. Any neighbourhood lacking sufficient CBS or GGD polling data is excluded from the ranking calculations to preserve statistical reliability.
+                </div>
+            </div>
+            <div class="caveat-item">
+                <div class="caveat-num">04</div>
+                <div class="caveat-body">
+                    <strong>It works at neighbourhood level.</strong>
+                    The score can hide differences between streets, buildings or groups of residents inside the same neighbourhood.
+                </div>
+            </div>
+            <div class="caveat-item">
+                <div class="caveat-num">05</div>
+                <div class="caveat-body">
+                    <strong>Future scores depend on assumptions.</strong>
+                    They show a scenario, not a certainty. Different climate, population or planning assumptions would produce different future scores.
+                </div>
+            </div>
+            <div class="caveat-item">
+                <div class="caveat-num">06</div>
+                <div class="caveat-body">
+                    <strong>The themes explain risk, but not causality.</strong>
+                    A high theme score shows an association with vulnerability. It should be used to guide planning, not to prove that one single factor directly caused the risk.
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<footer>
+    <p>
+        <strong>Heat Vulnerability Tool</strong> · Methodology page<br>
+        Dutch neighbourhood, health, climate and environmental data · Four themes · Ridge regression · Present and future 0–100 risk scores.
+    </p>
+</footer>
+
+<script>
+    const sections = ['overview', 'calculation', 'themes', 'model', 'future', 'limits'];
+    const navLinks = document.querySelectorAll('.sticky-nav a[data-section]');
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                navLinks.forEach(link => {
+                    link.classList.toggle('active', link.dataset.section === entry.target.id);
+                });
+            }
+        });
+    }, { rootMargin: '-30% 0px -65% 0px' });
+
+    sections.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) observer.observe(el);
+    });
+
+    document.querySelectorAll('.theme-flip').forEach(card => {
+        card.setAttribute('aria-pressed', 'false');
+
+        const toggleThemeCard = () => {
+            const flipped = card.classList.toggle('is-flipped');
+            card.setAttribute('aria-pressed', flipped ? 'true' : 'false');
+        };
+
+        card.addEventListener('click', toggleThemeCard);
+
+        card.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggleThemeCard();
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

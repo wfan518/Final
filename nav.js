@@ -1,7 +1,7 @@
 (function () {
     const NAV_LINKS = [
         { href: 'dashboard.html', label: 'Dashboard', pageId: 'dashboard' },
-        { href: 'explain.html', label: 'Methodology', pageId: 'explain' },
+        { href: 'methodology.html', label: 'Methodology', pageId: 'methodology' },
         { href: 'background.html', label: 'Background', pageId: 'background' },
     ];
 
@@ -19,6 +19,7 @@
         if (file === '' || file === 'index.html') return 'index';
         if (file === 'dashboard.html') return 'dashboard';
         if (file === 'explain.html') return 'explain';
+        if (file === 'methodology.html') return 'methodology';
         if (file === 'background.html') return 'background';
         return file.replace(/\.html$/, '');
     }

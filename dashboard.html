@@ -681,7 +681,7 @@ function buildPopup(feature) {
         const col  = THEME_DEFS[t.theme]?.color || '#888';
         const isActive = currentType === 'theme' && currentLayer === t.key;
         
-        return `<a href="explain.html#theme-${t.theme}" title="Read more about ${t.label} risk" class="popup-theme-row${isActive ? ' active-row' : ''}">
+        return `<a href="methodology.html#themes" title="Read more about ${t.label} risk" class="popup-theme-row${isActive ? ' active-row' : ''}">
             <span class="popup-theme-label">${t.label}</span>
             <div class="popup-theme-bar-track">
                 <div class="popup-theme-bar-fill" style="width:${pct}%;background:${col}"></div>
