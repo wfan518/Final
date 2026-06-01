@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <title>Sources & References — Heat Vulnerability Tool</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700;800&family=Lora:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="global.css">
+    <style>
+        body { overflow-x: hidden; background: var(--paper); }
+        
+        /* ── HERO ── */
+        .hero {
+            position: relative;
+            margin-top: 58px;
+            min-height: 380px;
+            padding: 98px 32px 76px;
+            overflow: hidden;
+            color: var(--paper);
+            background:
+                radial-gradient(ellipse 70% 75% at 92% 42%, rgba(37,147,143,.07) 0%, transparent 55%),
+                linear-gradient(150deg,#3a2e39 0%,#2e2630 50%,#211a20 100%);
+        }
+        .hero::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: radial-gradient(ellipse 55% 70% at 70% 24%, rgba(145,39,46,.10) 0%, transparent 56%);
+            pointer-events: none;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            right: -90px; top: 50%; transform: translateY(-50%);
+            width: 430px; height: 430px; border-radius: 50%;
+            border: 1px solid rgba(37,147,143,.12);
+            box-shadow: 0 0 0 52px rgba(37,147,143,.055), 0 0 0 104px rgba(253,255,247,.025), 0 0 0 156px rgba(58,46,57,.18);
+            pointer-events: none;
+        }
+        .hero-inner { max-width: 1180px; margin: 0 auto; position: relative; z-index: 1; animation: fadeLift .7s ease both; }
+        .hero-label {
+            display: inline-flex; align-items: center; gap: 9px;
+            font-family: var(--mono); font-size: .68rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase;
+            color: rgba(37,147,143,.92); border: 1px solid rgba(37,147,143,.36);
+            background: rgba(58,46,57,.22); padding: 7px 16px; border-radius: 999px; margin-bottom: 30px;
+        }
+        .hero-label::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+        .hero h1 { font-family: var(--serif); font-size: clamp(2.8rem, 5.2vw, 5.05rem); line-height: 1.03; letter-spacing: -.045em; margin-bottom: 24px; color: #fdfff7; }
+        .hero h1 em { font-style: italic; color: var(--heat); font-weight: 600; }
+        .hero p { font-size: 1.06rem; line-height: 1.72; color: rgba(253,255,247,.76); max-width: 620px; }
+
+        /* ── SOURCE CONTENT LAYOUT ── */
+        .container { max-width: 980px; margin: 0 auto; padding: 0 32px 108px; }
+        .section { padding: 78px 0 0; animation: fadeLift .7s ease both; }
+        .section-header { display: flex; align-items: baseline; gap: 18px; margin-bottom: 30px; }
+        .section-num { font-family: var(--mono); font-size: .7rem; font-weight: 600; color: var(--accent-strong); letter-spacing: .12em; flex-shrink: 0; }
+        .section h2 { font-family: var(--serif); font-size: clamp(1.9rem, 3vw, 2.65rem); font-weight: 700; letter-spacing: -.025em; line-height: 1.13; color: var(--ink); }
+        
+        .sources-list { display: flex; flex-direction: column; gap: 16px; margin-top: 24px; }
+        
+        /* Card design */
+        .source-card {
+            background: rgba(253, 255, 247, 0.88);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            padding: 26px;
+            border-top: 4px solid var(--accent);
+            transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .source-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(37,147,143,.34);
+            box-shadow: var(--shadow-md);
+        }
+        .source-meta {
+            font-family: var(--mono); font-size: .64rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+            color: var(--accent-strong); margin-bottom: 8px; display: block;
+        }
+        .source-title {
+            font-family: var(--serif); font-size: 1.35rem; font-weight: 700; line-height: 1.2;
+            color: var(--ink); margin-bottom: 10px;
+        }
+        .source-desc { color: var(--mid); font-size: .95rem; line-height: 1.65; margin-bottom: 14px; }
+        
+        .source-link {
+            display: inline-flex; align-items: center;
+            font-family: var(--mono); font-size: 0.68rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--accent-strong); background: var(--accent-pale);
+            padding: 6px 14px; border-radius: 999px; transition: background 0.18s;
+        }
+        .source-card:hover .source-link { background: var(--accent); color: var(--paper); }
+
+        @media(max-width: 680px){
+            .hero { padding: 92px 22px 62px; }
+            .hero::after { display: none; }
+            .container { padding: 0 22px 84px; }
+            .section { padding-top: 62px; }
+        }
+    </style>
+</head>
+<body data-page="sources" class="layout-narrow">
+
+<header class="hero">
+    <div class="hero-inner">
+        <div class="hero-label">Data &amp; Learn more</div>
+        <h1>Sources</h1>
+        <p>If you want to learn more about the data sources and references used in this tool, please explore the links below.</p>
+    </div>
+</header>
+
+<div class="container">
+
+    <!-- ── SECTION 01: CORE METRICS ── -->
+    <section class="section">
+        <div class="section-header">
+            <span class="section-num">01</span>
+            <h2>Data Sources</h2>
+        </div>
+        <div class="sources-list">
+            
+            <a href="https://www.cbs.nl" target="_blank" rel="noopener" class="source-card" style="border-top-color: var(--c-socio);">
+                <span class="source-meta">Centraal Bureau voor de Statistiek (CBS) · 2024</span>
+                <div class="source-title">Kerncijfers Wijken en Buurten</div>
+                <span class="source-link">Access Database &rarr;</span>
+            </a>
+
+            <a href="https://www.ggd.nl" target="_blank" rel="noopener" class="source-card" style="border-top-color: var(--c-pop);">
+                <span class="source-meta">Gemeentelijke Gezondheidsdienst (GGD) · 2024</span>
+                <div class="source-title">Nationale Gezondheidsmonitor</div>
+                <span class="source-link">Access Database &rarr;</span>
+            </a>
+
+        </div>
+    </section>
+
+    <!-- ── SECTION 02: CLIMATE SCENARIOS ── -->
+    <section class="section">
+        <div class="section-header">
+            <span class="section-num">02</span>
+            <h2>Climate Projections Sources </h2>
+        </div>
+        <div class="sources-list">
+
+           <a href="https://doi.org/10.1002/joc.4453" target="_blank" rel="noopener" class="source-card" style="border-top-color: var(--c-heat);">
+                <span class="source-meta">Molenaar, Heusinkveld, &amp; Steeneveld · 2016</span>
+                <div class="source-title">Projection of rural and urban human thermal comfort in The Netherlands for 2050</div>
+                <span class="source-link">Read more &rarr;</span>
+            </a>
+
+            <a href="https://doi.org/10.1016/j.jenvman.2004.03.015" target="_blank" rel="noopener" class="source-card" style="border-top-color: var(--c-built);">
+                <span class="source-meta">De Nijs, De Niet, &amp; Crommentuijn · 2004</span>
+                <div class="source-title">Constructing land-use maps of the Netherlands in 2030</div>
+                <span class="source-link">Read more &rarr;</span>
+            </a>
+
+            <a href="https://doi.org/10.1016/j.landusepol.2019.104107" target="_blank" rel="noopener" class="source-card" style="border-top-color: var(--c-socio);">
+                <span class="source-meta">Beunen, Meijer, &amp; De Vries · 2020</span>
+                <div class="source-title">Planning strategies for dealing with population decline: Experiences from the Netherlands</div>
+                <span class="source-link">Read more &rarr;</span>
+            </a>
+
+            <a href="https://doi.org/10.60923/issn.2612-0496/18797" target="_blank" rel="noopener" class="source-card" style="border-top-color: var(--accent);">
+                <span class="source-meta">Nabielek · 2024</span>
+                <div class="source-title">Mapping Scenarios for the Netherlands in 2050</div>
+                <span class="source-link">Read more &rarr;</span>
+            </a>
+
+            <a href="https://www.pbl.nl/en/publications/regional-population-and-household-projections-2011-2040-marked-regional-differences#specifications" target="_blank" rel="noopener" class="source-card" style="border-top-color: var(--c-pop);">
+                <span class="source-meta">Planbureau voor de Leefomgeving (PBL) / CBS</span>
+                <div class="source-title">Regional population and household projections 2011–2040</div>
+                <span class="source-link">Read more &rarr;</span>
+            </a>
+
+            <a href="https://cdn.knmi.nl/system/ckeditor/attachment_files/data/000/000/358/original/KNMI23_climate_scenarios_user_report.pdf" target="_blank" rel="noopener" class="source-card" style="border-top-color: var(--heat);">
+                <span class="source-meta">Koninklijk Nederlands Meteorologisch Instituut (KNMI)</span>
+                <div class="source-title">KNMI’23 Climate Scenarios for the Netherlands</div>
+                <span class="source-link">Read more &rarr;</span>
+            </a>
+
+        </div>
+    </section>
+        <!-- ── SECTION 03: Intervention  ── -->
+    <section class="section">
+        <div class="section-header">
+            <span class="section-num">03</span>
+            <h2>Interventions Sources  </h2>
+        </div>
+        <div class="sources-list">
+
+
+        </div>
+    </section>
+
+</div>
+
+<footer>
+    <div style="max-width:var(--w);margin:0 auto">
+        <p><strong>Heat Vulnerability Tool</strong> · Sources Directory</p>
+        <p style="margin-top:12px;opacity:.85">Data pipeline processed across CBS · GGD · RIVM · KlimaatAtlas parameters.</p>
+    </div>
+</footer>
+
+<script src="nav.js" defer></script>
+</body>
+</html>
